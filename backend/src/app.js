@@ -37,6 +37,11 @@ app.get('/health', (req, res) => {
 
 // Routes
 const authRoutes = require('./routes/auth.routes');
+console.log('Auth routes yüklendi, tip:', typeof authRoutes);
+console.log('Auth routes içeriği:', authRoutes);
+
+app.use('/api/auth', authRoutes);
+console.log('Auth routes /api/auth yoluna bağlandı');
 
 app.use('/api/auth', authRoutes);
 

@@ -332,12 +332,9 @@ model UserAchievement {
 // ==================== ENUMS ====================
 
 enum ExamType {
-  YKS_TYT
-  YKS_AYT
-  YKS_YDT
-  KPSS_GY
-  KPSS_GK
-  ALES
-  DGS
-  CUSTOM
+  LGS              // Ortaokul (8. sınıf) - Liseye Geçiş Sınavı
+  YKS_SAYISAL      // Lise - Sayısal (TYT + AYT Matematik-Fen)
+  YKS_ESIT_AGIRLIK // Lise - Eşit Ağırlık (TYT + AYT EA)
+  YKS_SOZEL        // Lise - Sözel (TYT + AYT Sözel)
+  YKS_DIL          // Lise - Dil (TYT + YDT)
 }

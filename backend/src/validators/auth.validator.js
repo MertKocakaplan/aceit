@@ -43,13 +43,12 @@ const registerSchema = Joi.object({
     }),
   
   examType: Joi.string()
-    .valid('YKS_TYT', 'YKS_AYT', 'YKS_YDT', 'KPSS_GY', 'KPSS_GK', 'ALES', 'DGS', 'CUSTOM')
+    .valid('LGS', 'YKS_SAYISAL', 'YKS_ESIT_AGIRLIK', 'YKS_SOZEL', 'YKS_DIL')
     .required()
     .messages({
-      'any.only': 'Geçersiz sınav türü',
+      'any.only': 'Geçersiz sınav türü. Geçerli değerler: LGS, YKS_SAYISAL, YKS_ESIT_AGIRLIK, YKS_SOZEL, YKS_DIL',
       'any.required': 'Sınav türü zorunludur',
     }),
-  
   targetDate: Joi.date()
     .optional()
     .allow(null)
