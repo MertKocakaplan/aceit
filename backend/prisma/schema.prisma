@@ -1,0 +1,343 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== AUTH & USER ====================
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  username      String    @unique
+  password      String
+  fullName      String
+  examType      ExamType
+  targetScore   Int?
+  targetDate    DateTime?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+  
+  studySessions     StudySession[]
+  studyPlans        StudyPlan[]
+  goals             StudyGoal[]
+  achievements      UserAchievement[]
+  preferences       UserPreference?
+  pomodoroSessions  PomodoroSession[]
+  aiQuestions       AIQuestionLog[]
+  examAttempts      ExamAttempt[]
+  
+  @@index([email])
+  @@index([examType])
+}
+
+model UserPreference {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  theme             String   @default("light")
+  notifications     Boolean  @default(true)
+  pomodoroWork      Int      @default(25)
+  pomodoroBreak     Int      @default(5)
+  pomodoroLongBreak Int      @default(15)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ==================== STUDY TRACKING ====================
+
+model StudySession {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  subjectId     String
+  subject       Subject  @relation(fields: [subjectId], references: [id])
+  
+  topicId       String?
+  topic         Topic?   @relation(fields: [topicId], references: [id])
+  
+  date          DateTime @default(now())
+  duration      Int
+  questionsCorrect Int   @default(0)
+  questionsWrong   Int   @default(0)
+  questionsEmpty   Int   @default(0)
+  
+  notes         String?  @db.Text
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([userId, date])
+  @@index([subjectId])
+}
+
+model Subject {
+  id            String   @id @default(uuid())
+  name          String
+  code          String   @unique
+  examType      ExamType
+  color         String   @default("#3b82f6")
+  
+  topics        Topic[]
+  studySessions StudySession[]
+  examTopics    ExamTopic[]
+  examResults   ExamResult[]
+  
+  createdAt     DateTime @default(now())
+  
+  @@index([examType])
+}
+
+model Topic {
+  id            String   @id @default(uuid())
+  subjectId     String
+  subject       Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  name          String
+  code          String
+  order         Int      @default(0)
+  
+  studySessions StudySession[]
+  examTopics    ExamTopic[]
+  
+  createdAt     DateTime @default(now())
+  
+  @@unique([subjectId, code])
+  @@index([subjectId])
+}
+
+// ==================== EXAM DATA ====================
+
+model ExamData {
+  id            String      @id @default(uuid())
+  examType      ExamType    @unique
+  year          Int
+  description   String?     @db.Text
+  
+  examTopics    ExamTopic[]
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model ExamTopic {
+  id            String   @id @default(uuid())
+  examDataId    String
+  examData      ExamData @relation(fields: [examDataId], references: [id], onDelete: Cascade)
+  
+  subjectId     String
+  subject       Subject  @relation(fields: [subjectId], references: [id])
+  
+  topicId       String?
+  topic         Topic?   @relation(fields: [topicId], references: [id])
+  
+  outcome       String
+  weight        Float
+  questionCount Int      @default(0)
+  
+  createdAt     DateTime @default(now())
+  
+  @@index([examDataId])
+  @@index([subjectId])
+}
+
+// ==================== EXAM ATTEMPTS (DENEME) ====================
+
+model ExamAttempt {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  examType      String
+  examName      String
+  attemptDate   DateTime
+  
+  totalNet      Float
+  estimatedRank Int?
+  estimatedScore Float?
+  
+  notes         String?  @db.Text
+  
+  examResults   ExamResult[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([userId, attemptDate])
+}
+
+model ExamResult {
+  id              String      @id @default(uuid())
+  examAttemptId   String
+  examAttempt     ExamAttempt @relation(fields: [examAttemptId], references: [id], onDelete: Cascade)
+  
+  subjectId       String
+  subject         Subject     @relation(fields: [subjectId], references: [id])
+  
+  correct         Int
+  wrong           Int
+  empty           Int
+  net             Float
+  
+  targetNet       Float?
+  
+  createdAt       DateTime    @default(now())
+  
+  @@index([examAttemptId])
+  @@index([subjectId])
+}
+
+// ==================== PLANNING ====================
+
+model StudyPlan {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title         String
+  description   String?  @db.Text
+  startDate     DateTime
+  endDate       DateTime
+  
+  isActive      Boolean  @default(true)
+  
+  planItems     StudyPlanItem[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([userId, isActive])
+}
+
+model StudyPlanItem {
+  id            String     @id @default(uuid())
+  planId        String
+  plan          StudyPlan  @relation(fields: [planId], references: [id], onDelete: Cascade)
+  
+  dayOfWeek     Int
+  startTime     String
+  endTime       String
+  
+  subjectId     String?
+  topicName     String?
+  
+  isCompleted   Boolean    @default(false)
+  completedAt   DateTime?
+  
+  createdAt     DateTime   @default(now())
+  
+  @@index([planId])
+}
+
+model StudyGoal {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title         String
+  description   String?  @db.Text
+  targetValue   Int
+  currentValue  Int      @default(0)
+  unit          String
+  
+  deadline      DateTime?
+  isCompleted   Boolean  @default(false)
+  completedAt   DateTime?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([userId, isCompleted])
+}
+
+// ==================== POMODORO ====================
+
+model PomodoroSession {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  date          DateTime @default(now())
+  duration      Int
+  type          String
+  isCompleted   Boolean  @default(false)
+  
+  subjectName   String?
+  
+  createdAt     DateTime @default(now())
+  
+  @@index([userId, date])
+}
+
+// ==================== AI ====================
+
+model AIQuestionLog {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  questionText  String   @db.Text
+  questionImage String?
+  
+  aiResponse    String   @db.Text
+  aiModel       String
+  
+  rating        Int?
+  tokensUsed    Int?
+  
+  createdAt     DateTime @default(now())
+  
+  @@index([userId, createdAt])
+}
+
+// ==================== GAMIFICATION ====================
+
+model Achievement {
+  id            String   @id @default(uuid())
+  code          String   @unique
+  name          String
+  description   String   @db.Text
+  icon          String
+  category      String
+  
+  condition     String
+  
+  userAchievements UserAchievement[]
+  
+  createdAt     DateTime @default(now())
+}
+
+model UserAchievement {
+  id              String      @id @default(uuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  achievementId   String
+  achievement     Achievement @relation(fields: [achievementId], references: [id])
+  
+  unlockedAt      DateTime    @default(now())
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+// ==================== ENUMS ====================
+
+enum ExamType {
+  YKS_TYT
+  YKS_AYT
+  YKS_YDT
+  KPSS_GY
+  KPSS_GK
+  ALES
+  DGS
+  CUSTOM
+}

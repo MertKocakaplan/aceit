@@ -1,0 +1,120 @@
+const Joi = require('joi');
+
+/**
+ * Kayıt (Register) validasyonu
+ */
+const registerSchema = Joi.object({
+  email: Joi.string()
+    .email()
+    .required()
+    .messages({
+      'string.email': 'Geçerli bir email adresi giriniz',
+      'any.required': 'Email adresi zorunludur',
+    }),
+  
+  username: Joi.string()
+    .alphanum()
+    .min(3)
+    .max(30)
+    .required()
+    .messages({
+      'string.alphanum': 'Kullanıcı adı sadece harf ve rakam içerebilir',
+      'string.min': 'Kullanıcı adı en az 3 karakter olmalıdır',
+      'string.max': 'Kullanıcı adı en fazla 30 karakter olabilir',
+      'any.required': 'Kullanıcı adı zorunludur',
+    }),
+  
+  password: Joi.string()
+    .min(8)
+    .required()
+    .messages({
+      'string.min': 'Şifre en az 8 karakter olmalıdır',
+      'any.required': 'Şifre zorunludur',
+    }),
+  
+  fullName: Joi.string()
+    .min(2)
+    .max(100)
+    .required()
+    .messages({
+      'string.min': 'Ad Soyad en az 2 karakter olmalıdır',
+      'string.max': 'Ad Soyad en fazla 100 karakter olabilir',
+      'any.required': 'Ad Soyad zorunludur',
+    }),
+  
+  examType: Joi.string()
+    .valid('YKS_TYT', 'YKS_AYT', 'YKS_YDT', 'KPSS_GY', 'KPSS_GK', 'ALES', 'DGS', 'CUSTOM')
+    .required()
+    .messages({
+      'any.only': 'Geçersiz sınav türü',
+      'any.required': 'Sınav türü zorunludur',
+    }),
+  
+  targetDate: Joi.date()
+    .optional()
+    .allow(null)
+    .messages({
+      'date.base': 'Geçersiz tarih formatı',
+    }),
+  
+  targetScore: Joi.number()
+    .integer()
+    .min(0)
+    .optional()
+    .allow(null)
+    .messages({
+      'number.base': 'Hedef skor sayı olmalıdır',
+      'number.min': 'Hedef skor 0\'dan büyük olmalıdır',
+    }),
+});
+
+/**
+ * Giriş (Login) validasyonu
+ */
+const loginSchema = Joi.object({
+  identifier: Joi.string()
+    .required()
+    .messages({
+      'any.required': 'Email veya kullanıcı adı zorunludur',
+    }),
+  
+  password: Joi.string()
+    .required()
+    .messages({
+      'any.required': 'Şifre zorunludur',
+    }),
+});
+
+/**
+ * Validation middleware factory
+ */
+const validate = (schema) => {
+  return (req, res, next) => {
+    const { error, value } = schema.validate(req.body, {
+      abortEarly: false, // Tüm hataları göster
+      stripUnknown: true, // Bilinmeyen alanları kaldır
+    });
+
+    if (error) {
+      const errors = error.details.map(detail => ({
+        field: detail.path[0],
+        message: detail.message,
+      }));
+
+      return res.status(400).json({
+        success: false,
+        message: 'Validasyon hatası',
+        errors: errors,
+      });
+    }
+
+    // Validated data'yı request'e ekle
+    req.validatedData = value;
+    next();
+  };
+};
+
+module.exports = {
+  validateRegister: validate(registerSchema),
+  validateLogin: validate(loginSchema),
+};
