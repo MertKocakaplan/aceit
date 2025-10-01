@@ -37,13 +37,12 @@ app.get('/health', (req, res) => {
 
 // Routes
 const authRoutes = require('./routes/auth.routes');
-console.log('Auth routes yüklendi, tip:', typeof authRoutes);
-console.log('Auth routes içeriği:', authRoutes);
+const subjectRoutes = require('./routes/subject.routes');
+const studySessionRoutes = require('./routes/studySession.routes');
 
 app.use('/api/auth', authRoutes);
-console.log('Auth routes /api/auth yoluna bağlandı');
-
-app.use('/api/auth', authRoutes);
+app.use('/api/subjects', subjectRoutes);
+app.use('/api/study-sessions', studySessionRoutes);
 
 // 404 handler (route bulunamazsa)
 app.use(notFound);
