@@ -39,10 +39,12 @@ app.get('/health', (req, res) => {
 const authRoutes = require('./routes/auth.routes');
 const subjectRoutes = require('./routes/subject.routes');
 const studySessionRoutes = require('./routes/studySession.routes');
+const statsRoutes = require('./routes/stats.routes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/study-sessions', studySessionRoutes);
+app.use('/api/stats', statsRoutes);
 
 // 404 handler (route bulunamazsa)
 app.use(notFound);
