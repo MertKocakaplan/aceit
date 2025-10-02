@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './store/AuthContext';
+import { ThemeProvider } from './store/ThemeContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 // Pages
@@ -11,8 +12,9 @@ import Dashboard from './pages/Dashboard/Dashboard';
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -32,9 +34,10 @@ function App() {
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
 
-        {/* Toast Notifications */}
-        <Toaster position="top-right" richColors />
-      </AuthProvider>
+          {/* Toast Notifications */}
+          <Toaster position="top-right" richColors />
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
