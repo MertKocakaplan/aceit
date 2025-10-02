@@ -2,18 +2,25 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../store/AuthContext';
 import { statsAPI } from '../../api';
 import { Clock, Target, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, BookOpen } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { BarChart3 } from 'lucide-react';
+
 import {
   AnimatedBackground,
   DashboardHeader,
   WelcomeCard,
   StatsCard,
   ComingSoonCard,
+  AnimatedButton,
 } from '../../ui';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchStats();
@@ -99,7 +106,34 @@ const Dashboard = () => {
               />
             ))}
           </div>
-          
+              {/* Quick Action Button */}
+              <AnimatedButton
+                onClick={() => navigate('/study-sessions/create')}
+                variant="primary"
+                icon={Plus}
+                className="w-full md:w-auto"
+                delay={0.7} // AnimatedButton'a delay prop'u varsa
+              >
+                Yeni Çalışma Kaydı Ekle
+              </AnimatedButton>
+              <div className="flex gap-4">
+                <AnimatedButton
+                  onClick={() => navigate('/study-sessions')}
+                  variant="secondary"
+                  icon={BookOpen}
+                  className="flex-1 md:flex-none"
+                >
+                  Geçmişi Gör
+                </AnimatedButton>
+              </div>
+
+                <AnimatedButton
+                  onClick={() => navigate('/stats')}
+                  variant="secondary"
+                  icon={BarChart3}
+                >
+                  İstatistikler
+                </AnimatedButton>
           {/* Coming Soon */}
           <ComingSoonCard />
         </div>
