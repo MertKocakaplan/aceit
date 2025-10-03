@@ -2,14 +2,42 @@ const prisma = require('../config/database');
 const logger = require('../utils/logger');
 
 /**
- * Kullanıcının sınav türüne göre dersleri getir
- * @param {String} examType - Kullanıcının sınav türü (LGS, YKS_SAYISAL, vb.)
- * @returns {Array} Dersler listesi
+ * Ders erişim kontrolü helper fonksiyonu
  */
-const getSubjectsByExamType = async (examType) => {
+const checkSubjectAccess = (userExamType, subjectExamType) => {
+  // TYT herkese açık
+  if (subjectExamType === 'TYT') return true;
+
+  // LGS kullanıcısı sadece LGS
+  if (userExamType === 'LGS') return subjectExamType === 'LGS';
+
+  // AYT derslerini kontrol et
+  const aytAccessMap = {
+    'YKS_SAYISAL': ['AYT_MATEMATIK', 'AYT_FIZIK', 'AYT_KIMYA', 'AYT_BIYOLOJI'],
+    'YKS_ESIT_AGIRLIK': ['AYT_MATEMATIK', 'AYT_EDEBIYAT', 'AYT_TARIH', 'AYT_COGRAFYA'],
+    'YKS_SOZEL': ['AYT_EDEBIYAT', 'AYT_TARIH', 'AYT_COGRAFYA', 'AYT_FELSEFE', 'AYT_DIN'],
+  };
+
+  return aytAccessMap[userExamType]?.includes(subjectExamType) || false;
+};
+
+/**
+ * Kullanıcının erişebileceği tüm dersleri getir
+ */
+const getUserSubjects = async (userId) => {
   try {
-    const subjects = await prisma.subject.findMany({
-      where: { examType },
+    // Kullanıcının sınav türünü al
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { examType: true },
+    });
+
+    if (!user) {
+      throw new Error('Kullanıcı bulunamadı');
+    }
+
+    // Tüm dersleri getir
+    const allSubjects = await prisma.subject.findMany({
       include: {
         topics: {
           orderBy: { order: 'asc' },
@@ -24,36 +52,14 @@ const getSubjectsByExamType = async (examType) => {
       orderBy: { name: 'asc' },
     });
 
-    return subjects;
-  } catch (error) {
-    logger.error(`getSubjectsByExamType error: ${error.message}`);
-    throw error;
-  }
-};
+    // Kullanıcının erişebileceği dersleri filtrele
+    const accessibleSubjects = allSubjects.filter(subject =>
+      checkSubjectAccess(user.examType, subject.examType)
+    );
 
-/**
- * Kullanıcının çalıştığı dersleri getir (study session olanlar)
- * @param {String} userId - Kullanıcı ID
- * @returns {Array} Çalışılan dersler
- */
-const getUserSubjects = async (userId) => {
-  try {
-    // Önce kullanıcının sınav türünü al
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { examType: true },
-    });
-
-    if (!user) {
-      throw new Error('Kullanıcı bulunamadı');
-    }
-
-    // Kullanıcının sınav türüne göre dersleri getir
-    const subjects = await getSubjectsByExamType(user.examType);
-
-    // Her ders için kullanıcının çalışma istatistiklerini ekle
+    // Her ders için kullanıcının istatistiklerini ekle
     const subjectsWithStats = await Promise.all(
-      subjects.map(async (subject) => {
+      accessibleSubjects.map(async (subject) => {
         const stats = await prisma.studySession.aggregate({
           where: {
             userId,
@@ -94,9 +100,6 @@ const getUserSubjects = async (userId) => {
 
 /**
  * Ders detayını getir
- * @param {String} subjectId - Ders ID
- * @param {String} userId - Kullanıcı ID (optional, stats için)
- * @returns {Object} Ders detayı
  */
 const getSubjectById = async (subjectId, userId = null) => {
   try {
@@ -113,7 +116,7 @@ const getSubjectById = async (subjectId, userId = null) => {
       throw new Error('Ders bulunamadı');
     }
 
-    // Eğer userId verilmişse, kullanıcının bu dersteki istatistiklerini ekle
+    // userId verilmişse, kullanıcının istatistiklerini ekle
     if (userId) {
       const stats = await prisma.studySession.aggregate({
         where: {
@@ -129,7 +132,6 @@ const getSubjectById = async (subjectId, userId = null) => {
         _count: true,
       });
 
-      // Son çalışma tarihi
       const lastSession = await prisma.studySession.findFirst({
         where: {
           userId,
@@ -162,13 +164,9 @@ const getSubjectById = async (subjectId, userId = null) => {
 
 /**
  * Dersin konularını getir
- * @param {String} subjectId - Ders ID
- * @param {String} userId - Kullanıcı ID (optional, stats için)
- * @returns {Array} Konular listesi
  */
 const getSubjectTopics = async (subjectId, userId = null) => {
   try {
-    // Önce dersin var olduğunu kontrol et
     const subject = await prisma.subject.findUnique({
       where: { id: subjectId },
     });
@@ -182,7 +180,7 @@ const getSubjectTopics = async (subjectId, userId = null) => {
       orderBy: { order: 'asc' },
     });
 
-    // Eğer userId verilmişse, her konu için çalışma istatistikleri ekle
+    // userId verilmişse istatistikleri ekle
     if (userId) {
       const topicsWithStats = await Promise.all(
         topics.map(async (topic) => {
@@ -224,8 +222,8 @@ const getSubjectTopics = async (subjectId, userId = null) => {
 };
 
 module.exports = {
-  getSubjectsByExamType,
   getUserSubjects,
   getSubjectById,
   getSubjectTopics,
+  checkSubjectAccess, // Export helper
 };

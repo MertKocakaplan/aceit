@@ -1,12 +1,13 @@
 const prisma = require('../config/database');
 const logger = require('../utils/logger');
+const { checkSubjectAccess } = require('./subject.service');
 
 /**
  * Yeni çalışma kaydı oluştur
  */
 const createStudySession = async (userId, sessionData) => {
   try {
-    // Subject'in var olduğunu ve kullanıcının sınav türüne uygun olduğunu kontrol et
+    // Kullanıcı ve ders bilgisi al
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { examType: true },
@@ -20,11 +21,13 @@ const createStudySession = async (userId, sessionData) => {
       throw new Error('Ders bulunamadı');
     }
 
-    if (subject.examType !== user.examType) {
+    // Ders erişim kontrolü
+    const canAccess = checkSubjectAccess(user.examType, subject.examType);
+    if (!canAccess) {
       throw new Error('Bu ders sizin sınav türünüze uygun değil');
     }
 
-    // Eğer topicId verilmişse, topic'in bu subject'e ait olduğunu kontrol et
+    // TopicId kontrol
     if (sessionData.topicId) {
       const topic = await prisma.topic.findUnique({
         where: { id: sessionData.topicId },
@@ -46,7 +49,6 @@ const createStudySession = async (userId, sessionData) => {
         questionsCorrect: sessionData.questionsCorrect || 0,
         questionsWrong: sessionData.questionsWrong || 0,
         questionsEmpty: sessionData.questionsEmpty || 0,
-        notes: sessionData.notes || null,
       },
       include: {
         subject: {
@@ -75,7 +77,7 @@ const createStudySession = async (userId, sessionData) => {
 };
 
 /**
- * Kullanıcının çalışma kayıtlarını getir (filtreleme ile)
+ * Kullanıcının çalışma kayıtlarını getir
  */
 const getUserStudySessions = async (userId, filters = {}) => {
   try {
@@ -83,12 +85,10 @@ const getUserStudySessions = async (userId, filters = {}) => {
 
     const where = { userId };
 
-    // Subject filtresi
     if (subjectId) {
       where.subjectId = subjectId;
     }
 
-    // Tarih aralığı filtresi
     if (startDate || endDate) {
       where.date = {};
       if (startDate) where.date.gte = new Date(startDate);
@@ -146,7 +146,7 @@ const getStudySessionById = async (sessionId, userId) => {
     const studySession = await prisma.studySession.findFirst({
       where: {
         id: sessionId,
-        userId, // Güvenlik: Sadece kullanıcının kendi kayıtlarına erişim
+        userId,
       },
       include: {
         subject: {
@@ -182,7 +182,6 @@ const getStudySessionById = async (sessionId, userId) => {
  */
 const updateStudySession = async (sessionId, userId, updateData) => {
   try {
-    // Önce kaydın var olduğunu ve kullanıcıya ait olduğunu kontrol et
     const existingSession = await prisma.studySession.findFirst({
       where: {
         id: sessionId,
@@ -194,7 +193,7 @@ const updateStudySession = async (sessionId, userId, updateData) => {
       throw new Error('Çalışma kaydı bulunamadı');
     }
 
-    // Eğer subjectId değiştiriliyorsa, kontrollerini yap
+    // SubjectId değişiyorsa kontrol et
     if (updateData.subjectId && updateData.subjectId !== existingSession.subjectId) {
       const user = await prisma.user.findUnique({
         where: { id: userId },
@@ -209,7 +208,9 @@ const updateStudySession = async (sessionId, userId, updateData) => {
         throw new Error('Ders bulunamadı');
       }
 
-      if (subject.examType !== user.examType) {
+      // Ders erişim kontrolü
+      const canAccess = checkSubjectAccess(user.examType, subject.examType);
+      if (!canAccess) {
         throw new Error('Bu ders sizin sınav türünüze uygun değil');
       }
     }
@@ -249,7 +250,6 @@ const updateStudySession = async (sessionId, userId, updateData) => {
  */
 const deleteStudySession = async (sessionId, userId) => {
   try {
-    // Önce kaydın var olduğunu ve kullanıcıya ait olduğunu kontrol et
     const existingSession = await prisma.studySession.findFirst({
       where: {
         id: sessionId,
