@@ -42,8 +42,9 @@ const createUser = async (userData) => {
         targetDate: userData.targetDate || null,
         preferences: {
           create: {
-            theme: 'light',
+            theme: 'SYSTEM',
             notifications: true,
+            soundEnabled: true,
             pomodoroWork: 25,
             pomodoroBreak: 5,
             pomodoroLongBreak: 15,
@@ -56,6 +57,7 @@ const createUser = async (userData) => {
         username: true,
         fullName: true,
         examType: true,
+        role: true,
         targetScore: true,
         targetDate: true,
         createdAt: true,
@@ -106,6 +108,7 @@ const loginUser = async (identifier, password) => {
     const accessToken = generateToken({
       userId: user.id,
       email: user.email,
+      role: user.role, // Role ekle
     });
 
     const refreshToken = generateRefreshToken({
@@ -129,7 +132,7 @@ const loginUser = async (identifier, password) => {
 };
 
 /**
- * Kullanıcıyı ID ile bul
+ * Kullanıcıyı ID ile bul (Normal kullanıcı için)
  */
 const getUserById = async (userId) => {
   try {
@@ -141,8 +144,10 @@ const getUserById = async (userId) => {
         username: true,
         fullName: true,
         examType: true,
+        role: true,
         targetScore: true,
         targetDate: true,
+        dailyStudyGoal: true,
         createdAt: true,
         lastLoginAt: true,
       },
@@ -155,8 +160,224 @@ const getUserById = async (userId) => {
   }
 };
 
+// ==================== ADMIN FONKSİYONLARI ====================
+
+/**
+ * Admin: Tüm kullanıcıları getir
+ */
+const getAllUsers = async (filters = {}) => {
+  try {
+    const { role, examType, search, page = 1, limit = 50 } = filters;
+
+    const where = {};
+
+    if (role) {
+      where.role = role;
+    }
+
+    if (examType) {
+      where.examType = examType;
+    }
+
+    if (search) {
+      where.OR = [
+        { fullName: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        { username: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const skip = (page - 1) * limit;
+
+    const [users, totalCount] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          email: true,
+          username: true,
+          fullName: true,
+          examType: true,
+          role: true,
+          targetScore: true,
+          dailyStudyGoal: true,
+          lastLoginAt: true,
+          createdAt: true,
+          _count: {
+            select: {
+              studySessions: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: parseInt(limit),
+        skip: skip,
+      }),
+      prisma.user.count({ where }),
+    ]);
+
+    return {
+      users,
+      pagination: {
+        total: totalCount,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(totalCount / limit),
+      },
+    };
+  } catch (error) {
+    logger.error(`getAllUsers error: ${error.message}`);
+    throw error;
+  }
+};
+
+/**
+ * Admin: Kullanıcı detayı (Detaylı)
+ */
+const getUserByIdAdmin = async (userId) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        fullName: true,
+        examType: true,
+        role: true,
+        targetScore: true,
+        targetDate: true,
+        dailyStudyGoal: true,
+        lastLoginAt: true,
+        createdAt: true,
+        updatedAt: true,
+        preferences: true,
+        _count: {
+          select: {
+            studySessions: true,
+            studyPlans: true,
+            goals: true,
+            achievements: true,
+            pomodoroSessions: true,
+            aiQuestions: true,
+            examAttempts: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new Error('Kullanıcı bulunamadı');
+    }
+
+    return user;
+  } catch (error) {
+    logger.error(`getUserByIdAdmin error: ${error.message}`);
+    throw error;
+  }
+};
+
+/**
+ * Admin: Kullanıcı rolü güncelle
+ */
+const updateUserRole = async (userId, role) => {
+  try {
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { role },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        fullName: true,
+        role: true,
+      },
+    });
+
+    logger.info(`Kullanıcı rolü güncellendi: ${user.email} -> ${role}`);
+    return user;
+  } catch (error) {
+    logger.error(`updateUserRole error: ${error.message}`);
+    throw error;
+  }
+};
+
+/**
+ * Admin: Kullanıcı sil
+ */
+const deleteUser = async (userId) => {
+  try {
+    await prisma.user.delete({
+      where: { id: userId },
+    });
+
+    logger.info(`Kullanıcı silindi: ${userId}`);
+    return { message: 'Kullanıcı başarıyla silindi' };
+  } catch (error) {
+    logger.error(`deleteUser error: ${error.message}`);
+    throw error;
+  }
+};
+
+/**
+ * Admin: İstatistikler
+ */
+const getAdminStats = async () => {
+  try {
+    const [
+      totalUsers,
+      adminCount,
+      todayUsers,
+      totalSessions,
+      activeUsers,
+    ] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({ where: { role: 'ADMIN' } }),
+      prisma.user.count({
+        where: {
+          createdAt: {
+            gte: new Date(new Date().setHours(0, 0, 0, 0)),
+          },
+        },
+      }),
+      prisma.studySession.count(),
+      prisma.user.count({
+        where: {
+          lastLoginAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Son 7 gün
+          },
+        },
+      }),
+    ]);
+
+    // Sınav türüne göre dağılım
+    const examTypeDistribution = await prisma.user.groupBy({
+      by: ['examType'],
+      _count: true,
+    });
+
+    return {
+      totalUsers,
+      adminCount,
+      todayUsers,
+      totalSessions,
+      activeUsers,
+      examTypeDistribution,
+    };
+  } catch (error) {
+    logger.error(`getAdminStats error: ${error.message}`);
+    throw error;
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
   getUserById,
+  // Admin fonksiyonları
+  getAllUsers,
+  getUserByIdAdmin,
+  updateUserRole,
+  deleteUser,
+  getAdminStats,
 };

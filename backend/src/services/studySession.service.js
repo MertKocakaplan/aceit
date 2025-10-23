@@ -22,7 +22,7 @@ const createStudySession = async (userId, sessionData) => {
     }
 
     // Ders erişim kontrolü
-    const canAccess = checkSubjectAccess(user.examType, subject.examType);
+    const canAccess = checkSubjectAccess(user.examType, subject);
     if (!canAccess) {
       throw new Error('Bu ders sizin sınav türünüze uygun değil');
     }
@@ -209,7 +209,7 @@ const updateStudySession = async (sessionId, userId, updateData) => {
       }
 
       // Ders erişim kontrolü
-      const canAccess = checkSubjectAccess(user.examType, subject.examType);
+      const canAccess = checkSubjectAccess(user.examType, subject);
       if (!canAccess) {
         throw new Error('Bu ders sizin sınav türünüze uygun değil');
       }

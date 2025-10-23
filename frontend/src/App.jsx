@@ -11,7 +11,13 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import StudySessionCreate from './pages/StudySessions/StudySessionCreate';
 import StudySessionList from './pages/StudySessions/StudySessionList';
 import StatsPage from './pages/Stats/StatsPage';
-
+import StudySessionEdit from './pages/StudySessions/StudySessionEdit';
+import AdminRoute from './components/common/AdminRoute';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import ExamYears from './pages/Admin/ExamYears';
+import TopicQuestions from './pages/Admin/TopicQuestions';
+import Users from './pages/Admin/Users';
+import PomodoroTimer from './pages/Pomodoro/PomodoroTimer';
 
 function App() {
   return (
@@ -59,6 +65,55 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/study-sessions/:id/edit"
+              element={
+                <ProtectedRoute>
+                  <StudySessionEdit />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/exam-years"
+              element={
+                <AdminRoute>
+                  <ExamYears />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/topic-questions"
+              element={
+                <AdminRoute>
+                  <TopicQuestions />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <AdminRoute>
+                  <Users />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/pomodoro"
+              element={<PomodoroTimer />}
+            />
+              
 
             {/* Default Redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />

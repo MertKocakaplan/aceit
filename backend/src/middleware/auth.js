@@ -2,6 +2,7 @@ const { verifyToken } = require('../config/jwt');
 const prisma = require('../config/database');
 const logger = require('../utils/logger');
 
+
 /**
  * Token doğrulama middleware
  * Authorization header'dan token alır ve doğrular
@@ -33,6 +34,7 @@ const authenticate = async (req, res, next) => {
         username: true,
         fullName: true,
         examType: true,
+        role: true,
         targetScore: true,
         targetDate: true,
       },

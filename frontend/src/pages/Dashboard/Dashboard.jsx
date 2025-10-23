@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../store/AuthContext';
 import { statsAPI } from '../../api';
-import { Clock, Target, TrendingUp } from 'lucide-react';
+import { Clock, Target, TrendingUp, Plus, BookOpen, BarChart3, Shield, Timer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, BookOpen } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { BarChart3 } from 'lucide-react';
-
 import {
   AnimatedBackground,
   DashboardHeader,
@@ -75,13 +71,9 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
-      {/* Enhanced Animated Background */}
       <AnimatedBackground variant="dashboard" className="fixed -z-10" />
-
-      {/* Header */}
       <DashboardHeader user={user} onLogout={logout} />
 
-      {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
           {/* Welcome Card */}
@@ -106,34 +98,56 @@ const Dashboard = () => {
               />
             ))}
           </div>
-              {/* Quick Action Button */}
-              <AnimatedButton
-                onClick={() => navigate('/study-sessions/create')}
-                variant="primary"
-                icon={Plus}
-                className="w-full md:w-auto"
-                delay={0.7} // AnimatedButton'a delay prop'u varsa
-              >
-                Yeni Çalışma Kaydı Ekle
-              </AnimatedButton>
-              <div className="flex gap-4">
-                <AnimatedButton
-                  onClick={() => navigate('/study-sessions')}
-                  variant="secondary"
-                  icon={BookOpen}
-                  className="flex-1 md:flex-none"
-                >
-                  Geçmişi Gör
-                </AnimatedButton>
-              </div>
 
-                <AnimatedButton
-                  onClick={() => navigate('/stats')}
-                  variant="secondary"
-                  icon={BarChart3}
-                >
-                  İstatistikler
-                </AnimatedButton>
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <AnimatedButton
+              onClick={() => navigate('/study-sessions/create')}
+              variant="primary"
+              icon={Plus}
+              className="w-full"
+            >
+              Yeni Kayıt
+            </AnimatedButton>
+
+            <AnimatedButton
+              onClick={() => navigate('/study-sessions')}
+              variant="secondary"
+              icon={BookOpen}
+              className="w-full"
+            >
+              Geçmişi Gör
+            </AnimatedButton>
+
+            <AnimatedButton
+              onClick={() => navigate('/stats')}
+              variant="secondary"
+              icon={BarChart3}
+              className="w-full"
+            >
+              İstatistikler
+            </AnimatedButton>
+
+            {user?.role === 'ADMIN' && (
+              <AnimatedButton
+                onClick={() => navigate('/admin')}
+                variant="secondary"
+                icon={Shield}
+                className="w-full"
+              >
+                Admin Panel
+              </AnimatedButton>
+            )}
+            <AnimatedButton
+                onClick={() => navigate('/pomodoro')}
+                variant="secondary"
+                icon={Timer}
+                className="w-full"
+              >
+                Pomodoro
+              </AnimatedButton>
+          </div>
+
           {/* Coming Soon */}
           <ComingSoonCard />
         </div>

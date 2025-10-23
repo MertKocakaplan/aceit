@@ -4,6 +4,7 @@ const cors = require('cors');
 const compression = require('compression');
 const { apiLimiter } = require('./middleware/security');
 const { errorHandler, notFound } = require('./middleware/errorHandler');
+const pomodoroRoutes = require('./routes/pomodoro.routes');
 
 const app = express();
 
@@ -16,6 +17,14 @@ app.use(cors({
   credentials: true
 }));
 
+// Cache kontrolü - development için
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV !== 'production') {
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  }
+  next();
+});
+
 // Body parser
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -23,7 +32,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Compression
 app.use(compression());
 
-// Rate limiting (tüm API'ye uygula)
+// Rate limiting
 app.use('/api/', apiLimiter);
 
 // Health check
@@ -40,11 +49,21 @@ const authRoutes = require('./routes/auth.routes');
 const subjectRoutes = require('./routes/subject.routes');
 const studySessionRoutes = require('./routes/studySession.routes');
 const statsRoutes = require('./routes/stats.routes');
+const examYearRoutes = require('./routes/examYear.routes');
+const topicQuestionCountRoutes = require('./routes/topicQuestionCount.routes');
+const userRoutes = require('./routes/user.routes');
+const adminStatsRoutes = require('./routes/adminStats.routes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/study-sessions', studySessionRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/admin/exam-years', examYearRoutes);
+app.use('/api/admin/topic-question-counts', topicQuestionCountRoutes);
+app.use('/api/admin/users', userRoutes);
+app.use('/api/admin/stats', adminStatsRoutes);
+app.use('/api/pomodoro', pomodoroRoutes);
+
 
 // 404 handler (route bulunamazsa)
 app.use(notFound);

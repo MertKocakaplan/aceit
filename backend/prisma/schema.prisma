@@ -7,329 +7,336 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ==================== AUTH & USER ====================
-
 model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  username      String    @unique
-  password      String
-  fullName      String
-  examType      ExamType
-  targetScore   Int?
-  targetDate    DateTime?
-  
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  lastLoginAt   DateTime?
-  
-  studySessions     StudySession[]
-  studyPlans        StudyPlan[]
-  goals             StudyGoal[]
-  achievements      UserAchievement[]
-  preferences       UserPreference?
-  pomodoroSessions  PomodoroSession[]
-  aiQuestions       AIQuestionLog[]
-  examAttempts      ExamAttempt[]
-  
+  id               String                    @id @default(uuid())
+  email            String                    @unique
+  username         String                    @unique
+  password         String
+  fullName         String
+  examType         ExamType
+  targetScore      Int?
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+  lastLoginAt      DateTime?
+  targetDate       DateTime?
+  dailyStudyGoal   Int?
+  role             UserRole                  @default(USER)
+  aiQuestions      AIQuestionLog[]
+  examAttempts     ExamAttempt[]
+  pomodoroSessions PomodoroSession[]
+  goals            StudyGoal[]
+  studyPlans       StudyPlan[]
+  studySessions    StudySession[]
+  achievements     UserAchievement[]
+  preferences      UserPreference?
+  recommendations  UserTopicRecommendation[]
+
   @@index([email])
   @@index([examType])
+  @@map("User")
 }
 
 model UserPreference {
-  id                String   @id @default(uuid())
-  userId            String   @unique
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  theme             String   @default("light")
-  notifications     Boolean  @default(true)
-  pomodoroWork      Int      @default(25)
-  pomodoroBreak     Int      @default(5)
-  pomodoroLongBreak Int      @default(15)
-  
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                String    @id @default(uuid())
+  userId            String    @unique
+  pomodoroLongBreak Int       @default(15)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  notifications     Boolean   @default(true)
+  pomodoroBreak     Int       @default(5)
+  pomodoroWork      Int       @default(25)
+  soundEnabled      Boolean   @default(true)
+  theme             ThemeMode @default(SYSTEM)
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("UserPreference")
 }
 
-// ==================== STUDY TRACKING ====================
-
 model StudySession {
-  id            String   @id @default(uuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  subjectId     String
-  subject       Subject  @relation(fields: [subjectId], references: [id])
-  
-  topicId       String?
-  topic         Topic?   @relation(fields: [topicId], references: [id])
-  
-  date          DateTime @default(now())
-  duration      Int
-  questionsCorrect Int   @default(0)
-  questionsWrong   Int   @default(0)
-  questionsEmpty   Int   @default(0)
-  
-  notes         String?  @db.Text
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
+  id               String   @id @default(uuid())
+  userId           String
+  subjectId        String
+  topicId          String?
+  date             DateTime @default(now())
+  duration         Int
+  questionsCorrect Int      @default(0)
+  questionsWrong   Int      @default(0)
+  questionsEmpty   Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  notes            String?
+  subject          Subject  @relation(fields: [subjectId], references: [id])
+  topic            Topic?   @relation(fields: [topicId], references: [id])
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId, date])
   @@index([subjectId])
+  @@map("StudySession")
 }
 
 model Subject {
-  id            String   @id @default(uuid())
+  id            String         @id @default(uuid())
   name          String
-  code          String   @unique
+  code          String         @unique
   examType      ExamType
-  color         String   @default("#3b82f6")
-  
-  topics        Topic[]
-  studySessions StudySession[]
-  examTopics    ExamTopic[]
+  color         String         @default("#3b82f6")
+  createdAt     DateTime       @default(now())
   examResults   ExamResult[]
-  
-  createdAt     DateTime @default(now())
-  
+  examTopics    ExamTopic[]
+  studySessions StudySession[]
+  topics        Topic[]
+  pomodoroSessions PomodoroSession[]
+
   @@index([examType])
+  @@map("Subject")
 }
 
 model Topic {
-  id            String   @id @default(uuid())
-  subjectId     String
-  subject       Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  
-  name          String
-  code          String
-  order         Int      @default(0)
-  
-  studySessions StudySession[]
-  examTopics    ExamTopic[]
-  
-  createdAt     DateTime @default(now())
-  
+  id                  String                    @id @default(uuid())
+  subjectId           String
+  name                String
+  order               Int                       @default(0)
+  createdAt           DateTime                  @default(now())
+  code                String
+  averageQuestions    Float?
+  importanceScore     Float?
+  updatedAt           DateTime                  @updatedAt
+  examTopics          ExamTopic[]
+  studySessions       StudySession[]
+  subject             Subject                   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  questionCounts      TopicQuestionCount[]
+  userRecommendations UserTopicRecommendation[]
+
   @@unique([subjectId, code])
   @@index([subjectId])
+  @@map("Topic")
 }
 
-// ==================== EXAM DATA ====================
-
 model ExamData {
-  id            String      @id @default(uuid())
-  examType      ExamType    @unique
-  year          Int
-  description   String?     @db.Text
-  
-  examTopics    ExamTopic[]
-  
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id          String      @id @default(uuid())
+  examType    ExamType    @unique
+  year        Int
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  examTopics  ExamTopic[]
+
+  @@map("ExamData")
 }
 
 model ExamTopic {
   id            String   @id @default(uuid())
   examDataId    String
-  examData      ExamData @relation(fields: [examDataId], references: [id], onDelete: Cascade)
-  
   subjectId     String
-  subject       Subject  @relation(fields: [subjectId], references: [id])
-  
   topicId       String?
-  topic         Topic?   @relation(fields: [topicId], references: [id])
-  
   outcome       String
   weight        Float
   questionCount Int      @default(0)
-  
   createdAt     DateTime @default(now())
-  
+  examData      ExamData @relation(fields: [examDataId], references: [id], onDelete: Cascade)
+  subject       Subject  @relation(fields: [subjectId], references: [id])
+  topic         Topic?   @relation(fields: [topicId], references: [id])
+
   @@index([examDataId])
   @@index([subjectId])
+  @@map("ExamTopic")
 }
 
-// ==================== EXAM ATTEMPTS (DENEME) ====================
+model ExamYear {
+  id         String               @id @default(uuid())
+  year       Int                  @unique
+  examDate   DateTime?
+  isActive   Boolean              @default(false)
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  topicStats TopicQuestionCount[]
 
-model ExamAttempt {
+  @@map("ExamYear")
+}
+
+model TopicQuestionCount {
   id            String   @id @default(uuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  examType      String
-  examName      String
-  attemptDate   DateTime
-  
-  totalNet      Float
-  estimatedRank Int?
-  estimatedScore Float?
-  
-  notes         String?  @db.Text
-  
-  examResults   ExamResult[]
-  
+  topicId       String
+  examYearId    String
+  questionCount Int
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  
+  examYear      ExamYear @relation(fields: [examYearId], references: [id], onDelete: Cascade)
+  topic         Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, examYearId])
+  @@index([topicId])
+  @@index([examYearId])
+  @@map("TopicQuestionCount")
+}
+
+model UserTopicRecommendation {
+  id                 String   @id @default(uuid())
+  userId             String
+  topicId            String
+  priorityScore      Float
+  reason             String
+  recommendedMinutes Int
+  lastCalculated     DateTime @default(now())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  topic              Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+  @@index([userId, priorityScore])
+  @@map("UserTopicRecommendation")
+}
+
+model ExamAttempt {
+  id             String       @id @default(uuid())
+  userId         String
+  examType       String
+  examName       String
+  attemptDate    DateTime
+  totalNet       Float
+  estimatedRank  Int?
+  estimatedScore Float?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  examResults    ExamResult[]
+
   @@index([userId, attemptDate])
+  @@map("ExamAttempt")
 }
 
 model ExamResult {
-  id              String      @id @default(uuid())
-  examAttemptId   String
-  examAttempt     ExamAttempt @relation(fields: [examAttemptId], references: [id], onDelete: Cascade)
-  
-  subjectId       String
-  subject         Subject     @relation(fields: [subjectId], references: [id])
-  
-  correct         Int
-  wrong           Int
-  empty           Int
-  net             Float
-  
-  targetNet       Float?
-  
-  createdAt       DateTime    @default(now())
-  
+  id            String      @id @default(uuid())
+  examAttemptId String
+  subjectId     String
+  correct       Int
+  wrong         Int
+  empty         Int
+  net           Float
+  targetNet     Float?
+  createdAt     DateTime    @default(now())
+  examAttempt   ExamAttempt @relation(fields: [examAttemptId], references: [id], onDelete: Cascade)
+  subject       Subject     @relation(fields: [subjectId], references: [id])
+
   @@index([examAttemptId])
   @@index([subjectId])
+  @@map("ExamResult")
 }
 
-// ==================== PLANNING ====================
-
 model StudyPlan {
-  id            String   @id @default(uuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  title         String
-  description   String?  @db.Text
-  startDate     DateTime
-  endDate       DateTime
-  
-  isActive      Boolean  @default(true)
-  
-  planItems     StudyPlanItem[]
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
+  id          String          @id @default(uuid())
+  userId      String
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planItems   StudyPlanItem[]
+
   @@index([userId, isActive])
+  @@map("StudyPlan")
 }
 
 model StudyPlanItem {
-  id            String     @id @default(uuid())
-  planId        String
-  plan          StudyPlan  @relation(fields: [planId], references: [id], onDelete: Cascade)
-  
-  dayOfWeek     Int
-  startTime     String
-  endTime       String
-  
-  subjectId     String?
-  topicName     String?
-  
-  isCompleted   Boolean    @default(false)
-  completedAt   DateTime?
-  
-  createdAt     DateTime   @default(now())
-  
+  id          String    @id @default(uuid())
+  planId      String
+  dayOfWeek   Int
+  startTime   String
+  endTime     String
+  subjectId   String?
+  topicName   String?
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  plan        StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
   @@index([planId])
+  @@map("StudyPlanItem")
 }
 
 model StudyGoal {
-  id            String   @id @default(uuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  title         String
-  description   String?  @db.Text
-  targetValue   Int
-  currentValue  Int      @default(0)
-  unit          String
-  
-  deadline      DateTime?
-  isCompleted   Boolean  @default(false)
-  completedAt   DateTime?
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  @@index([userId, isCompleted])
-}
+  id           String    @id @default(uuid())
+  userId       String
+  title        String
+  description  String?
+  targetValue  Int
+  currentValue Int       @default(0)
+  unit         String
+  deadline     DateTime?
+  isCompleted  Boolean   @default(false)
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-// ==================== POMODORO ====================
+  @@index([userId, isCompleted])
+  @@map("StudyGoal")
+}
 
 model PomodoroSession {
-  id            String   @id @default(uuid())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  userId      String
+  date        DateTime @default(now())
+  duration    Int      // dakika cinsinden
+  mode        String   // "work" | "break" | "longBreak"
+  isCompleted Boolean  @default(true) // Tamamlandığında kaydediyoruz
+  subjectId   String?  // Opsiyonel: Hangi ders için çalışıldı
+  createdAt   DateTime @default(now())
   
-  date          DateTime @default(now())
-  duration      Int
-  type          String
-  isCompleted   Boolean  @default(false)
-  
-  subjectName   String?
-  
-  createdAt     DateTime @default(now())
-  
-  @@index([userId, date])
-}
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 
-// ==================== AI ====================
+  @@index([userId, date])
+  @@map("PomodoroSession")
+}
 
 model AIQuestionLog {
   id            String   @id @default(uuid())
   userId        String
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  questionText  String   @db.Text
+  questionText  String
   questionImage String?
-  
-  aiResponse    String   @db.Text
+  aiResponse    String
   aiModel       String
-  
   rating        Int?
   tokensUsed    Int?
-  
   createdAt     DateTime @default(now())
-  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId, createdAt])
+  @@map("AIQuestionLog")
 }
 
-// ==================== GAMIFICATION ====================
-
 model Achievement {
-  id            String   @id @default(uuid())
-  code          String   @unique
-  name          String
-  description   String   @db.Text
-  icon          String
-  category      String
-  
-  condition     String
-  
+  id               String            @id @default(uuid())
+  code             String            @unique
+  name             String
+  description      String
+  icon             String
+  category         String
+  condition        String
+  createdAt        DateTime          @default(now())
   userAchievements UserAchievement[]
-  
-  createdAt     DateTime @default(now())
+
+  @@map("Achievement")
 }
 
 model UserAchievement {
-  id              String      @id @default(uuid())
-  userId          String
-  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  achievementId   String
-  achievement     Achievement @relation(fields: [achievementId], references: [id])
-  
-  unlockedAt      DateTime    @default(now())
-  
+  id            String      @id @default(uuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime    @default(now())
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([userId, achievementId])
   @@index([userId])
+  @@map("UserAchievement")
 }
-
-// ==================== ENUMS ====================
 
 enum ExamType {
   LGS
@@ -347,4 +354,16 @@ enum ExamType {
   YKS_ESIT_AGIRLIK
   YKS_SOZEL
   YKS_DIL
+  AYT
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ThemeMode {
+  LIGHT
+  DARK
+  SYSTEM
 }

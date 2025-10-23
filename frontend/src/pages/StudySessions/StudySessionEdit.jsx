@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
 import { subjectsAPI, studySessionsAPI } from '../../api';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { Plus, Clock, BookOpen, CheckCircle, XCircle, MinusCircle, ArrowLeft } from 'lucide-react';
+import { Save, Clock, BookOpen, CheckCircle, XCircle, MinusCircle, ArrowLeft } from 'lucide-react';
 import {
   AnimatedBackground,
   GlassCard,
@@ -14,48 +14,62 @@ import {
   DashboardHeader,
 } from '../../ui';
 
-const StudySessionCreate = () => {
+const StudySessionEdit = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const { user, logout } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
   const [subjects, setSubjects] = useState([]);
-  const [loadingSubjects, setLoadingSubjects] = useState(true);
   const [focusedField, setFocusedField] = useState(null);
   const [topics, setTopics] = useState([]);
   const [loadingTopics, setLoadingTopics] = useState(false);
   
   const [formData, setFormData] = useState({
     subjectId: '',
-    topicId: '', 
     duration: '',
+    topicId: '',
     questionsCorrect: '',
     questionsWrong: '',
     questionsEmpty: '',
   });
 
   useEffect(() => {
-    fetchSubjects();
-  }, []);
+    fetchData();
+  }, [id]);
 
-  const fetchSubjects = async () => {
+  const fetchData = async () => {
     try {
-      const data = await subjectsAPI.getAll();
-      setSubjects(data);
+      const [session, subjectsData] = await Promise.all([
+        studySessionsAPI.getById(id),
+        subjectsAPI.getAll(),
+      ]);
+
+      setFormData({
+        subjectId: session.subjectId,
+        duration: session.duration.toString(),
+        questionsCorrect: session.questionsCorrect.toString(),
+        questionsWrong: session.questionsWrong.toString(),
+        questionsEmpty: session.questionsEmpty.toString(),
+      });
+
+      setSubjects(subjectsData);
     } catch (error) {
-      toast.error('Dersler yüklenemedi');
+      toast.error('Kayıt yüklenemedi');
       console.error(error);
+      navigate('/study-sessions');
     } finally {
-      setLoadingSubjects(false);
+      setLoadingData(false);
     }
   };
 
-  // Ders değişince konuları getir
+    // Ders değişince konuları getir
   const handleSubjectChange = async (e) => {
     const subjectId = e.target.value;
     setFormData({
       ...formData,
       subjectId,
-      topicId: '',
+      topicId: '', // Ders değişince konu sıfırlansın
     });
 
     if (subjectId) {
@@ -75,6 +89,7 @@ const StudySessionCreate = () => {
   };
 
   const handleChange = (e) => {
+    // Subject değişiyorsa özel handler
     if (e.target.name === 'subjectId') {
       handleSubjectChange(e);
     } else {
@@ -90,7 +105,7 @@ const StudySessionCreate = () => {
     setLoading(true);
 
     try {
-      const sessionData = {
+      const updateData = {
         subjectId: formData.subjectId,
         topicId: formData.topicId || null,
         duration: parseInt(formData.duration),
@@ -99,25 +114,35 @@ const StudySessionCreate = () => {
         questionsEmpty: parseInt(formData.questionsEmpty) || 0,
       };
 
-      await studySessionsAPI.create(sessionData);
-      toast.success('Çalışma kaydı oluşturuldu!');
-      navigate('/dashboard');
+      await studySessionsAPI.update(id, updateData);
+      toast.success('Kayıt güncellendi!');
+      navigate('/study-sessions');
     } catch (error) {
-      console.error('❌ Tam hata:', error);
-      toast.error(error.message || 'Kayıt oluşturulamadı');
+      toast.error(error.message || 'Kayıt güncellenemedi');
     } finally {
       setLoading(false);
     }
   };
 
-  // Subjects'i select options'a çevir (boş seçenek dahil)
-  const subjectOptions = [
-    { value: '', label: 'Ders Seçin' },
-    ...subjects.map(subject => ({
-      value: subject.id,
-      label: subject.name,
-    }))
-  ];
+  const subjectOptions = subjects.map(subject => ({
+    value: subject.id,
+    label: subject.name,
+  }));
+
+  if (loadingData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <AnimatedBackground variant="dashboard" className="fixed -z-10" />
+        <DashboardHeader user={user} onLogout={logout} />
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <GlassCard className="p-12 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-400">Yükleniyor...</p>
+          </GlassCard>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
@@ -127,18 +152,16 @@ const StudySessionCreate = () => {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
-          {/* Back Button */}
           <motion.button
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/study-sessions')}
             className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Dashboard'a Dön</span>
+            <span>Geçmişe Dön</span>
           </motion.button>
 
-          {/* Form Card */}
           <GlassCard className="p-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -147,19 +170,18 @@ const StudySessionCreate = () => {
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl">
-                  <Plus className="w-6 h-6 text-white" />
+                  <Save className="w-6 h-6 text-white" />
                 </div>
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-                  Yeni Çalışma Kaydı
+                  Çalışma Kaydını Düzenle
                 </h1>
               </div>
               <p className="text-gray-600 dark:text-gray-400 ml-16">
-                Bugünkü çalışmanı kaydet ve ilerlemeyi takip et
+                Çalışma bilgilerini güncelle
               </p>
             </motion.div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Subject Selection */}
               <AnimatedSelect
                 id="subjectId"
                 name="subjectId"
@@ -171,10 +193,9 @@ const StudySessionCreate = () => {
                 focusedField={focusedField}
                 icon={BookOpen}
                 options={subjectOptions}
-                disabled={loadingSubjects}
                 required
               />
-              
+
               {/* Topic Selection - Opsiyonel */}
               {formData.subjectId && (
                 <AnimatedSelect
@@ -204,7 +225,6 @@ const StudySessionCreate = () => {
                 </p>
               )}
 
-              {/* Duration */}
               <AnimatedInput
                 id="duration"
                 name="duration"
@@ -220,7 +240,6 @@ const StudySessionCreate = () => {
                 required
               />
 
-              {/* Question Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <AnimatedInput
                   id="questionsCorrect"
@@ -268,16 +287,25 @@ const StudySessionCreate = () => {
                 />
               </div>
 
-              {/* Submit Button */}
-              <AnimatedButton
-                type="submit"
-                variant="primary"
-                loading={loading}
-                icon={Plus}
-                className="w-full"
-              >
-                Kaydı Oluştur
-              </AnimatedButton>
+              <div className="flex gap-4">
+                <AnimatedButton
+                  type="button"
+                  variant="secondary"
+                  onClick={() => navigate('/study-sessions')}
+                  className="flex-1"
+                >
+                  İptal
+                </AnimatedButton>
+                <AnimatedButton
+                  type="submit"
+                  variant="primary"
+                  loading={loading}
+                  icon={Save}
+                  className="flex-1"
+                >
+                  Güncelle
+                </AnimatedButton>
+              </div>
             </form>
           </GlassCard>
         </div>
@@ -286,4 +314,4 @@ const StudySessionCreate = () => {
   );
 };
 
-export default StudySessionCreate;
+export default StudySessionEdit;

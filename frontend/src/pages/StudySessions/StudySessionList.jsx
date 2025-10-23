@@ -56,11 +56,14 @@ const StudySessionList = () => {
     setLoading(true);
     try {
       const response = await studySessionsAPI.getAll(filters);
-      setSessions(response.data);
-      setPagination(response.pagination);
+      console.log('📦 Response:', response);
+      
+      setSessions(response.data || []); 
+      setPagination(response.pagination || null);
     } catch (error) {
       toast.error('Kayıtlar yüklenemedi');
       console.error(error);
+      setSessions([]); // Hata durumunda boş array
     } finally {
       setLoading(false);
     }

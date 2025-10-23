@@ -13,10 +13,11 @@ exports.register = async (req, res, next) => {
     // Kullanıcı oluştur
     const user = await authService.createUser(userData);
 
-    // Token oluştur
+    // Token oluştur (role ekle)
     const accessToken = generateToken({
       userId: user.id,
       email: user.email,
+      role: user.role,
     });
 
     res.status(201).json({
@@ -24,7 +25,7 @@ exports.register = async (req, res, next) => {
       message: 'Kayıt başarılı! Hoş geldiniz.',
       data: {
         user,
-        token: accessToken,
+        accessToken, // Frontend ile tutarlı olması için accessToken kullan
       },
     });
   } catch (error) {
@@ -83,17 +84,18 @@ exports.refresh = async (req, res, next) => {
       throw error;
     }
 
-    // Yeni access token oluştur
+    // Yeni access token oluştur (role ekle)
     const newAccessToken = generateToken({
       userId: user.id,
       email: user.email,
+      role: user.role,
     });
 
     res.status(200).json({
       success: true,
       message: 'Token yenilendi',
       data: {
-        token: newAccessToken,
+        accessToken: newAccessToken, // Frontend ile tutarlı olması için accessToken kullan
       },
     });
   } catch (error) {
@@ -129,12 +131,12 @@ exports.logout = async (req, res, next) => {
  */
 exports.getCurrentUser = async (req, res, next) => {
   try {
-    // req.user zaten auth middleware'den geliyor
+    // req.user zaten auth middleware'den geliyor (tüm user objesi)
     const user = await authService.getUserById(req.user.id);
 
     res.status(200).json({
       success: true,
-      data: { user },
+      data: user, // sadece user döndür
     });
   } catch (error) {
     logger.error(`getCurrentUser controller error: ${error.message}`);

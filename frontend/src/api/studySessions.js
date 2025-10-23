@@ -11,7 +11,11 @@ export const studySessionsAPI = {
     if (filters.page) params.append('page', filters.page);
 
     const response = await api.get(`/study-sessions?${params.toString()}`);
-    return response;
+    // Interceptor { success, data, pagination } döndürür
+    return {
+      data: response.data,
+      pagination: response.pagination
+    };
   },
 
   // Tek kayıt
@@ -35,6 +39,6 @@ export const studySessionsAPI = {
   // Sil
   delete: async (id) => {
     const response = await api.delete(`/study-sessions/${id}`);
-    return response;
+    return response.data;
   },
 };

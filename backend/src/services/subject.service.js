@@ -4,39 +4,70 @@ const logger = require('../utils/logger');
 /**
  * Ders erişim kontrolü helper fonksiyonu
  */
-const checkSubjectAccess = (userExamType, subjectExamType) => {
-  // TYT herkese açık
-  if (subjectExamType === 'TYT') return true;
+  const checkSubjectAccess = (userExamType, subject, userRole = 'USER') => {
+    const { examType, code } = subject;
 
-  // LGS kullanıcısı sadece LGS
-  if (userExamType === 'LGS') return subjectExamType === 'LGS';
+    // Admin her şeyi görebilir
+    if (userRole === 'ADMIN') {
+      return true;
+    }
 
-  // AYT derslerini kontrol et
-  const aytAccessMap = {
-    'YKS_SAYISAL': ['AYT_MATEMATIK', 'AYT_FIZIK', 'AYT_KIMYA', 'AYT_BIYOLOJI'],
-    'YKS_ESIT_AGIRLIK': ['AYT_MATEMATIK', 'AYT_EDEBIYAT', 'AYT_TARIH', 'AYT_COGRAFYA'],
-    'YKS_SOZEL': ['AYT_EDEBIYAT', 'AYT_TARIH', 'AYT_COGRAFYA', 'AYT_FELSEFE', 'AYT_DIN'],
+    // LGS kullanıcısı sadece LGS
+    if (userExamType === 'LGS') {
+      return examType === 'LGS';
+    }
+
+    // TYT tüm YKS öğrencilerine açık
+    if (examType === 'TYT') {
+      return userExamType.startsWith('YKS_');
+    }
+
+    // AYT branşa göre filtrele
+    if (examType === 'AYT') {
+      const aytAccessMap = {
+        'YKS_SAYISAL': [
+          'AYT_MATEMATIK',
+          'AYT_GEOMETRI',
+          'AYT_FIZIK',
+          'AYT_KIMYA',
+          'AYT_BIYOLOJI'
+        ],
+        'YKS_ESIT_AGIRLIK': [
+          'AYT_MATEMATIK',
+          'AYT_GEOMETRI',
+          'AYT_EDEBIYAT',
+          'AYT_TARIH',
+          'AYT_COGRAFYA'
+        ],
+        'YKS_SOZEL': [
+          'AYT_EDEBIYAT',
+          'AYT_TARIH',
+          'AYT_COGRAFYA',
+          'AYT_FELSEFE',
+          'AYT_DIN'
+        ],
+      };
+
+      return aytAccessMap[userExamType]?.includes(code) || false;
+    }
+
+    return false;
   };
-
-  return aytAccessMap[userExamType]?.includes(subjectExamType) || false;
-};
 
 /**
  * Kullanıcının erişebileceği tüm dersleri getir
  */
 const getUserSubjects = async (userId) => {
   try {
-    // Kullanıcının sınav türünü al
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { examType: true },
+      select: { examType: true, role: true },
     });
 
     if (!user) {
       throw new Error('Kullanıcı bulunamadı');
     }
 
-    // Tüm dersleri getir
     const allSubjects = await prisma.subject.findMany({
       include: {
         topics: {
@@ -52,12 +83,11 @@ const getUserSubjects = async (userId) => {
       orderBy: { name: 'asc' },
     });
 
-    // Kullanıcının erişebileceği dersleri filtrele
+    // Kullanıcının erişebileceği dersleri filtrele (artık subject objesi gönderiyoruz)
     const accessibleSubjects = allSubjects.filter(subject =>
-      checkSubjectAccess(user.examType, subject.examType)
+      checkSubjectAccess(user.examType, subject, user.role)
     );
 
-    // Her ders için kullanıcının istatistiklerini ekle
     const subjectsWithStats = await Promise.all(
       accessibleSubjects.map(async (subject) => {
         const stats = await prisma.studySession.aggregate({
@@ -116,7 +146,6 @@ const getSubjectById = async (subjectId, userId = null) => {
       throw new Error('Ders bulunamadı');
     }
 
-    // userId verilmişse, kullanıcının istatistiklerini ekle
     if (userId) {
       const stats = await prisma.studySession.aggregate({
         where: {
@@ -180,7 +209,6 @@ const getSubjectTopics = async (subjectId, userId = null) => {
       orderBy: { order: 'asc' },
     });
 
-    // userId verilmişse istatistikleri ekle
     if (userId) {
       const topicsWithStats = await Promise.all(
         topics.map(async (topic) => {
@@ -225,5 +253,5 @@ module.exports = {
   getUserSubjects,
   getSubjectById,
   getSubjectTopics,
-  checkSubjectAccess, // Export helper
+  checkSubjectAccess,
 };
