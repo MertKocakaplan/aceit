@@ -8,28 +8,30 @@ datasource db {
 }
 
 model User {
-  id               String                    @id @default(uuid())
-  email            String                    @unique
-  username         String                    @unique
-  password         String
-  fullName         String
-  examType         ExamType
-  targetScore      Int?
-  createdAt        DateTime                  @default(now())
-  updatedAt        DateTime                  @updatedAt
-  lastLoginAt      DateTime?
-  targetDate       DateTime?
-  dailyStudyGoal   Int?
-  role             UserRole                  @default(USER)
-  aiQuestions      AIQuestionLog[]
-  examAttempts     ExamAttempt[]
-  pomodoroSessions PomodoroSession[]
-  goals            StudyGoal[]
-  studyPlans       StudyPlan[]
-  studySessions    StudySession[]
-  achievements     UserAchievement[]
-  preferences      UserPreference?
-  recommendations  UserTopicRecommendation[]
+  id                String                    @id @default(uuid())
+  email             String                    @unique
+  username          String                    @unique
+  password          String
+  fullName          String
+  examType          ExamType
+  targetScore       Int?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+  lastLoginAt       DateTime?
+  targetDate        DateTime?
+  dailyStudyGoal    Int?
+  role              UserRole                  @default(USER)
+  learningVelocity  Float                     @default(1.0)
+  aiQuestions       AIQuestionLog[]
+  examAttempts      ExamAttempt[]
+  pomodoroSessions  PomodoroSession[]
+  goals             StudyGoal[]
+  studyPlans        StudyPlan[]
+  studySessions     StudySession[]
+  achievements      UserAchievement[]
+  preferences       UserPreference?
+  recommendations   UserTopicRecommendation[]
+  spacedRepetitions UserTopicSpacedRepetition[]
 
   @@index([email])
   @@index([examType])
@@ -37,17 +39,20 @@ model User {
 }
 
 model UserPreference {
-  id                String    @id @default(uuid())
-  userId            String    @unique
-  pomodoroLongBreak Int       @default(15)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  notifications     Boolean   @default(true)
-  pomodoroBreak     Int       @default(5)
-  pomodoroWork      Int       @default(25)
-  soundEnabled      Boolean   @default(true)
-  theme             ThemeMode @default(SYSTEM)
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                      String    @id @default(uuid())
+  userId                  String    @unique
+  pomodoroLongBreak       Int       @default(15)
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  notifications           Boolean   @default(true)
+  pomodoroBreak           Int       @default(5)
+  pomodoroWork            Int       @default(25)
+  soundEnabled            Boolean   @default(true)
+  theme                   ThemeMode @default(SYSTEM)
+  dailyStudyHoursTarget   Int       @default(4)
+  preferredStudyStartHour Int?
+  preferredStudyEndHour   Int?
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("UserPreference")
 }
@@ -75,37 +80,41 @@ model StudySession {
 }
 
 model Subject {
-  id            String         @id @default(uuid())
-  name          String
-  code          String         @unique
-  examType      ExamType
-  color         String         @default("#3b82f6")
-  createdAt     DateTime       @default(now())
-  examResults   ExamResult[]
-  examTopics    ExamTopic[]
-  studySessions StudySession[]
-  topics        Topic[]
+  id               String            @id @default(uuid())
+  name             String
+  code             String            @unique
+  examType         ExamType
+  color            String            @default("#3b82f6")
+  createdAt        DateTime          @default(now())
+  examResults      ExamResult[]
+  examTopics       ExamTopic[]
   pomodoroSessions PomodoroSession[]
+  studySessions    StudySession[]
+  studyPlanSlots   StudyPlanSlot[]
+  topics           Topic[]
 
   @@index([examType])
   @@map("Subject")
 }
 
 model Topic {
-  id                  String                    @id @default(uuid())
+  id                  String                      @id @default(uuid())
   subjectId           String
   name                String
-  order               Int                       @default(0)
-  createdAt           DateTime                  @default(now())
+  order               Int                         @default(0)
+  createdAt           DateTime                    @default(now())
   code                String
   averageQuestions    Float?
   importanceScore     Float?
-  updatedAt           DateTime                  @updatedAt
+  difficultyLevel     Int                         @default(3)
+  updatedAt           DateTime                    @updatedAt
   examTopics          ExamTopic[]
   studySessions       StudySession[]
-  subject             Subject                   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  studyPlanSlots      StudyPlanSlot[]
+  subject             Subject                     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   questionCounts      TopicQuestionCount[]
   userRecommendations UserTopicRecommendation[]
+  spacedRepetitions   UserTopicSpacedRepetition[]
 
   @@unique([subjectId, code])
   @@index([subjectId])
@@ -226,37 +235,61 @@ model ExamResult {
 }
 
 model StudyPlan {
-  id          String          @id @default(uuid())
-  userId      String
-  title       String
-  description String?
-  startDate   DateTime
-  endDate     DateTime
-  isActive    Boolean         @default(true)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  planItems   StudyPlanItem[]
+  id            String         @id @default(uuid())
+  userId        String
+  title         String
+  description   String?
+  startDate     DateTime
+  endDate       DateTime
+  isActive      Boolean        @default(true)
+  isAIGenerated Boolean        @default(false)
+  aiExplanation String?        @db.Text
+  weeklyGoals   String?        @db.Text
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  days          StudyPlanDay[]
 
   @@index([userId, isActive])
   @@map("StudyPlan")
 }
 
-model StudyPlanItem {
-  id          String    @id @default(uuid())
-  planId      String
-  dayOfWeek   Int
+model StudyPlanDay {
+  id               String          @id @default(uuid())
+  planId           String
+  date             DateTime
+  dayNote          String?
+  dailyGoalMinutes Int?
+  createdAt        DateTime        @default(now())
+  plan             StudyPlan       @relation(fields: [planId], references: [id], onDelete: Cascade)
+  slots            StudyPlanSlot[]
+
+  @@unique([planId, date])
+  @@index([planId, date])
+  @@map("StudyPlanDay")
+}
+
+model StudyPlanSlot {
+  id          String       @id @default(uuid())
+  dayId       String
+  subjectId   String
+  topicId     String?
   startTime   String
   endTime     String
-  subjectId   String?
-  topicName   String?
-  isCompleted Boolean   @default(false)
+  duration    Int
+  priority    Int          @default(3)
+  slotType    String       @default("study")
+  isCompleted Boolean      @default(false)
   completedAt DateTime?
-  createdAt   DateTime  @default(now())
-  plan        StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  notes       String?
+  aiReason    String?      @db.Text
+  createdAt   DateTime     @default(now())
+  day         StudyPlanDay @relation(fields: [dayId], references: [id], onDelete: Cascade)
+  subject     Subject      @relation(fields: [subjectId], references: [id])
+  topic       Topic?       @relation(fields: [topicId], references: [id])
 
-  @@index([planId])
-  @@map("StudyPlanItem")
+  @@index([dayId, startTime])
+  @@map("StudyPlanSlot")
 }
 
 model StudyGoal {
@@ -282,14 +315,13 @@ model PomodoroSession {
   id          String   @id @default(uuid())
   userId      String
   date        DateTime @default(now())
-  duration    Int      // dakika cinsinden
-  mode        String   // "work" | "break" | "longBreak"
-  isCompleted Boolean  @default(true) // Tamamlandığında kaydediyoruz
-  subjectId   String?  // Opsiyonel: Hangi ders için çalışıldı
+  duration    Int
+  isCompleted Boolean  @default(true)
   createdAt   DateTime @default(now())
-  
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  mode        String
+  subjectId   String?
+  subject     Subject? @relation(fields: [subjectId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, date])
   @@map("PomodoroSession")
@@ -338,10 +370,32 @@ model UserAchievement {
   @@map("UserAchievement")
 }
 
+model UserTopicSpacedRepetition {
+  id                 String   @id @default(uuid())
+  userId             String
+  topicId            String
+  lastStudiedAt      DateTime
+  nextReviewAt       DateTime
+  repetitionLevel    Int      @default(0)
+  easinessFactor     Float    @default(2.5)
+  consecutiveCorrect Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  topic              Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+  @@index([userId, nextReviewAt])
+  @@index([nextReviewAt])
+  @@map("UserTopicSpacedRepetition")
+}
+
 enum ExamType {
   LGS
   TYT
+  AYT
   AYT_MATEMATIK
+  AYT_GEOMETRI
   AYT_FIZIK
   AYT_KIMYA
   AYT_BIYOLOJI
@@ -354,7 +408,6 @@ enum ExamType {
   YKS_ESIT_AGIRLIK
   YKS_SOZEL
   YKS_DIL
-  AYT
 }
 
 enum UserRole {

@@ -8,7 +8,6 @@ const logger = require('../utils/logger');
 exports.getSummaryStats = async (req, res, next) => {
   try {
     const userId = req.user.id;
-
     const stats = await statsService.getSummaryStats(userId);
 
     res.status(200).json({
@@ -29,7 +28,6 @@ exports.getDailyStats = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const days = parseInt(req.query.days) || 7;
-
     const stats = await statsService.getDailyStats(userId, days);
 
     res.status(200).json({
@@ -49,7 +47,6 @@ exports.getDailyStats = async (req, res, next) => {
 exports.getWeeklyComparison = async (req, res, next) => {
   try {
     const userId = req.user.id;
-
     const stats = await statsService.getWeeklyComparison(userId);
 
     res.status(200).json({
@@ -69,7 +66,6 @@ exports.getWeeklyComparison = async (req, res, next) => {
 exports.getMonthlyComparison = async (req, res, next) => {
   try {
     const userId = req.user.id;
-
     const stats = await statsService.getMonthlyComparison(userId);
 
     res.status(200).json({
@@ -89,7 +85,6 @@ exports.getMonthlyComparison = async (req, res, next) => {
 exports.getSubjectBreakdown = async (req, res, next) => {
   try {
     const userId = req.user.id;
-
     const stats = await statsService.getSubjectBreakdown(userId);
 
     res.status(200).json({
@@ -98,6 +93,224 @@ exports.getSubjectBreakdown = async (req, res, next) => {
     });
   } catch (error) {
     logger.error(`getSubjectBreakdown controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * Streak verileri
+ * GET /api/stats/streak
+ */
+exports.getStreak = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const streak = await statsService.getStreakData(userId);
+
+    res.status(200).json({
+      success: true,
+      data: streak,
+    });
+  } catch (error) {
+    logger.error(`getStreak controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * Rekorlar
+ * GET /api/stats/records
+ */
+exports.getRecords = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const records = await statsService.getRecords(userId);
+
+    res.status(200).json({
+      success: true,
+      data: records,
+    });
+  } catch (error) {
+    logger.error(`getRecords controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * Başarı oranı trendi
+ * GET /api/stats/success-trend
+ */
+exports.getSuccessTrend = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const trend = await statsService.getSuccessRateTrend(userId);
+
+    res.status(200).json({
+      success: true,
+      data: trend,
+    });
+  } catch (error) {
+    logger.error(`getSuccessTrend controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * Hazırlık durumu
+ * GET /api/stats/preparation
+ */
+exports.getPreparation = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const preparation = await statsService.getPreparationProgress(userId);
+
+    res.status(200).json({
+      success: true,
+      data: preparation,
+    });
+  } catch (error) {
+    logger.error(`getPreparation controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * Gelişim hızı
+ * GET /api/stats/velocity
+ */
+exports.getVelocity = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const velocity = await statsService.getLearningVelocityAnalysis(userId);
+
+    res.status(200).json({
+      success: true,
+      data: velocity,
+    });
+  } catch (error) {
+    logger.error(`getVelocity controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * 
+ * GET /api/stats/overview
+ */
+exports.getOverview = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    const [
+      summary,
+      streak,
+      records,
+      successTrend,
+      preparation,
+      velocity,
+      weekly,
+      daily,
+    ] = await Promise.all([
+      statsService.getSummaryStats(userId),
+      statsService.getStreakData(userId),
+      statsService.getRecords(userId),
+      statsService.getSuccessRateTrend(userId),
+      statsService.getPreparationProgress(userId),
+      statsService.getLearningVelocityAnalysis(userId),
+      statsService.getWeeklyComparison(userId),
+      statsService.getDailyStats(userId, 7),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        summary,
+        streak,
+        records,
+        successTrend,
+        preparation,
+        velocity,
+        weekly,
+        daily,
+      },
+    });
+  } catch (error) {
+    logger.error(`getOverview controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * Yıllık aktivite (heatmap)
+ * GET /api/stats/yearly-activity
+ */
+exports.getYearlyActivity = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const activity = await statsService.getYearlyActivity(userId);
+
+    res.status(200).json({
+      success: true,
+      data: activity,
+    });
+  } catch (error) {
+    logger.error(`getYearlyActivity controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * Son 6 ay trend
+ * GET /api/stats/six-month-trend
+ */
+exports.getSixMonthTrend = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const trend = await statsService.getSixMonthTrend(userId);
+
+    res.status(200).json({
+      success: true,
+      data: trend,
+    });
+  } catch (error) {
+    logger.error(`getSixMonthTrend controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * Ders detaylı analiz
+ * GET /api/stats/subjects-detailed
+ */
+exports.getSubjectDetailedAnalysis = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const analysis = await statsService.getSubjectDetailedAnalysis(userId);
+
+    res.status(200).json({
+      success: true,
+      data: analysis,
+    });
+  } catch (error) {
+    logger.error(`getSubjectDetailedAnalysis controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * Konu detaylı analiz
+ * GET /api/stats/topics-detailed
+ */
+exports.getTopicDetailedAnalysis = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const analysis = await statsService.getTopicDetailedAnalysis(userId);
+
+    res.status(200).json({
+      success: true,
+      data: analysis,
+    });
+  } catch (error) {
+    logger.error(`getTopicDetailedAnalysis controller error: ${error.message}`);
     next(error);
   }
 };

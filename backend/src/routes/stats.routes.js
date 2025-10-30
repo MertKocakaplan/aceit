@@ -39,4 +39,64 @@ router.get('/monthly', statsController.getMonthlyComparison);
  */
 router.get('/subject-breakdown', statsController.getSubjectBreakdown);
 
+/**
+ * GET /api/stats/streak
+ * Streak verileri (üst üste çalışma)
+ */
+router.get('/streak', statsController.getStreak);
+
+/**
+ * GET /api/stats/records
+ * Rekorlar (en çok soru, en çok saat)
+ */
+router.get('/records', statsController.getRecords);
+
+/**
+ * GET /api/stats/success-trend
+ * Başarı oranı trendi (son 4 hafta)
+ */
+router.get('/success-trend', statsController.getSuccessTrend);
+
+/**
+ * GET /api/stats/preparation
+ * Hazırlık yüzdesi (konu tamamlama oranı)
+ */
+router.get('/preparation', statsController.getPreparation);
+
+/**
+ * GET /api/stats/velocity
+ * Gelişim hızı analizi
+ */
+router.get('/velocity', statsController.getVelocity);
+
+/**
+ * GET /api/stats/overview
+ * FAZ 1: Genel Özet ve Performans Analizi (Tüm veriler)
+ */
+router.get('/overview', statsController.getOverview);
+
 module.exports = router;
+
+/**
+ * GET /api/stats/yearly-activity
+ * Yıllık aktivite (heatmap için)
+ */
+router.get('/yearly-activity', statsController.getYearlyActivity);
+
+/**
+ * GET /api/stats/six-month-trend
+ * Son 6 aylık trend
+ */
+router.get('/six-month-trend', statsController.getSixMonthTrend);
+
+/**
+ * GET /api/stats/subjects-detailed
+ * Ders detaylı analiz (Dersler tab'ı için)
+ */
+router.get('/subjects-detailed', statsController.getSubjectDetailedAnalysis);
+
+/**
+ * GET /api/stats/topics-detailed
+ * Konu detaylı analiz (Konular tab'ı için)
+ */
+router.get('/topics-detailed', statsController.getTopicDetailedAnalysis);

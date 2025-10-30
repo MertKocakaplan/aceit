@@ -14,6 +14,7 @@ import {
   Filter,
   ChevronLeft,
   ChevronRight,
+  ArrowLeft,
 } from 'lucide-react';
 import {
   AnimatedBackground,
@@ -45,8 +46,9 @@ const StudySessionList = () => {
 
   const fetchSubjects = async () => {
     try {
-      const data = await subjectsAPI.getAll();
-      setSubjects(data);
+      const response = await subjectsAPI.getAll();
+      // response = { success: true, data: [...] }
+      setSubjects(response.data);
     } catch (error) {
       console.error('Subjects error:', error);
     }
@@ -127,6 +129,17 @@ const StudySessionList = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
+          {/* Back Button */}
+          <motion.button
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Dashboard'a Dön</span>
+          </motion.button>
+
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -1,6 +1,8 @@
 import api from './axios';
 
 export const studySessionsAPI = {
+  // axios interceptor zaten response.data döndürür → { success: true, data: {...}, pagination?: {...} }
+
   // Tüm çalışma kayıtları
   getAll: async (filters = {}) => {
     const params = new URLSearchParams();
@@ -9,36 +11,18 @@ export const studySessionsAPI = {
     if (filters.endDate) params.append('endDate', filters.endDate);
     if (filters.limit) params.append('limit', filters.limit);
     if (filters.page) params.append('page', filters.page);
-
-    const response = await api.get(`/study-sessions?${params.toString()}`);
-    // Interceptor { success, data, pagination } döndürür
-    return {
-      data: response.data,
-      pagination: response.pagination
-    };
+    return api.get(`/study-sessions?${params.toString()}`);
   },
 
   // Tek kayıt
-  getById: async (id) => {
-    const response = await api.get(`/study-sessions/${id}`);
-    return response.data;
-  },
+  getById: async (id) => api.get(`/study-sessions/${id}`),
 
   // Yeni kayıt oluştur
-  create: async (sessionData) => {
-    const response = await api.post('/study-sessions', sessionData);
-    return response.data;
-  },
+  create: async (sessionData) => api.post('/study-sessions', sessionData),
 
   // Güncelle
-  update: async (id, updateData) => {
-    const response = await api.put(`/study-sessions/${id}`, updateData);
-    return response.data;
-  },
+  update: async (id, updateData) => api.put(`/study-sessions/${id}`, updateData),
 
   // Sil
-  delete: async (id) => {
-    const response = await api.delete(`/study-sessions/${id}`);
-    return response.data;
-  },
+  delete: async (id) => api.delete(`/study-sessions/${id}`),
 };

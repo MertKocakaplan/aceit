@@ -38,8 +38,9 @@ const ExamYears = () => {
 
   const fetchYears = async () => {
     try {
-      const data = await adminAPI.examYears.getAll();
-      setYears(data);
+      const response = await adminAPI.examYears.getAll();
+      // response = { success: true, data: [...] }
+      setYears(response.data);
     } catch (error) {
       toast.error('Yıllar yüklenemedi');
       console.error(error);

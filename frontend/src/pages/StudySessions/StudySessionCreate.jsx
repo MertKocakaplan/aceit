@@ -39,11 +39,12 @@ const StudySessionCreate = () => {
 
   const fetchSubjects = async () => {
     try {
-      const data = await subjectsAPI.getAll();
-      setSubjects(data);
+      const response = await subjectsAPI.getAll();
+      // response = { success: true, data: [...] }
+      setSubjects(response.data);
     } catch (error) {
-      toast.error('Dersler yüklenemedi');
-      console.error(error);
+      // Hata mesajı axios interceptor tarafından gösterilecek
+      console.error('Fetch subjects error:', error);
     } finally {
       setLoadingSubjects(false);
     }
@@ -61,8 +62,9 @@ const StudySessionCreate = () => {
     if (subjectId) {
       setLoadingTopics(true);
       try {
-        const topicsData = await subjectsAPI.getTopics(subjectId);
-        setTopics(topicsData);
+        const response = await subjectsAPI.getTopics(subjectId);
+        // response = { success: true, data: [...] }
+        setTopics(response.data);
       } catch (error) {
         console.error('Konular yüklenemedi:', error);
         setTopics([]);
@@ -100,11 +102,13 @@ const StudySessionCreate = () => {
       };
 
       await studySessionsAPI.create(sessionData);
-      toast.success('Çalışma kaydı oluşturuldu!');
+      toast.success('Başarılı! 🎉', {
+        description: 'Çalışma kaydınız başarıyla oluşturuldu.',
+      });
       navigate('/dashboard');
     } catch (error) {
-      console.error('❌ Tam hata:', error);
-      toast.error(error.message || 'Kayıt oluşturulamadı');
+      // Hata mesajı axios interceptor tarafından gösterilecek
+      console.error('Create session error:', error);
     } finally {
       setLoading(false);
     }

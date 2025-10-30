@@ -55,9 +55,10 @@ const TopicQuestions = () => {
 
   const fetchYears = async () => {
     try {
-      const data = await adminAPI.examYears.getAll();
-      setYears(data);
-      const activeYear = data.find(y => y.isActive);
+      const response = await adminAPI.examYears.getAll();
+      // response = { success: true, data: [...] }
+      setYears(response.data);
+      const activeYear = response.data.find(y => y.isActive);
       if (activeYear) {
         setSelectedYear(activeYear.id);
       }
@@ -68,8 +69,9 @@ const TopicQuestions = () => {
 
   const fetchSubjects = async () => {
     try {
-      const data = await subjectsAPI.getAll();
-      setSubjects(data);
+      const response = await subjectsAPI.getAll();
+      // response = { success: true, data: [...] }
+      setSubjects(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -78,8 +80,9 @@ const TopicQuestions = () => {
   const fetchTopics = async () => {
     setLoading(true);
     try {
-      const data = await subjectsAPI.getTopics(selectedSubject);
-      setTopics(data);
+      const response = await subjectsAPI.getTopics(selectedSubject);
+      // response = { success: true, data: [...] }
+      setTopics(response.data);
     } catch (error) {
       toast.error('Konular yüklenemedi');
     } finally {
@@ -90,8 +93,10 @@ const TopicQuestions = () => {
   const fetchQuestionCounts = async () => {
     setLoading(true);
     try {
-      const data = await adminAPI.topicQuestionCounts.getByExamYear(selectedYear);
-      
+      const response = await adminAPI.topicQuestionCounts.getByExamYear(selectedYear);
+      // response = { success: true, data: [...] }
+      const data = response.data;
+
       const counts = {};
       data.forEach(item => {
         counts[item.topicId] = item.questionCount;

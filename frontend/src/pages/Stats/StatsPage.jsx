@@ -1,94 +1,163 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
-import { statsAPI } from '../../api';
+import { statsAPI, pomodoroAPI } from '../../api';
+import { generateStatsPDF } from '../../utils/pdfGenerator';
 import { motion } from 'framer-motion';
-import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
-import {
-  TrendingUp,
-  Calendar,
-  Award,
-  BarChart3,
-  PieChart as PieChartIcon,
-} from 'lucide-react';
+import { ArrowLeft, Activity, BarChart, BookOpen, Clock, FileText } from 'lucide-react';
 import {
   AnimatedBackground,
   DashboardHeader,
   GlassCard,
-  StatsCard,
 } from '../../ui';
+import StatsOverview from './StatsOverview';
+import StatsCharts from './StatsCharts';
+import ActivityHeatmap from './ActivityHeatmap';
+import SixMonthTrend from './SixMonthTrend';
+import SubjectsTab from './SubjectsTab';
+import TopicsTab from './TopicsTab';
+import PomodoroTab from './PomodoroTab';
 
 const StatsPage = () => {
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    summary: null,
-    daily: [],
-    weekly: null,
-    monthly: null,
-    subjectBreakdown: [],
-  });
-  const [timeRange, setTimeRange] = useState(7); // 7 veya 30 gün
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('overview'); // overview, subjects, topics, pomodoro, reports
+  const [overviewData, setOverviewData] = useState(null);
+  const [dailyTimeRange, setDailyTimeRange] = useState(7);
+  const [yearlyActivity, setYearlyActivity] = useState([]);
+  const [sixMonthTrend, setSixMonthTrend] = useState([]);
+  const [subjectsDetailed, setSubjectsDetailed] = useState(null);
+  const [topicsDetailed, setTopicsDetailed] = useState(null);
+  const [pomodoroStats, setPomodoroStats] = useState(null);
 
-  useEffect(() => {
-    fetchAllStats();
-  }, [timeRange]);
+useEffect(() => {
+  fetchInitialData();
+}, []);
 
-  const fetchAllStats = async () => {
-    setLoading(true);
-    try {
-      const [summary, daily, weekly, monthly, subjectBreakdown] = await Promise.all([
-        statsAPI.getSummary(),
-        statsAPI.getDaily(timeRange),
-        statsAPI.getWeekly(),
-        statsAPI.getMonthly(),
-        statsAPI.getSubjectBreakdown(),
-      ]);
+// Daily time range değişince sadece daily veriyi güncelle
+useEffect(() => {
+  if (overviewData) {
+    fetchDailyData();
+  }
+}, [dailyTimeRange]);
 
-      setStats({
-        summary,
-        daily,
-        weekly,
-        monthly,
-        subjectBreakdown,
-      });
-    } catch (error) {
-      console.error('Stats error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchInitialData = async () => {
+  setLoading(true);
+  setError(null);
+  try {
+    const [
+      overviewResponse,
+      subjectBreakdownResponse,
+      monthlyResponse,
+      dailyResponse,
+      yearlyActivityResponse,
+      sixMonthTrendResponse,
+      subjectsDetailedResponse,
+      topicsDetailedResponse,
+      pomodoroStatsResponse,
+    ] = await Promise.all([
+      statsAPI.getOverview(),
+      statsAPI.getSubjectBreakdown(),
+      statsAPI.getMonthly(),
+      statsAPI.getDaily(7),
+      statsAPI.getYearlyActivity(),
+      statsAPI.getSixMonthTrend(),
+      statsAPI.getSubjectsDetailed(),
+      statsAPI.getTopicsDetailed(),
+      pomodoroAPI.getDetailedStats(),
+    ]);
 
-  // Renk paleti
-  const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#ef4444'];
+    setOverviewData({
+      ...overviewResponse.data,
+      subjectBreakdown: subjectBreakdownResponse.data,
+      monthly: monthlyResponse.data,
+      daily: dailyResponse.data,
+    });
 
-  // Günlük veriyi grafik formatına çevir
-  const dailyChartData = stats.daily.map((day) => ({
-    date: new Date(day.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }),
-    dakika: day.duration,
-    soru: day.correct + day.wrong + day.empty,
-    doğru: day.correct,
-  }));
+    setYearlyActivity(yearlyActivityResponse.data);
+    setSixMonthTrend(sixMonthTrendResponse.data);
+    setSubjectsDetailed(subjectsDetailedResponse.data);
+    setTopicsDetailed(topicsDetailedResponse.data);
 
-  // Ders dağılımı grafik formatı
-  const subjectChartData = stats.subjectBreakdown.map((item) => ({
-    name: item.subject.name,
-    value: item.duration,
-    color: item.subject.color,
-  }));
+    console.log('🍅 Pomodoro Stats Response:', pomodoroStatsResponse);
+    console.log('🍅 Pomodoro Stats Data:', pomodoroStatsResponse.data);
+    setPomodoroStats(pomodoroStatsResponse.data);
+  } catch (err) {
+    console.error('Initial data fetch error:', err);
+    setError('İstatistikler yüklenirken bir hata oluştu');
+  } finally {
+    setLoading(false);
+  }
+};
+
+const fetchDailyData = async () => {
+  try {
+    const dailyResponse = await statsAPI.getDaily(dailyTimeRange);
+    
+    setOverviewData(prev => ({
+      ...prev,
+      daily: dailyResponse.data,
+    }));
+  } catch (err) {
+    console.error('Daily data fetch error:', err);
+  }
+};
+
+/**
+ * PDF raporu indir
+ */
+const handleDownloadPDF = () => {
+  try {
+    // Tüm verileri topla
+    const pdfData = {
+      user: {
+        name: user?.name || 'Bilinmiyor',
+        email: user?.email || 'Bilinmiyor',
+        examType: user?.examType || 'Bilinmiyor',
+      },
+      overview: overviewData,
+      subjects: subjectsDetailed,
+      topics: topicsDetailed,
+      pomodoro: pomodoroStats,
+    };
+
+    generateStatsPDF(pdfData);
+  } catch (error) {
+    console.error('PDF oluşturma hatası:', error);
+    alert('PDF oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
+  }
+};
+
+  // Tab yapısı (şimdilik sadece overview aktif, diğerleri sonra eklenecek)
+  const tabs = [
+    { 
+      id: 'overview', 
+      label: 'Genel Özet', 
+      icon: Activity,
+      available: true 
+    },
+    { 
+      id: 'subjects', 
+      label: 'Dersler', 
+      icon: BookOpen,
+      available: true
+    },
+    { 
+      id: 'topics', 
+      label: 'Konular', 
+      icon: BarChart,
+      available: true
+    },
+    { 
+      id: 'pomodoro', 
+      label: 'Pomodoro', 
+      icon: Clock,
+      available: true
+    },
+  
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
@@ -97,224 +166,203 @@ const StatsPage = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
+          {/* Back Button */}
+          <motion.button
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Dashboard'a Dön</span>
+          </motion.button>
+
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-              İstatistikler
+              İstatistikler ve Gelişim Analizi
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Çalışma performansını analiz et
+              Çalışma performansını detaylı analiz et ve gelişimini takip et
             </p>
           </motion.div>
 
-          {loading ? (
-            <GlassCard className="p-12 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-400">Yükleniyor...</p>
-            </GlassCard>
-          ) : (
-            <>
-              {/* Haftalık/Aylık Karşılaştırma */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Bu Hafta */}
-                <GlassCard className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
-                      <Calendar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
-                        Bu Hafta
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        vs Geçen Hafta
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 dark:text-gray-400">Çalışma Süresi</span>
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-gray-800 dark:text-gray-200">
-                          {Math.floor(stats.weekly.thisWeek.duration / 60)}s {stats.weekly.thisWeek.duration % 60}dk
-                        </p>
-                        <p className={`text-sm ${stats.weekly.comparison.durationChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {stats.weekly.comparison.durationChange >= 0 ? '+' : ''}{stats.weekly.comparison.durationChange}%
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 dark:text-gray-400">Doğru Cevap</span>
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-gray-800 dark:text-gray-200">
-                          {stats.weekly.thisWeek.correct}
-                        </p>
-                        <p className={`text-sm ${stats.weekly.comparison.questionsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {stats.weekly.comparison.questionsChange >= 0 ? '+' : ''}{stats.weekly.comparison.questionsChange}%
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </GlassCard>
+          {/* Tabs */}
+          <GlassCard className="p-2">
+            <div className="flex flex-wrap gap-2 items-center justify-between">
+              {/* Sol taraf - Tab butonları */}
+              <div className="flex flex-wrap gap-2">
+                {tabs.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  const isAvailable = tab.available;
 
-                {/* Bu Ay */}
-                <GlassCard className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-3 bg-purple-100 dark:bg-purple-900/50 rounded-xl">
-                      <TrendingUp className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
-                        Bu Ay
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        vs Geçen Ay
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 dark:text-gray-400">Çalışma Süresi</span>
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-gray-800 dark:text-gray-200">
-                          {Math.floor(stats.monthly.thisMonth.duration / 60)}s {stats.monthly.thisMonth.duration % 60}dk
-                        </p>
-                        <p className={`text-sm ${stats.monthly.comparison.durationChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {stats.monthly.comparison.durationChange >= 0 ? '+' : ''}{stats.monthly.comparison.durationChange}%
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 dark:text-gray-400">Doğru Cevap</span>
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-gray-800 dark:text-gray-200">
-                          {stats.monthly.thisMonth.correct}
-                        </p>
-                        <p className={`text-sm ${stats.monthly.comparison.questionsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {stats.monthly.comparison.questionsChange >= 0 ? '+' : ''}{stats.monthly.comparison.questionsChange}%
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </GlassCard>
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => isAvailable && setActiveTab(tab.id)}
+                      disabled={!isAvailable}
+                      className={`
+                        flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all
+                        ${isActive
+                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                          : isAvailable
+                          ? 'bg-white/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-gray-800/80'
+                          : 'bg-gray-100 dark:bg-gray-800/30 text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                        }
+                      `}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="text-sm">{tab.label}</span>
+                      {!isAvailable && (
+                        <span className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded">
+                          Yakında
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
 
-              {/* Günlük Çalışma Grafiği */}
-              <GlassCard className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
-                      <BarChart3 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
-                      Günlük Çalışma
-                    </h3>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setTimeRange(7)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        timeRange === 7
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-white/50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400'
-                      }`}
-                    >
-                      7 Gün
-                    </button>
-                    <button
-                      onClick={() => setTimeRange(30)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        timeRange === 30
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-white/50 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400'
-                      }`}
-                    >
-                      30 Gün
-                    </button>
-                  </div>
-                </div>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={dailyChartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="date" stroke="#6b7280" />
-                    <YAxis stroke="#6b7280" />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        border: 'none',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                      }}
-                    />
-                    <Legend />
-                    <Line type="monotone" dataKey="dakika" stroke="#3b82f6" strokeWidth={2} />
-                    <Line type="monotone" dataKey="doğru" stroke="#10b981" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </GlassCard>
+              {/* Sağ taraf - PDF İndir Butonu */}
+              {overviewData && subjectsDetailed && topicsDetailed && pomodoroStats && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleDownloadPDF}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span className="text-sm">Rapor İndir (PDF)</span>
+                </motion.button>
+              )}
+            </div>
+          </GlassCard>
 
-              {/* Ders Dağılımı */}
-              {stats.subjectBreakdown.length > 0 && (
-                <GlassCard className="p-6">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 bg-purple-100 dark:bg-purple-900/50 rounded-xl">
-                      <PieChartIcon className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
-                      Ders Dağılımı
-                    </h3>
-                  </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={subjectChartData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                          outerRadius={100}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {subjectChartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="space-y-3">
-                      {stats.subjectBreakdown.map((item, index) => (
-                        <div key={index} className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-4 h-4 rounded-full"
-                              style={{ backgroundColor: item.subject.color }}
-                            />
-                            <span className="text-gray-800 dark:text-gray-200 font-medium">
-                              {item.subject.name}
-                            </span>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-bold text-gray-800 dark:text-gray-200">
-                              {Math.floor(item.duration / 60)}s {item.duration % 60}dk
-                            </p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
-                              {item.totalQuestions} soru ({item.successRate}%)
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+          {/* Content */}
+          {loading ? (
+            <GlassCard className="p-12 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-purple-600"></div>
+                <div>
+                  <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    İstatistikler Yükleniyor
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Veriler analiz ediliyor...
+                  </p>
+                </div>
+              </div>
+            </GlassCard>
+          ) : error ? (
+            <GlassCard className="p-12 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <div className="p-4 bg-red-100 dark:bg-red-900/30 rounded-full">
+                  <svg
+                    className="w-12 h-12 text-red-600 dark:text-red-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    {error}
+                  </p>
+                  <button
+                    onClick={fetchOverviewData}
+                    className="mt-4 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+                  >
+                    Tekrar Dene
+                  </button>
+                </div>
+              </div>
+            </GlassCard>
+          ) : overviewData ? (
+            <>
+              {activeTab === 'overview' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  {/* Metrikler ve Rekorlar */}
+                  <StatsOverview data={overviewData} />
+
+                  {/* Grafikler */}
+                  <StatsCharts
+                    data={{
+                      daily: overviewData.daily || [],
+                      weekly: overviewData.weekly || { thisWeek: {}, lastWeek: {}, comparison: {} },
+                      monthly: overviewData.monthly || { thisMonth: {}, lastMonth: {}, comparison: {} },
+                      subjectBreakdown: overviewData.subjectBreakdown || [],
+                    }}
+                    onTimeRangeChange={setDailyTimeRange}
+                  />
+
+                  {/* Yıllık Aktivite Heatmap */}
+                  {yearlyActivity.length > 0 && (
+                    <ActivityHeatmap yearlyData={yearlyActivity} />
+                  )}
+
+                  {/* Son 6 Aylık Trend */}
+                  {sixMonthTrend.length > 0 && (
+                    <SixMonthTrend trendData={sixMonthTrend} />
+                  )}
+                </motion.div>
+              )}
+              {/* Dersler Tab */}
+              {activeTab === 'subjects' && subjectsDetailed && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <SubjectsTab subjectsData={subjectsDetailed} />
+                </motion.div>
+              )}
+              {/* Konular Tab */}
+              {activeTab === 'topics' && topicsDetailed && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <TopicsTab topicsData={topicsDetailed} />
+                </motion.div>
+              )}
+              {/* Pomodoro Tab */}
+              {activeTab === 'pomodoro' && pomodoroStats && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <PomodoroTab pomodoroData={pomodoroStats} />
+                </motion.div>
+              )}
+              {/* Diğer tablar için placeholder */}
+              {activeTab !== 'overview' && 
+              activeTab !== 'subjects' && 
+              activeTab !== 'topics' && 
+              activeTab !== 'pomodoro' && (
+                <GlassCard className="p-12 text-center">
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Bu bölüm çok yakında eklenecek!
+                  </p>
                 </GlassCard>
               )}
             </>
-          )}
+          ) : null}
         </div>
       </main>
     </div>

@@ -41,12 +41,22 @@ exports.saveSession = async (req, res, next) => {
 exports.getStats = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const filters = {
-      startDate: req.query.startDate,
-      endDate: req.query.endDate,
-    };
 
-    const stats = await pomodoroService.getUserPomodoroStats(userId, filters);
+    // Eğer tarih filtreleri varsa basit stats dön
+    if (req.query.startDate || req.query.endDate) {
+      const filters = {
+        startDate: req.query.startDate,
+        endDate: req.query.endDate,
+      };
+      const stats = await pomodoroService.getUserPomodoroStats(userId, filters);
+      return res.status(200).json({
+        success: true,
+        data: stats,
+      });
+    }
+
+    // Tarih filtresi yoksa detaylı stats dön (Stats sayfası için)
+    const stats = await pomodoroService.getPomodoroStats(userId);
 
     res.status(200).json({
       success: true,

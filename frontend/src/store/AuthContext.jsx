@@ -25,8 +25,9 @@ export const AuthProvider = ({ children }) => {
 
         // Token geçerliliğini kontrol et
         try {
-          const currentUser = await authAPI.getCurrentUser();
-          setUser(currentUser);
+          const response = await authAPI.getCurrentUser();
+          // response = { success: true, data: user }
+          setUser(response.data);
         } catch {
           // Token geçersiz, temizle
           logout();

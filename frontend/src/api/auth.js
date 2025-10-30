@@ -30,7 +30,7 @@ export const authAPI = {
   // Mevcut kullanıcı
   getCurrentUser: async () => {
     const response = await api.get('/auth/me');
-    return response.data; 
+    return response; // axios interceptor zaten response.data döndürür
   },
 
   // Token yenile

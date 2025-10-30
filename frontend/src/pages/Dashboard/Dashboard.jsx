@@ -24,8 +24,9 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const data = await statsAPI.getSummary();
-      setStats(data);
+      const response = await statsAPI.getSummary();
+      // response = { success: true, data: {...} }
+      setStats(response.data);
     } catch (error) {
       console.error('Stats error:', error);
     } finally {

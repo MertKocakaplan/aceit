@@ -40,10 +40,14 @@ const StudySessionEdit = () => {
 
   const fetchData = async () => {
     try {
-      const [session, subjectsData] = await Promise.all([
+      const [sessionResponse, subjectsResponse] = await Promise.all([
         studySessionsAPI.getById(id),
         subjectsAPI.getAll(),
       ]);
+
+      // API responses = { success: true, data: {...} }
+      const session = sessionResponse.data;
+      const subjectsData = subjectsResponse.data;
 
       setFormData({
         subjectId: session.subjectId,
@@ -75,8 +79,9 @@ const StudySessionEdit = () => {
     if (subjectId) {
       setLoadingTopics(true);
       try {
-        const topicsData = await subjectsAPI.getTopics(subjectId);
-        setTopics(topicsData);
+        const response = await subjectsAPI.getTopics(subjectId);
+        // response = { success: true, data: [...] }
+        setTopics(response.data);
       } catch (error) {
         console.error('Konular yüklenemedi:', error);
         setTopics([]);

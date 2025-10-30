@@ -36,10 +36,13 @@ const Login = () => {
 
     try {
       await login(formData);
-      toast.success('Giriş başarılı!');
+      toast.success('Hoş geldiniz! 🎉', {
+        description: 'Başarıyla giriş yaptınız.',
+      });
       navigate('/dashboard');
     } catch (error) {
-      toast.error(error.message || 'Giriş başarısız');
+      // Hata mesajı axios interceptor tarafından gösterilecek
+      console.error('Login error:', error);
     } finally {
       setLoading(false);
     }

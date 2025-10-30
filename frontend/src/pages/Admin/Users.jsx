@@ -38,8 +38,9 @@ const Users = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const data = await adminAPI.users.getAll(filters);
-      setUsers(data);
+      const response = await adminAPI.users.getAll(filters);
+      // response = { success: true, data: [...] }
+      setUsers(response.data);
     } catch (error) {
       toast.error('Kullanıcılar yüklenemedi');
       console.error(error);

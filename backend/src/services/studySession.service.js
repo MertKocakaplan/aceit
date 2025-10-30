@@ -1,6 +1,7 @@
 const prisma = require('../config/database');
 const logger = require('../utils/logger');
 const { checkSubjectAccess } = require('./subject.service');
+const spacedRepetitionService = require('./spacedRepetition.service');
 
 /**
  * Yeni çalışma kaydı oluştur
@@ -67,6 +68,35 @@ const createStudySession = async (userId, sessionData) => {
         },
       },
     });
+
+    // Eğer topicId varsa, spaced repetition sistemini güncelle
+    if (sessionData.topicId) {
+      try {
+        const totalQuestions =
+          (sessionData.questionsCorrect || 0) +
+          (sessionData.questionsWrong || 0) +
+          (sessionData.questionsEmpty || 0);
+
+        // Performans skorunu hesapla (0-1 arası)
+        const performanceScore =
+          totalQuestions > 0
+            ? (sessionData.questionsCorrect || 0) / totalQuestions
+            : 0.5; // Soru yoksa ortalama skor
+
+        await spacedRepetitionService.updateTopicProgress(
+          userId,
+          sessionData.topicId,
+          performanceScore
+        );
+
+        logger.info(
+          `Spaced repetition updated for topic ${sessionData.topicId} with score ${performanceScore.toFixed(2)}`
+        );
+      } catch (error) {
+        // Spaced repetition hatası çalışma kaydını etkilememeli
+        logger.error(`Spaced repetition update error: ${error.message}`);
+      }
+    }
 
     logger.info(`Yeni çalışma kaydı oluşturuldu: ${studySession.id}`);
     return studySession;
