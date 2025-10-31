@@ -7,24 +7,26 @@ const ThemeToggle = ({ className = '' }) => {
 
   return (
     <motion.button
-      whileHover={{ scale: 1.1 }}
+      whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={toggleTheme}
-      className={`relative p-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-600 dark:to-purple-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden group ${className}`}
+      className={`relative p-3 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md border-2 border-neutral-200/80 dark:border-neutral-700/80 hover:border-primary-400 dark:hover:border-primary-600 rounded-2xl shadow-elegant hover:shadow-elegant-lg transition-all duration-300 overflow-hidden group ${className}`}
       title={isDark ? 'Açık Mod' : 'Koyu Mod'}
     >
-      {/* Button Shine */}
-      <motion.div
-        animate={{
-          x: [-100, 100],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          repeatDelay: 2,
-        }}
-        className="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-      />
+      {/* Subtle dot pattern */}
+      <div className="absolute inset-0 opacity-[0.08] dark:opacity-[0.06]">
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="themeToggleDots" width="16" height="16" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="0.5" fill="currentColor" className="text-primary-700 dark:text-primary-400" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#themeToggleDots)" />
+        </svg>
+      </div>
+
+      {/* Background gradient on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary-50/0 to-secondary-50/0 group-hover:from-primary-50/50 group-hover:to-secondary-50/50 dark:group-hover:from-primary-950/50 dark:group-hover:to-secondary-950/50 transition-all duration-300" />
 
       <motion.div
         initial={{ rotate: 0 }}
@@ -32,7 +34,11 @@ const ThemeToggle = ({ className = '' }) => {
         transition={{ duration: 0.5, type: "spring" }}
         className="relative z-10"
       >
-        {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        {isDark ? (
+          <Sun className="w-5 h-5 text-primary-700 dark:text-primary-400" />
+        ) : (
+          <Moon className="w-5 h-5 text-primary-700 dark:text-primary-400" />
+        )}
       </motion.div>
     </motion.button>
   );

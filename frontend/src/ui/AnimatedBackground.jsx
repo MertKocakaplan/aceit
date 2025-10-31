@@ -1,76 +1,74 @@
 import { motion } from 'framer-motion';
 
 const AnimatedBackground = ({
-  variant = 'default', // 'default' | 'dashboard'
-  particleCount = 15,
+  variant = 'subtle', // 'subtle' | 'elegant' | 'minimal'
   className = ''
 }) => {
-  const particles = variant === 'dashboard' ? 12 : particleCount;
+  if (variant === 'minimal') {
+    return (
+      <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
+        {/* Minimal grain texture */}
+        <div className="absolute inset-0 opacity-[0.015] dark:opacity-[0.025]"
+             style={{
+               backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
+             }}
+        />
+      </div>
+    );
+  }
 
-  return (
-    <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
-      {/* Large Animated Orbs */}
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          x: [0, 30, 0],
-          y: [0, -30, 0],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-gradient-to-br from-blue-400/30 to-purple-500/30 dark:from-blue-600/15 dark:to-purple-700/15 rounded-full blur-3xl"
-      />
-      <motion.div
-        animate={{
-          scale: [1, 1.3, 1],
-          x: [0, -50, 0],
-          y: [0, 50, 0],
-        }}
-        transition={{
-          duration: 25,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute top-1/4 -right-20 w-[450px] h-[450px] bg-gradient-to-br from-purple-400/30 to-pink-500/30 dark:from-purple-600/15 dark:to-pink-700/15 rounded-full blur-3xl"
-      />
-      <motion.div
-        animate={{
-          scale: [1, 1.15, 1],
-          x: [0, 40, 0],
-          y: [0, -40, 0],
-        }}
-        transition={{
-          duration: 22,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute -bottom-20 left-1/4 w-[480px] h-[480px] bg-gradient-to-br from-indigo-400/30 to-blue-500/30 dark:from-indigo-600/15 dark:to-blue-700/15 rounded-full blur-3xl"
-      />
-
-      {/* Floating Particles */}
-      {[...Array(particles)].map((_, i) => (
+  if (variant === 'elegant') {
+    return (
+      <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
+        {/* Elegant gradient orbs */}
         <motion.div
-          key={i}
           animate={{
-            y: [0, -30, 0],
-            x: [0, Math.sin(i) * 20, 0],
-            opacity: [0.3, 0.6, 0.3],
+            scale: [1, 1.1, 1],
+            opacity: [0.03, 0.05, 0.03],
           }}
           transition={{
-            duration: 3 + i * 0.3,
+            duration: 15,
             repeat: Infinity,
-            delay: i * 0.2,
+            ease: "easeInOut"
           }}
-          className="absolute w-2 h-2 bg-white dark:bg-gray-300 rounded-full"
-          style={{
-            left: `${(i * 7) % 100}%`,
-            top: `${(i * 13) % 100}%`,
-          }}
+          className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-bl from-primary-500 via-secondary-400 to-transparent rounded-full blur-3xl"
         />
-      ))}
+        <motion.div
+          animate={{
+            scale: [1, 1.15, 1],
+            opacity: [0.02, 0.04, 0.02],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+          className="absolute bottom-0 left-0 w-[700px] h-[700px] bg-gradient-to-tr from-primary-600 via-accent-rose to-transparent rounded-full blur-3xl"
+        />
+      </div>
+    );
+  }
+
+  // Subtle variant (default)
+  return (
+    <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
+      {/* Very subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-secondary-100/30 via-white to-secondary-50/20 dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-900" />
+
+      {/* Minimal animated accent */}
+      <motion.div
+        animate={{
+          opacity: [0.02, 0.04, 0.02],
+          scale: [1, 1.05, 1],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-bl from-primary-200/20 to-transparent dark:from-primary-900/10 rounded-full blur-3xl"
+      />
     </div>
   );
 };

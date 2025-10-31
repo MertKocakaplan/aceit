@@ -3,20 +3,29 @@ import { motion } from 'framer-motion';
 const AnimatedButton = ({
   children,
   type = 'button',
-  variant = 'primary', // 'primary' | 'secondary' | 'danger'
+  variant = 'primary',
+  size = 'md',
   loading = false,
   disabled = false,
   onClick,
   className = '',
   icon: Icon,
   rightIcon: RightIcon,
-  shineEffect = true,
   ...props
 }) => {
   const variants = {
-    primary: 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white hover:shadow-purple-500/50',
-    secondary: 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-purple-500/50',
-    danger: 'bg-gradient-to-r from-red-500 to-pink-500 text-white hover:shadow-red-500/50',
+    primary: 'bg-primary-700 text-white hover:bg-primary-800 active:bg-primary-900 shadow-elegant hover:shadow-elegant-lg',
+    secondary: 'bg-secondary-500 text-primary-900 hover:bg-secondary-600 active:bg-secondary-700 shadow-elegant',
+    outline: 'bg-transparent border-2 border-primary-700 text-primary-700 hover:bg-primary-50 dark:hover:bg-primary-950 dark:text-primary-300 dark:border-primary-500',
+    ghost: 'bg-transparent text-primary-700 hover:bg-primary-50 dark:hover:bg-neutral-800 dark:text-primary-400',
+    minimal: 'bg-neutral-100 text-neutral-900 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700',
+    danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-elegant',
+  };
+
+  const sizes = {
+    sm: 'px-4 py-2 text-sm',
+    md: 'px-6 py-2.5 text-base',
+    lg: 'px-8 py-4 text-lg',
   };
 
   return (
@@ -24,48 +33,36 @@ const AnimatedButton = ({
       type={type}
       disabled={disabled || loading}
       onClick={onClick}
-      whileHover={{ scale: 1.03, y: -2 }}
-      whileTap={{ scale: 0.98 }}
-      className={`relative flex items-center justify-center gap-3 py-4 px-6 ${variants[variant]} font-bold text-lg rounded-2xl shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group ${className}`}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+      className={`
+        relative flex items-center justify-center gap-2
+        ${variants[variant]}
+        ${sizes[size]}
+        font-medium rounded-xl
+        transition-all duration-200
+        disabled:opacity-40 disabled:cursor-not-allowed
+        focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+        ${className}
+      `}
       {...props}
     >
-      {/* Animated Shine Background */}
-      {shineEffect && (
-        <motion.div
-          animate={{
-            x: [-1000, 1000],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
-        />
-      )}
-
       {/* Content */}
       {loading ? (
         <>
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full relative"
+            className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
           />
-          <span className="relative">{typeof children === 'string' ? 'Yükleniyor...' : children}</span>
+          <span>{typeof children === 'string' ? 'Yükleniyor...' : children}</span>
         </>
       ) : (
         <>
-          {Icon && <Icon className="w-6 h-6 relative" />}
-          <span className="relative">{children}</span>
-          {RightIcon && (
-            <motion.div
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              <RightIcon className="w-5 h-5 relative" />
-            </motion.div>
-          )}
+          {Icon && <Icon className="w-5 h-5" />}
+          <span>{children}</span>
+          {RightIcon && <RightIcon className="w-5 h-5" />}
         </>
       )}
     </motion.button>
