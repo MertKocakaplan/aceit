@@ -75,8 +75,6 @@ router.get('/velocity', statsController.getVelocity);
  */
 router.get('/overview', statsController.getOverview);
 
-module.exports = router;
-
 /**
  * GET /api/stats/yearly-activity
  * Yıllık aktivite (heatmap için)
@@ -100,3 +98,17 @@ router.get('/subjects-detailed', statsController.getSubjectDetailedAnalysis);
  * Konu detaylı analiz (Konular tab'ı için)
  */
 router.get('/topics-detailed', statsController.getTopicDetailedAnalysis);
+
+/**
+ * GET /api/stats/exam-countdown
+ * Sınava kalan süre bilgisi
+ */
+router.get('/exam-countdown', statsController.getExamCountdown);
+
+/**
+ * GET /api/stats/daily-guidance
+ * Günlük rehberlik
+ */
+router.get('/daily-guidance', statsController.getDailyGuidance);
+
+module.exports = router;

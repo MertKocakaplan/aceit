@@ -81,5 +81,17 @@ export const statsAPI = {
     const response = await api.get('/stats/topics-detailed');
     return response;
   },
+
+  // Sınava kalan süre
+  getExamCountdown: async () => {
+    const response = await api.get('/stats/exam-countdown');
+    return response;
+  },
+
+  // Günlük rehberlik
+  getDailyGuidance: async () => {
+    const response = await api.get('/stats/daily-guidance');
+    return response;
+  },
 };
 

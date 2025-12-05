@@ -3,21 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { LogIn, Mail, GraduationCap, Sparkles, ArrowRight } from 'lucide-react';
-import {
-  AnimatedBackground,
-  GlassCard,
-  AnimatedInput,
-  PasswordInput,
-  AnimatedButton,
-  AnimatedIcon,
-} from '../../ui';
+import { LogIn, Mail, Lock, Eye, EyeOff, ArrowRight, TrendingUp, Target, Award } from 'lucide-react';
+import { ThemeToggle } from '../../ui';
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     identifier: '',
     password: '',
@@ -41,7 +34,6 @@ const Login = () => {
       });
       navigate('/dashboard');
     } catch (error) {
-      // Hata mesajı axios interceptor tarafından gösterilecek
       console.error('Login error:', error);
     } finally {
       setLoading(false);
@@ -49,136 +41,269 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100">
-      {/* Animated Background */}
-      <AnimatedBackground />
+    <div className="min-h-screen flex relative overflow-hidden bg-gradient-to-br from-secondary-100 via-neutral-50 to-secondary-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950">
+      {/* Theme Toggle - Top Right */}
+      <div className="absolute top-6 right-6 z-50">
+        <ThemeToggle />
+      </div>
 
-      {/* Login Card */}
-      <GlassCard className="max-w-md w-full mx-4 p-8 space-y-8">
-        {/* Header with Animated Icon */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-center"
-        >
-          <AnimatedIcon
-            icon={GraduationCap}
-            variant="gradient"
-            size="lg"
-            shineEffect
-            className="mx-auto mb-4"
-          />
-
-          <motion.h2
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3 }}
-            className="text-5xl font-extrabold mb-2"
+      {/* Left Side - Form */}
+      <motion.div
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10"
+      >
+        <div className="max-w-md w-full">
+          {/* Logo/Brand */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-12"
           >
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              AceIt
-            </span>
-          </motion.h2>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-700 to-primary-900 rounded-2xl flex items-center justify-center shadow-elegant-lg">
+                <LogIn className="w-6 h-6 text-white" />
+              </div>
+              <h1 className="text-3xl font-normal text-primary-700 dark:text-primary-400 font-display tracking-wide">
+                AceIt
+              </h1>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-normal text-neutral-900 dark:text-white font-display tracking-wide mb-3">
+              Tekrar Hoş Geldin
+            </h2>
+            <p className="text-neutral-600 dark:text-neutral-400 font-sans text-lg">
+              Hesabına giriş yap ve hedeflerine doğru ilerle
+            </p>
+          </motion.div>
 
-          <motion.p
+          {/* Form */}
+          <motion.form
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-gray-600 flex items-center justify-center gap-2"
+            onSubmit={handleSubmit}
+            className="space-y-6"
           >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            {/* Email/Username Input */}
+            <div className="space-y-2">
+              <label htmlFor="identifier" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
+                Email veya Kullanıcı Adı
+              </label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors">
+                  <Mail className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
+                </div>
+                <input
+                  id="identifier"
+                  name="identifier"
+                  type="text"
+                  value={formData.identifier}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans text-neutral-900 dark:text-white"
+                  placeholder="ornek@email.com"
+                />
+              </div>
+            </div>
+
+            {/* Password Input */}
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
+                Şifre
+              </label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors">
+                  <Lock className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-12 pr-12 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans text-neutral-900 dark:text-white"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="relative w-full mt-8 bg-gradient-to-r from-primary-700 via-primary-800 to-primary-900 dark:from-primary-600 dark:via-primary-700 dark:to-primary-800 text-white py-4 rounded-xl font-medium transition-all duration-300 hover:shadow-elegant-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 overflow-hidden group"
             >
-              <Sparkles className="w-4 h-4 text-purple-500" />
-            </motion.div>
-            Hesabınıza giriş yapın
-          </motion.p>
-        </motion.div>
+              {/* Button pattern */}
+              <div className="absolute inset-0 opacity-[0.08]">
+                <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <pattern id="loginButtonPattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                      <circle cx="2" cy="2" r="0.8" fill="white" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#loginButtonPattern)" />
+                </svg>
+              </div>
 
-        {/* Form with Enhanced Animations */}
-        <motion.form
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          onSubmit={handleSubmit}
-          className="space-y-6"
-        >
-          {/* Email/Username Input */}
-          <AnimatedInput
-            id="identifier"
-            name="identifier"
-            type="text"
-            label="Email veya Kullanıcı Adı"
-            value={formData.identifier}
-            onChange={handleChange}
-            onFocus={() => setFocusedField('identifier')}
-            onBlur={() => setFocusedField(null)}
-            focusedField={focusedField}
-            icon={Mail}
-            required
-          />
+              <span className="relative z-10 flex items-center justify-center gap-2 font-sans text-base">
+                {loading ? (
+                  <>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                    />
+                    Giriş yapılıyor...
+                  </>
+                ) : (
+                  <>
+                    Giriş Yap
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </span>
+            </button>
 
-          {/* Password Input */}
-          <PasswordInput
-            id="password"
-            name="password"
-            label="Şifre"
-            value={formData.password}
-            onChange={handleChange}
-            onFocus={() => setFocusedField('password')}
-            onBlur={() => setFocusedField(null)}
-            focusedField={focusedField}
-            required
-          />
+            {/* Register Link */}
+            <div className="text-center pt-6">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 font-sans">
+                Hesabın yok mu?{' '}
+                <Link
+                  to="/register"
+                  className="font-medium text-primary-700 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors underline-offset-4 hover:underline"
+                >
+                  Hemen Kayıt Ol
+                </Link>
+              </p>
+            </div>
+          </motion.form>
+        </div>
+      </motion.div>
 
-          {/* Submit Button */}
-          <AnimatedButton
-            type="submit"
-            variant="primary"
-            loading={loading}
-            icon={LogIn}
-            rightIcon={ArrowRight}
-            className="w-full"
-          >
-            Giriş Yap
-          </AnimatedButton>
-
-          {/* Register Link */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="text-center pt-2"
-          >
-            <p className="text-sm text-gray-600">
-              Hesabınız yok mu?{' '}
-              <Link
-                to="/register"
-                className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-all relative group"
-              >
-                Kayıt Ol
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
-              </Link>
-            </p>
-          </motion.div>
-        </motion.form>
-      </GlassCard>
-
-      {/* Footer */}
+      {/* Right Side - Visual/Branding */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.7 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        initial={{ x: 100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="hidden lg:flex w-1/2 relative overflow-hidden"
       >
-        <motion.p
-          whileHover={{ scale: 1.05 }}
-          className="text-sm text-gray-600 font-medium backdrop-blur-sm bg-white/40 rounded-full px-6 py-3 shadow-lg"
-        >
-          Sınavlarına hazırlanmanın en etkili yolu ✨
-        </motion.p>
+        {/* Artistic Background */}
+        <div className="absolute inset-0">
+          {/* Gradient Base */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />
+
+          {/* Cross pattern texture */}
+          <div
+            className="absolute inset-0 opacity-[0.06]"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23FFFFFF' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }}
+          />
+
+          {/* Diagonal lines */}
+          <div className="absolute inset-0 opacity-[0.15]">
+            <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="loginRightDiagonal" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                  <line x1="0" y1="0" x2="0" y2="40" stroke="white" strokeWidth="1" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#loginRightDiagonal)" />
+            </svg>
+          </div>
+
+          {/* Animated organic shapes */}
+          <motion.div
+            animate={{
+              scale: [1, 1.3, 1],
+              x: [0, 50, 0],
+              y: [0, -30, 0],
+              rotate: [0, 90, 0],
+              opacity: [0.15, 0.25, 0.15],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-secondary-400 to-secondary-600 blur-3xl"
+            style={{
+              borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
+            }}
+          />
+
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              x: [0, -40, 0],
+              y: [0, 40, 0],
+              rotate: [0, -45, 0],
+              opacity: [0.1, 0.2, 0.1],
+            }}
+            transition={{
+              duration: 25,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 5
+            }}
+            className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-primary-900 to-primary-950 blur-3xl"
+            style={{
+              borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+            }}
+          />
+        </div>
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col justify-center items-center text-white p-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="max-w-lg"
+          >
+            <h3 className="text-5xl font-normal font-display tracking-wide mb-6">
+              Başarıya Giden Yol
+            </h3>
+            <p className="text-xl text-secondary-100 font-sans mb-12 leading-relaxed">
+              Hedeflerine ulaşmanın en etkili yolu düzenli çalışma ve ilerlemeyi takip etmek
+            </p>
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 gap-4">
+              {[
+                { icon: TrendingUp, label: 'Gelişim Takibi', description: 'Her adımda ilerlemeni gör' },
+                { icon: Target, label: 'Hedefe Odaklan', description: 'Planlı ve sistematik çalış' },
+                { icon: Award, label: 'Başarı Elde Et', description: 'Hedeflerine ulaş' },
+              ].map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8 + idx * 0.1 }}
+                  className="flex items-start gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20"
+                >
+                  <div className="p-3 bg-white/10 rounded-xl">
+                    <item.icon className="w-6 h-6 text-secondary-200" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium font-sans text-lg mb-1">{item.label}</h4>
+                    <p className="text-sm text-secondary-100 font-sans">{item.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
       </motion.div>
     </div>
   );

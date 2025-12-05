@@ -1,6 +1,7 @@
 const prisma = require('../config/database');
 const logger = require('../utils/logger');
 const spacedRepetitionService = require('./spacedRepetition.service');
+const examDateService = require('./examDate.service');
 
 /**
  * Kullanıcının tam performans analizini yap
@@ -64,18 +65,28 @@ const analyzeUserPerformance = async (userId) => {
       user.examType
     );
 
-    // 9. Zaman analizi
-    const timeAnalysis = calculateTimeAvailable(user);
+    // 9. Sınav tarihi bilgisi (resmi veya kullanıcı hedefi)
+    const examDateInfo = await examDateService.getEffectiveExamDate(userId);
+
+    // 10. Zaman analizi
+    const timeAnalysis = calculateTimeAvailable(user, examDateInfo);
 
     return {
       user: {
         id: user.id,
         examType: user.examType,
-        targetDate: user.targetDate,
+        targetDate: examDateInfo.examDate, // Resmi veya kullanıcı tarihi
         targetScore: user.targetScore,
         learningVelocity: user.learningVelocity,
         dailyStudyGoal: user.dailyStudyGoal,
         preferences: user.preferences,
+      },
+      examInfo: {
+        examDate: examDateInfo.examDate,
+        daysRemaining: examDateInfo.daysRemaining,
+        source: examDateInfo.source,
+        urgencyLevel: examDateService.getUrgencyLevel(examDateInfo.daysRemaining),
+        formattedRemaining: examDateService.formatRemainingTime(examDateInfo.daysRemaining)
       },
       subjectAnalysis,
       topicAnalysis,
@@ -394,12 +405,13 @@ const prioritizeTopics = async (
 
 /**
  * Zaman analizi
+ * @param {Object} user - Kullanıcı bilgileri
+ * @param {Object} examDateInfo - examDateService'den gelen bilgi
  */
-const calculateTimeAvailable = (user) => {
-  const now = new Date();
-  const targetDate = user.targetDate ? new Date(user.targetDate) : null;
+const calculateTimeAvailable = (user, examDateInfo = {}) => {
+  const { examDate, daysRemaining, source } = examDateInfo;
 
-  if (!targetDate) {
+  if (!examDate || daysRemaining === null) {
     return {
       hasTargetDate: false,
       remainingDays: null,
@@ -407,26 +419,23 @@ const calculateTimeAvailable = (user) => {
       dailyCapacity: user.dailyStudyGoal || 4,
       studyStartHour: user.preferences?.preferredStudyStartHour || 9,
       studyEndHour: user.preferences?.preferredStudyEndHour || 22,
+      dateSource: 'none'
     };
   }
 
-  const remainingMs = targetDate - now;
-  const remainingDays = Math.max(
-    Math.ceil(remainingMs / (1000 * 60 * 60 * 24)),
-    0
-  );
   const dailyCapacity =
     user.preferences?.dailyStudyHoursTarget || user.dailyStudyGoal || 4;
-  const totalAvailableHours = remainingDays * dailyCapacity;
+  const totalAvailableHours = Math.max(0, daysRemaining) * dailyCapacity;
 
   return {
     hasTargetDate: true,
-    targetDate,
-    remainingDays,
+    targetDate: examDate,
+    remainingDays: Math.max(0, daysRemaining),
     dailyCapacity,
     totalAvailableHours,
     studyStartHour: user.preferences?.preferredStudyStartHour || 9,
     studyEndHour: user.preferences?.preferredStudyEndHour || 22,
+    dateSource: source // 'user' | 'examYear'
   };
 };
 

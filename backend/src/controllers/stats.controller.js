@@ -1,4 +1,6 @@
 const statsService = require('../services/stats.service');
+const examDateService = require('../services/examDate.service');
+const dailyGuidanceService = require('../services/dailyGuidance.service');
 const logger = require('../utils/logger');
 
 /**
@@ -311,6 +313,52 @@ exports.getTopicDetailedAnalysis = async (req, res, next) => {
     });
   } catch (error) {
     logger.error(`getTopicDetailedAnalysis controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * Sınava kalan süre bilgisi
+ * GET /api/stats/exam-countdown
+ */
+exports.getExamCountdown = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const examInfo = await examDateService.getEffectiveExamDate(userId);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        examDate: examInfo.examDate,
+        daysRemaining: examInfo.daysRemaining,
+        formattedRemaining: examDateService.formatRemainingTime(examInfo.daysRemaining),
+        urgencyLevel: examDateService.getUrgencyLevel(examInfo.daysRemaining),
+        source: examInfo.source, // 'user' | 'examYear' | 'none'
+        examType: examInfo.examType,
+        examYear: examInfo.examYear
+      },
+    });
+  } catch (error) {
+    logger.error(`getExamCountdown controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * Günlük rehberlik
+ * GET /api/stats/daily-guidance
+ */
+exports.getDailyGuidance = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const guidance = await dailyGuidanceService.getDailyGuidance(userId);
+
+    res.status(200).json({
+      success: true,
+      data: guidance,
+    });
+  } catch (error) {
+    logger.error(`getDailyGuidance controller error: ${error.message}`);
     next(error);
   }
 };

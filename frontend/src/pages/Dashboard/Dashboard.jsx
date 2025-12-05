@@ -11,67 +11,65 @@ import {
   BarChart3,
   Shield,
   Timer,
-  LogOut,
   Flame,
-  Award,
   Calendar,
   ArrowRight,
-  ChevronRight
+  ChevronRight,
+  Brain,
+  Sparkles
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { AnimatedBackground, GlassCard, AnimatedButton, ThemeToggle } from '../../ui';
+import { ThemeToggle } from '../../ui';
+import { getDailyGuidanceCache, setDailyGuidanceCache, getAIAnalysisCache } from '../../utils/aiCache';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const [stats, setStats] = useState(null);
+  const [examCountdown, setExamCountdown] = useState(null);
+  const [dailyGuidance, setDailyGuidance] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchStats();
+    fetchData();
   }, []);
 
-  const fetchStats = async () => {
+  const fetchData = async () => {
     try {
-      const response = await statsAPI.getSummary();
-      setStats(response.data);
+      // Stats ve exam countdown her zaman API'den al
+      const [statsResponse, examResponse] = await Promise.all([
+        statsAPI.getSummary(),
+        statsAPI.getExamCountdown()
+      ]);
+      setStats(statsResponse.data);
+      setExamCountdown(examResponse.data);
+
+      // Daily Guidance: Önce cache kontrol et (kullanıcıya özel)
+      let guidanceData = getDailyGuidanceCache(user?.id);
+
+      if (!guidanceData) {
+        // Cache yoksa API'den al ve cache'le
+        const response = await statsAPI.getDailyGuidance();
+        guidanceData = response.data;
+        setDailyGuidanceCache(user?.id, guidanceData);
+      }
+
+      // AI cache varsa, overview.summary'yi ekle (kullanıcıya özel)
+      const aiCache = getAIAnalysisCache(user?.id);
+      if (aiCache?.overview?.summary) {
+        guidanceData = {
+          ...guidanceData,
+          aiInsight: aiCache.overview.summary
+        };
+      }
+
+      setDailyGuidance(guidanceData);
     } catch (error) {
-      console.error('Stats error:', error);
+      console.error('Dashboard data error:', error);
     } finally {
       setLoading(false);
     }
   };
-
-  const quickActions = [
-    {
-      icon: Plus,
-      label: 'Yeni Çalışma',
-      description: 'Çalışma kaydı oluştur',
-      onClick: () => navigate('/study-sessions/create'),
-      variant: 'primary',
-    },
-    {
-      icon: BookOpen,
-      label: 'Geçmiş',
-      description: 'Çalışma geçmişini gör',
-      onClick: () => navigate('/study-sessions'),
-      variant: 'outline',
-    },
-    {
-      icon: BarChart3,
-      label: 'İstatistikler',
-      description: 'Detaylı analiz',
-      onClick: () => navigate('/stats'),
-      variant: 'outline',
-    },
-    {
-      icon: Timer,
-      label: 'Pomodoro',
-      description: 'Odaklanmış çalışma',
-      onClick: () => navigate('/pomodoro'),
-      variant: 'outline',
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-100 via-neutral-50 to-secondary-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300 relative overflow-hidden">
@@ -217,46 +215,51 @@ const Dashboard = () => {
       </div>
 
       {/* Header */}
-      <header className="relative border-b border-primary-200/30 dark:border-primary-900/30 bg-white/70 dark:bg-neutral-900/70 backdrop-blur-xl shadow-elegant">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3"
-            >
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-700 to-primary-900 rounded-2xl flex items-center justify-center shadow-elegant-lg">
-                <span className="text-white font-bold text-lg font-display">A</span>
-              </div>
-              <div>
-                <h1 className="text-2xl font-normal text-primary-700 dark:text-primary-400 font-display tracking-wide">AceIt</h1>
-                <p className="text-xs text-neutral-600 dark:text-neutral-400 font-sans">Sınav Hazırlık</p>
-              </div>
-            </motion.div>
+      <header className="relative z-20 border-b border-neutral-200/50 dark:border-neutral-800/50 bg-white/30 dark:bg-neutral-900/30 backdrop-blur-md shadow-sm">
+        {/* Decorative gradient accent */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary-400/30 dark:via-primary-600/30 to-transparent" />
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3"
-            >
+        {/* Subtle shadow gradient */}
+        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-neutral-100/20 dark:to-neutral-950/20 pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative flex items-center justify-between h-20">
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-700 to-primary-900 dark:from-primary-600 dark:to-primary-800 rounded-2xl flex items-center justify-center shadow-elegant-lg">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-2xl font-normal text-primary-700 dark:text-primary-400 font-display tracking-wide">
+                AceIt
+              </span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-4">
               <ThemeToggle />
+
               {user?.role === 'ADMIN' && (
-                <button
-                  onClick={() => navigate('/admin')}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-50/50 dark:bg-primary-950/50 text-primary-700 dark:text-primary-300 hover:bg-primary-100 dark:hover:bg-primary-900 transition-all backdrop-blur-sm"
-                >
-                  <Shield className="w-4 h-4" />
-                  <span className="text-sm font-medium hidden sm:inline">Admin</span>
-                </button>
+                <>
+                  <div className="h-8 w-px bg-neutral-300 dark:bg-neutral-700"></div>
+                  <button
+                    onClick={() => navigate('/admin')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 transition-all font-sans"
+                  >
+                    <Shield className="w-4 h-4" />
+                    <span>Admin</span>
+                  </button>
+                </>
               )}
+
+              <div className="h-8 w-px bg-neutral-300 dark:bg-neutral-700"></div>
+
               <button
                 onClick={logout}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50 text-neutral-700 dark:text-neutral-300 transition-all backdrop-blur-sm"
+                className="px-4 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-primary-700 dark:hover:text-primary-400 transition-colors font-sans"
               >
-                <LogOut className="w-4 h-4" />
-                <span className="text-sm font-medium hidden sm:inline">Çıkış</span>
+                Çıkış
               </button>
-            </motion.div>
+            </div>
           </div>
         </div>
       </header>
@@ -270,17 +273,85 @@ const Dashboard = () => {
           className="mb-12"
         >
           <div className="relative">
-            {/* Welcome Text */}
-            <div className="mb-8">
-              <h2 className="text-5xl font-light text-neutral-900 dark:text-white mb-2 font-display tracking-wide">
-                Hoş geldin,
-              </h2>
-              <p className="text-5xl font-normal text-primary-700 dark:text-primary-400 font-display tracking-wide">
-                {user?.name || user?.username || 'Kullanıcı'}
-              </p>
-              <p className="text-lg text-neutral-600 dark:text-neutral-400 mt-3 font-serif">
-                Bugün nasıl bir çalışma planın var?
-              </p>
+            {/* Welcome Text + Exam Countdown */}
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between mb-8 gap-6">
+              <div>
+                <h2 className="text-5xl font-normal text-neutral-900 dark:text-white mb-2 font-display tracking-wide">
+                  Hoş geldin,
+                </h2>
+                <p className="text-5xl font-normal text-primary-700 dark:text-primary-400 font-display tracking-wide">
+                  {user?.name || user?.username || 'Kullanıcı'}
+                </p>
+                <p className="text-lg text-neutral-600 dark:text-neutral-400 mt-3 font-serif">
+                  Bugün nasıl bir çalışma planın var?
+                </p>
+              </div>
+
+              {/* Exam Countdown Card */}
+              {examCountdown && examCountdown.daysRemaining !== null && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.15 }}
+                  className={`relative p-6 rounded-2xl border-2 min-w-[280px] overflow-hidden ${
+                    examCountdown.urgencyLevel === 'critical'
+                      ? 'bg-gradient-to-br from-red-500 to-red-700 border-red-400 text-white'
+                      : examCountdown.urgencyLevel === 'urgent'
+                      ? 'bg-gradient-to-br from-amber-500 to-orange-600 border-amber-400 text-white'
+                      : examCountdown.urgencyLevel === 'moderate'
+                      ? 'bg-gradient-to-br from-primary-500 to-primary-700 border-primary-400 text-white'
+                      : 'bg-white/80 dark:bg-neutral-800/80 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white'
+                  }`}
+                >
+                  {/* Background pattern */}
+                  <div className="absolute inset-0 opacity-10">
+                    <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <pattern id="examCountdownDots" width="16" height="16" patternUnits="userSpaceOnUse">
+                          <circle cx="2" cy="2" r="1" fill="currentColor" />
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#examCountdownDots)" />
+                    </svg>
+                  </div>
+
+                  <div className="relative">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calendar className={`w-5 h-5 ${
+                        examCountdown.urgencyLevel === 'relaxed'
+                          ? 'text-primary-600 dark:text-primary-400'
+                          : ''
+                      }`} />
+                      <span className={`text-sm font-medium ${
+                        examCountdown.urgencyLevel === 'relaxed'
+                          ? 'text-neutral-600 dark:text-neutral-400'
+                          : 'text-white/90'
+                      }`}>
+                        {examCountdown.examType} Sınavına Kalan
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-bold font-display">
+                        {examCountdown.daysRemaining}
+                      </span>
+                      <span className={`text-lg font-medium ${
+                        examCountdown.urgencyLevel === 'relaxed'
+                          ? 'text-neutral-600 dark:text-neutral-400'
+                          : 'text-white/80'
+                      }`}>
+                        gün
+                      </span>
+                    </div>
+                    <p className={`text-xs mt-1 ${
+                      examCountdown.urgencyLevel === 'relaxed'
+                        ? 'text-neutral-500 dark:text-neutral-500'
+                        : 'text-white/70'
+                    }`}>
+                      {examCountdown.formattedRemaining}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
             </div>
 
             {/* Stats Bar - Horizontal */}
@@ -352,6 +423,42 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
+        {/* Daily Guidance */}
+        {dailyGuidance && dailyGuidance.guidance && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="mb-12"
+          >
+            <div className="relative bg-gradient-to-r from-secondary-50 via-white to-secondary-50 dark:from-neutral-800/80 dark:via-neutral-800/60 dark:to-neutral-800/80 backdrop-blur-md rounded-2xl p-6 border border-secondary-200/50 dark:border-neutral-700/50 shadow-sm overflow-hidden">
+              {/* Subtle gradient accent */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-400/50 via-primary-600/80 to-primary-400/50" />
+
+              {/* Content */}
+              <div className="relative flex items-start gap-4">
+                <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-xl shrink-0">
+                  <Sparkles className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-medium text-primary-700 dark:text-primary-400 mb-1 font-sans">
+                    Günlük Rehberlik
+                  </h4>
+                  <p className="text-base text-neutral-700 dark:text-neutral-300 font-serif leading-relaxed">
+                    {dailyGuidance.guidance}
+                  </p>
+                  {/* AI Insight varsa göster */}
+                  {dailyGuidance.aiInsight && (
+                    <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-400 font-serif leading-relaxed border-t border-neutral-200/50 dark:border-neutral-700/50 pt-3">
+                      {dailyGuidance.aiInsight}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Quick Actions - Different Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
           {/* Primary Action - Larger */}
@@ -386,7 +493,7 @@ const Dashboard = () => {
                   <Plus className="w-8 h-8 text-white" />
                 </div>
                 <div className="text-left">
-                  <h3 className="text-3xl font-light text-white mb-2 font-display tracking-wide">Yeni Çalışma Başlat</h3>
+                  <h3 className="text-3xl font-normal text-white mb-2 font-display tracking-wide">Yeni Çalışma Başlat</h3>
                   <p className="text-secondary-100 font-serif text-base">Çalışma kaydı oluştur ve ilerlemeni takip et</p>
                 </div>
               </div>
@@ -401,6 +508,8 @@ const Dashboard = () => {
             className="grid grid-cols-1 gap-4"
           >
             {[
+              { icon: Calendar, label: 'Çalışma Planları', route: '/study-plans' },
+              { icon: Brain, label: 'AI Soru Çözücü', route: '/ai/question-solver' },
               { icon: BookOpen, label: 'Geçmiş', route: '/study-sessions' },
               { icon: BarChart3, label: 'İstatistikler', route: '/stats' },
               { icon: Timer, label: 'Pomodoro', route: '/pomodoro' },
@@ -426,7 +535,7 @@ const Dashboard = () => {
                   <div className="p-3 bg-primary-50 dark:bg-primary-950 rounded-xl group-hover:bg-primary-100 dark:group-hover:bg-primary-900 transition-colors">
                     <action.icon className="w-5 h-5 text-primary-700 dark:text-primary-400" />
                   </div>
-                  <span className="font-light text-neutral-900 dark:text-white font-sans text-base">{action.label}</span>
+                  <span className="font-normal text-neutral-900 dark:text-white font-sans text-base">{action.label}</span>
                 </div>
                 <ArrowRight className="relative w-5 h-5 text-neutral-400 group-hover:text-primary-700 dark:group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
               </button>
@@ -461,8 +570,8 @@ const Dashboard = () => {
 
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-3xl font-light text-neutral-900 dark:text-white font-display tracking-wide">Son Aktiviteler</h3>
-              <button className="text-primary-700 dark:text-primary-400 hover:underline text-sm font-light flex items-center gap-1 font-sans">
+              <h3 className="text-3xl font-normal text-neutral-900 dark:text-white font-display tracking-wide">Son Aktiviteler</h3>
+              <button className="text-primary-700 dark:text-primary-400 hover:underline text-sm font-normal flex items-center gap-1 font-sans">
                 Tümünü Gör
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -490,7 +599,7 @@ const StatsBarItem = ({ icon: Icon, label, value, unit, loading }) => {
       {loading ? (
         <div className="h-10 w-20 bg-white/10 rounded animate-pulse" />
       ) : (
-        <p className="text-5xl font-light text-white font-display tracking-wide">
+        <p className="text-5xl font-normal text-white font-display tracking-wide">
           {value}
           <span className="text-xl text-secondary-100 ml-2 font-normal font-serif">{unit}</span>
         </p>

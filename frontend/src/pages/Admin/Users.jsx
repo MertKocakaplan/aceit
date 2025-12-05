@@ -9,16 +9,14 @@ import {
   Shield,
   User,
   Trash2,
-  ArrowLeft,
   Search,
+  Mail,
+  Calendar,
+  Filter,
 } from 'lucide-react';
 import {
   AnimatedBackground,
   DashboardHeader,
-  GlassCard,
-  AnimatedButton,
-  AnimatedInput,
-  AnimatedSelect,
 } from '../../ui';
 
 const Users = () => {
@@ -39,7 +37,6 @@ const Users = () => {
     setLoading(true);
     try {
       const response = await adminAPI.users.getAll(filters);
-      // response = { success: true, data: [...] }
       setUsers(response.data);
     } catch (error) {
       toast.error('Kullanıcılar yüklenemedi');
@@ -91,15 +88,15 @@ const Users = () => {
   const getRoleBadge = (role) => {
     if (role === 'ADMIN') {
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full text-xs font-medium">
-          <Shield className="w-3 h-3" />
+        <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 rounded-xl text-xs font-medium border-2 border-purple-200 dark:border-purple-800 font-display">
+          <Shield className="w-3.5 h-3.5" />
           Admin
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-xs font-medium">
-        <User className="w-3 h-3" />
+      <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-xl text-xs font-medium border-2 border-blue-200 dark:border-blue-800 font-display">
+        <User className="w-3.5 h-3.5" />
         Kullanıcı
       </span>
     );
@@ -116,7 +113,7 @@ const Users = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300">
       <AnimatedBackground variant="dashboard" className="fixed -z-10" />
       <DashboardHeader user={user} onLogout={logout} />
 
@@ -127,70 +124,81 @@ const Users = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <button
-              onClick={() => navigate('/admin')}
-              className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors mb-4"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Admin Panel'e Dön</span>
-            </button>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-              Kullanıcı Yönetimi
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Kullanıcıları görüntüle ve yönet
-            </p>
+            <div className="flex items-center gap-4">
+              <div className="p-4 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl shadow-elegant">
+                <UsersIcon className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-normal bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent font-display">
+                  Kullanıcı Yönetimi
+                </h1>
+                <p className="text-neutral-600 dark:text-neutral-400 mt-1 font-display">
+                  {users.length} kullanıcı yönetiliyor
+                </p>
+              </div>
+            </div>
           </motion.div>
 
           {/* Filters */}
-          <GlassCard className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2">
-                <AnimatedInput
-                  id="search"
-                  name="search"
-                  type="text"
-                  placeholder="Email, kullanıcı adı veya ad ile ara..."
-                  value={filters.search}
-                  onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                  icon={Search}
-                />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="relative bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant overflow-hidden"
+          >
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-cyan-600"></div>
+
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="md:col-span-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Search className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+                    <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 font-display">Ara</label>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Email, kullanıcı adı veya ad ile ara..."
+                    value={filters.search}
+                    onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-800 dark:text-neutral-200 font-display focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Filter className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+                    <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 font-display">Rol</label>
+                  </div>
+                  <select
+                    value={filters.role}
+                    onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-800 dark:text-neutral-200 font-display focus:outline-none focus:border-blue-500 cursor-pointer"
+                  >
+                    <option value="">Tüm Roller</option>
+                    <option value="USER">Kullanıcı</option>
+                    <option value="ADMIN">Admin</option>
+                  </select>
+                </div>
               </div>
-              <AnimatedSelect
-                id="role"
-                name="role"
-                value={filters.role}
-                onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-                icon={Shield}
-                options={[
-                  { value: '', label: 'Tüm Roller' },
-                  { value: 'USER', label: 'Kullanıcı' },
-                  { value: 'ADMIN', label: 'Admin' },
-                ]}
-              />
-            </div>
-            <div className="mt-4">
-              <AnimatedButton
+              <button
                 onClick={handleSearch}
-                variant="primary"
-                icon={Search}
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl hover:from-blue-700 hover:to-cyan-700 transition-colors shadow-elegant font-display font-medium"
               >
                 Ara
-              </AnimatedButton>
+              </button>
             </div>
-          </GlassCard>
+          </motion.div>
 
           {/* Users List */}
           {loading ? (
-            <GlassCard className="p-12 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-400">Yükleniyor...</p>
-            </GlassCard>
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant p-12 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-neutral-200 dark:border-neutral-800 border-t-blue-600 mx-auto"></div>
+              <p className="mt-4 text-neutral-600 dark:text-neutral-400 font-display">Yükleniyor...</p>
+            </div>
           ) : users.length === 0 ? (
-            <GlassCard className="p-12 text-center">
-              <UsersIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400">Kullanıcı bulunamadı</p>
-            </GlassCard>
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant p-12 text-center">
+              <UsersIcon className="w-16 h-16 text-neutral-400 mx-auto mb-4" />
+              <p className="text-neutral-600 dark:text-neutral-400 font-display">Kullanıcı bulunamadı</p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {users.map((u, index) => (
@@ -198,36 +206,51 @@ const Users = () => {
                   key={u.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  transition={{ delay: 0.2 + index * 0.03 }}
+                  className="relative bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant overflow-hidden group hover:shadow-elegant-lg transition-shadow"
                 >
-                  <GlassCard className="p-6">
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-blue-600 to-cyan-600"></div>
+
+                  <div className="p-6 pl-8">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       {/* User Info */}
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                        <div className="flex items-center gap-3 mb-3">
+                          <h3 className="text-lg font-semibold text-neutral-800 dark:text-neutral-200 font-display">
                             {u.fullName}
                           </h3>
                           {getRoleBadge(u.role)}
                         </div>
-                        <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                          <p>@{u.username}</p>
-                          <p>{u.email}</p>
-                          <p>Branş: {getExamTypeBadge(u.examType)}</p>
-                          <p className="text-xs">
-                            Kayıt: {new Date(u.createdAt).toLocaleDateString('tr-TR')}
-                          </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4" />
+                            <span className="font-display">@{u.username}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Mail className="w-4 h-4" />
+                            <span className="font-display">{u.email}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Shield className="w-4 h-4" />
+                            <span className="font-display">Branş: {getExamTypeBadge(u.examType)}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4" />
+                            <span className="font-display text-xs">
+                              Kayıt: {new Date(u.createdAt).toLocaleDateString('tr-TR')}
+                            </span>
+                          </div>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-2 min-w-[140px]">
                         {u.id !== user.id && (
                           <>
                             <select
                               value={u.role}
                               onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                              className="px-3 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm"
+                              className="px-3 py-2.5 bg-neutral-50 dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-display cursor-pointer focus:outline-none focus:border-blue-500"
                             >
                               <option value="USER">Kullanıcı</option>
                               <option value="ADMIN">Admin</option>
@@ -236,7 +259,7 @@ const Users = () => {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleDelete(u.id)}
-                              className="px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center gap-2"
+                              className="px-3 py-2.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-xl hover:bg-rose-200 dark:hover:bg-rose-900/50 transition-colors flex items-center justify-center gap-2 font-display font-medium border-2 border-rose-200 dark:border-rose-800"
                             >
                               <Trash2 className="w-4 h-4" />
                               Sil
@@ -244,11 +267,11 @@ const Users = () => {
                           </>
                         )}
                         {u.id === user.id && (
-                          <p className="text-sm text-gray-500 italic">Mevcut kullanıcı</p>
+                          <p className="text-sm text-neutral-500 italic text-center font-display">Mevcut kullanıcı</p>
                         )}
                       </div>
                     </div>
-                  </GlassCard>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -256,11 +279,11 @@ const Users = () => {
 
           {/* Total Count */}
           {!loading && users.length > 0 && (
-            <GlassCard className="p-4 text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Toplam {users.length} kullanıcı
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant p-4 text-center">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 font-display">
+                Toplam <span className="font-semibold">{users.length}</span> kullanıcı
               </p>
-            </GlassCard>
+            </div>
           )}
         </div>
       </main>

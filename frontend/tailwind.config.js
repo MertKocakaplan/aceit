@@ -60,9 +60,9 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Cormorant Garamond', 'Baskerville', 'Georgia', 'serif'], // Main headings - elegant and thin
-        serif: ['DM Serif Text', 'Georgia', 'serif'], // Content text
+        sans: ['Quicksand', 'system-ui', 'sans-serif'],
+        display: ['Quicksand', 'system-ui', 'sans-serif'], // Main headings
+        serif: ['Quicksand', 'system-ui', 'sans-serif'], // Content text
       },
       boxShadow: {
         'elegant': '0 4px 24px -2px rgba(127, 2, 31, 0.08)',

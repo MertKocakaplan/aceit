@@ -336,6 +336,7 @@ model AIQuestionLog {
   aiModel       String
   rating        Int?
   tokensUsed    Int?
+  responseTime  Int?     // Response time in milliseconds
   createdAt     DateTime @default(now())
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

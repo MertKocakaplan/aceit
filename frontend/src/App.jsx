@@ -18,6 +18,10 @@ import ExamYears from './pages/Admin/ExamYears';
 import TopicQuestions from './pages/Admin/TopicQuestions';
 import Users from './pages/Admin/Users';
 import PomodoroTimer from './pages/Pomodoro/PomodoroTimer';
+import QuestionSolver from './pages/AI/QuestionSolver';
+import StudyPlanPage from './pages/StudyPlan/StudyPlanPage';
+import StudyPlanDetail from './pages/StudyPlan/StudyPlanDetail';
+import StudyPlanForm from './pages/StudyPlan/StudyPlanForm';
 
 function App() {
   return (
@@ -113,7 +117,42 @@ function App() {
               path="/pomodoro"
               element={<PomodoroTimer />}
             />
-              
+
+            <Route
+              path="/ai/question-solver"
+              element={
+                <ProtectedRoute>
+                  <QuestionSolver />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/study-plans"
+              element={
+                <ProtectedRoute>
+                  <StudyPlanPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/study-plans/create-manual"
+              element={
+                <ProtectedRoute>
+                  <StudyPlanForm />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/study-plans/:id"
+              element={
+                <ProtectedRoute>
+                  <StudyPlanDetail />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Default Redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />

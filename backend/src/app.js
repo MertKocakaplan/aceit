@@ -55,6 +55,8 @@ const userRoutes = require('./routes/user.routes');
 const adminStatsRoutes = require('./routes/adminStats.routes');
 const spacedRepetitionRoutes = require('./routes/spacedRepetition.routes');
 const studyPlanAnalysisRoutes = require('./routes/studyPlanAnalysis.routes');
+const studyPlanRoutes = require('./routes/studyPlan.routes');
+const aiRoutes = require('./routes/ai.routes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/subjects', subjectRoutes);
@@ -67,7 +69,8 @@ app.use('/api/admin/stats', adminStatsRoutes);
 app.use('/api/pomodoro', pomodoroRoutes);
 app.use('/api/spaced-repetition', spacedRepetitionRoutes);
 app.use('/api/study-plan', studyPlanAnalysisRoutes);
-
+app.use('/api/study-plans', studyPlanRoutes);
+app.use('/api/ai', aiRoutes);
 
 // 404 handler (route bulunamazsa)
 app.use(notFound);

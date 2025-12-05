@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  * {
+    font-family: "Quicksand", sans-serif;
+    font-optical-sizing: auto;
+  }
+
+  body {
+    font-family: "Quicksand", sans-serif;
+    font-optical-sizing: auto;
+  }
+}

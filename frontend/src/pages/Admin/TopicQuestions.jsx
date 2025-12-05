@@ -8,7 +8,6 @@ import {
   BookOpen,
   Calendar,
   Save,
-  ArrowLeft,
   Upload,
 } from 'lucide-react';
 import {
@@ -184,13 +183,6 @@ const TopicQuestions = () => {
             className="flex items-start justify-between"
           >
             <div>
-              <button
-                onClick={() => navigate('/admin')}
-                className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors mb-4"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Admin Panel'e Dön</span>
-              </button>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
                 Konu-Soru Dağılımı
               </h1>
