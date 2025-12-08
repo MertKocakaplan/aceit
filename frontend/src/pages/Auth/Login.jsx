@@ -3,14 +3,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { LogIn, Mail, Lock, Eye, EyeOff, ArrowRight, TrendingUp, Target, Award } from 'lucide-react';
-import { ThemeToggle } from '../../ui';
+import { LogIn, Mail, ArrowRight, TrendingUp, Target, Award } from 'lucide-react';
+import { ThemeToggle, AnimatedInput, PasswordInput } from '../../ui';
+import { DashboardBackgroundEffects } from '../../components/dashboard';
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
   const [formData, setFormData] = useState({
     identifier: '',
     password: '',
@@ -21,6 +22,14 @@ const Login = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleFocus = (e) => {
+    setFocusedField(e.target.name);
+  };
+
+  const handleBlur = () => {
+    setFocusedField(null);
   };
 
   const handleSubmit = async (e) => {
@@ -42,6 +51,8 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex relative overflow-hidden bg-gradient-to-br from-secondary-100 via-neutral-50 to-secondary-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950">
+      <DashboardBackgroundEffects />
+
       {/* Theme Toggle - Top Right */}
       <div className="absolute top-6 right-6 z-50">
         <ThemeToggle />
@@ -87,55 +98,33 @@ const Login = () => {
             className="space-y-6"
           >
             {/* Email/Username Input */}
-            <div className="space-y-2">
-              <label htmlFor="identifier" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
-                Email veya Kullanıcı Adı
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors">
-                  <Mail className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
-                </div>
-                <input
-                  id="identifier"
-                  name="identifier"
-                  type="text"
-                  value={formData.identifier}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans text-neutral-900 dark:text-white"
-                  placeholder="ornek@email.com"
-                />
-              </div>
-            </div>
+            <AnimatedInput
+              id="identifier"
+              name="identifier"
+              type="text"
+              label="Email veya Kullanıcı Adı"
+              value={formData.identifier}
+              onChange={handleChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              focusedField={focusedField}
+              icon={Mail}
+              required
+            />
 
             {/* Password Input */}
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
-                Şifre
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors">
-                  <Lock className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-12 pr-12 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans text-neutral-900 dark:text-white"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
+            <PasswordInput
+              id="password"
+              name="password"
+              label="Şifre"
+              value={formData.password}
+              onChange={handleChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              focusedField={focusedField}
+              showStrength={false}
+              required
+            />
 
             {/* Submit Button */}
             <button

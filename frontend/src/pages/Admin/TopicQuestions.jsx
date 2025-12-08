@@ -16,6 +16,7 @@ import {
   GlassCard,
   AnimatedButton,
   AnimatedSelect,
+  Modal,
 } from '../../ui';
 
 const TopicQuestions = () => {
@@ -301,59 +302,53 @@ const TopicQuestions = () => {
       </main>
 
       {/* CSV Upload Modal */}
-      {showUploadModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-2xl"
-          >
-            <GlassCard className="p-6">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
-                CSV Toplu Yükleme
-              </h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    CSV Verisi (Virgülle ayrılmış)
-                  </label>
-                  <textarea
-                    value={csvData}
-                    onChange={(e) => setCsvData(e.target.value)}
-                    placeholder="Ders,Konu,2024,2023,2022,2021,2020,2019,2018
+      <Modal
+        show={showUploadModal}
+        onClose={() => {
+          setShowUploadModal(false);
+          setCsvData('');
+        }}
+        title="CSV Toplu Yükleme"
+        maxWidth="2xl"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              CSV Verisi (Virgülle ayrılmış)
+            </label>
+            <textarea
+              value={csvData}
+              onChange={(e) => setCsvData(e.target.value)}
+              placeholder="Ders,Konu,2024,2023,2022,2021,2020,2019,2018
 TÜRKÇE,Ses Bilgisi,0,1,0,1,0,1,3
 TÜRKÇE,Dil Bilgisi,0,2,3,2,3,8,1
 ..."
-                    rows={15}
-                    className="w-full px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 font-mono text-sm"
-                  />
-                </div>
+              rows={15}
+              className="w-full px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 font-mono text-sm"
+            />
+          </div>
 
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowUploadModal(false);
-                      setCsvData('');
-                    }}
-                    className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                  >
-                    İptal
-                  </button>
-                  <button
-                    onClick={handleUploadCSV}
-                    disabled={uploading || !csvData}
-                    className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg disabled:opacity-50 hover:from-blue-700 hover:to-purple-700 transition-colors"
-                  >
-                    {uploading ? 'Yükleniyor...' : 'Yükle'}
-                  </button>
-                </div>
-              </div>
-            </GlassCard>
-          </motion.div>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setShowUploadModal(false);
+                setCsvData('');
+              }}
+              className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            >
+              İptal
+            </button>
+            <button
+              onClick={handleUploadCSV}
+              disabled={uploading || !csvData}
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg disabled:opacity-50 hover:from-blue-700 hover:to-purple-700 transition-colors"
+            >
+              {uploading ? 'Yükleniyor...' : 'Yükle'}
+            </button>
+          </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };

@@ -3,14 +3,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { UserPlus, User, Mail, Lock, Eye, EyeOff, BookOpen, ArrowRight, Rocket, Zap, CheckCircle } from 'lucide-react';
-import { ThemeToggle } from '../../ui';
+import { UserPlus, User, BookOpen, ArrowRight, Rocket, Zap, CheckCircle } from 'lucide-react';
+import { ThemeToggle, AnimatedInput, EmailInput, PasswordInput, AnimatedSelect } from '../../ui';
+import { DashboardBackgroundEffects } from '../../components/dashboard';
 
 const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -24,6 +25,14 @@ const Register = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handleFocus = (e) => {
+    setFocusedField(e.target.name);
+  };
+
+  const handleBlur = () => {
+    setFocusedField(null);
   };
 
   const handleSubmit = async (e) => {
@@ -49,26 +58,10 @@ const Register = () => {
     { value: 'YKS_DIL', label: 'YKS Dil' },
   ];
 
-  // Password strength calculator
-  const getPasswordStrength = (password) => {
-    if (!password) return { strength: 0, label: '' };
-    let strength = 0;
-    if (password.length >= 8) strength++;
-    if (password.length >= 12) strength++;
-    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-    if (/\d/.test(password)) strength++;
-    if (/[^a-zA-Z\d]/.test(password)) strength++;
-
-    const labels = ['Çok Zayıf', 'Zayıf', 'Orta', 'Güçlü', 'Çok Güçlü'];
-    const colors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500', 'bg-emerald-500'];
-
-    return { strength, label: labels[strength - 1] || '', color: colors[strength - 1] || 'bg-gray-300' };
-  };
-
-  const passwordStrength = getPasswordStrength(formData.password);
-
   return (
     <div className="min-h-screen flex relative overflow-hidden bg-gradient-to-br from-secondary-100 via-neutral-50 to-secondary-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950">
+      <DashboardBackgroundEffects />
+
       {/* Theme Toggle - Top Right */}
       <div className="absolute top-6 right-6 z-50">
         <ThemeToggle />
@@ -230,151 +223,78 @@ const Register = () => {
             className="space-y-5"
           >
             {/* Full Name */}
-            <div className="space-y-2">
-              <label htmlFor="fullName" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
-                Ad Soyad
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <User className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
-                </div>
-                <input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans text-neutral-900 dark:text-white"
-                  placeholder="Adınız Soyadınız"
-                />
-              </div>
-            </div>
+            <AnimatedInput
+              id="fullName"
+              name="fullName"
+              type="text"
+              label="Ad Soyad"
+              value={formData.fullName}
+              onChange={handleChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              focusedField={focusedField}
+              icon={User}
+              required
+            />
 
             {/* Email */}
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
-                Email
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans text-neutral-900 dark:text-white"
-                  placeholder="ornek@email.com"
-                />
-              </div>
-            </div>
+            <EmailInput
+              id="email"
+              name="email"
+              label="Email"
+              value={formData.email}
+              onChange={handleChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              focusedField={focusedField}
+              showValidation={true}
+              required
+            />
 
             {/* Username */}
-            <div className="space-y-2">
-              <label htmlFor="username" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
-                Kullanıcı Adı
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <User className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
-                </div>
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans text-neutral-900 dark:text-white"
-                  placeholder="kullaniciadi"
-                />
-              </div>
-            </div>
+            <AnimatedInput
+              id="username"
+              name="username"
+              type="text"
+              label="Kullanıcı Adı"
+              value={formData.username}
+              onChange={handleChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              focusedField={focusedField}
+              icon={User}
+              required
+            />
 
             {/* Password */}
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
-                Şifre
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-12 pr-12 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans text-neutral-900 dark:text-white"
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-
-              {/* Password Strength Indicator */}
-              {formData.password && (
-                <div className="mt-2">
-                  <div className="flex gap-1 mb-1">
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={i}
-                        className={`h-1.5 flex-1 rounded-full transition-all ${
-                          i < passwordStrength.strength ? passwordStrength.color : 'bg-neutral-200 dark:bg-neutral-700'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  {passwordStrength.label && (
-                    <p className="text-xs text-neutral-600 dark:text-neutral-400 font-sans">
-                      Şifre gücü: <span className="font-medium">{passwordStrength.label}</span>
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
+            <PasswordInput
+              id="password"
+              name="password"
+              label="Şifre"
+              value={formData.password}
+              onChange={handleChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              focusedField={focusedField}
+              showStrength={true}
+              required
+            />
 
             {/* Exam Type */}
-            <div className="space-y-2">
-              <label htmlFor="examType" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
-                Sınav Türü
-              </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <BookOpen className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
-                </div>
-                <select
-                  id="examType"
-                  name="examType"
-                  value={formData.examType}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans appearance-none cursor-pointer text-neutral-900 dark:text-white"
-                >
-                  {examOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <svg className="w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
+            <AnimatedSelect
+              id="examType"
+              name="examType"
+              label="Sınav Türü"
+              value={formData.examType}
+              onChange={handleChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              focusedField={focusedField}
+              icon={BookOpen}
+              options={examOptions}
+              required
+              className="mt-6"
+            />
 
             {/* Submit Button */}
             <button

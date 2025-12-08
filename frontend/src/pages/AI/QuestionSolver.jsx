@@ -1,7 +1,24 @@
 import { useState, useRef } from 'react';
+import { useAuth } from '../../store/AuthContext';
 import { aiAPI } from '../../api';
 import { toast } from 'sonner';
-import { Brain, Upload, X, Loader2, Star, History, ChevronDown, Calendar, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  Brain,
+  X,
+  Loader2,
+  Star,
+  History,
+  ChevronDown,
+  Calendar,
+  Clock,
+  Sparkles,
+  ImagePlus,
+  Send,
+  RotateCcw
+} from 'lucide-react';
+import { DashboardHeader } from '../../ui';
+import { DashboardBackgroundEffects, GradientCard } from '../../components/dashboard';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 
@@ -10,6 +27,7 @@ import { InlineMath, BlockMath } from 'react-katex';
  * Allows users to solve questions using AI with text and/or images
  */
 const QuestionSolver = () => {
+  const { user, logout } = useAuth();
   const [questionText, setQuestionText] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -219,239 +237,371 @@ const QuestionSolver = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <Brain className="w-6 h-6 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-secondary-100 via-neutral-50 to-secondary-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300 relative overflow-hidden">
+      {/* Background Effects */}
+      <DashboardBackgroundEffects />
+
+      {/* Header */}
+      <DashboardHeader user={user} onLogout={logout} />
+
+      {/* Main Content */}
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-12">
+        {/* Hero Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-12"
+        >
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-8">
+            <div>
+              <div className="flex items-center gap-4 mb-2">
+                <div className="p-3 bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl shadow-elegant-lg">
+                  <Brain className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-5xl font-normal text-neutral-900 dark:text-white font-display tracking-wide">
+                    AI Soru Çözücü
+                  </h2>
+                  <p className="text-sm text-neutral-500 dark:text-neutral-500 font-sans mt-1">
+                    GPT-5.1 ile desteklenmektedir
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  AI Soru Çözücü
-                </h1>
-                <p className="text-gray-600 text-sm">GPT-5.1 ile desteklenmektedir</p>
-              </div>
+              <p className="text-lg text-neutral-600 dark:text-neutral-400 mt-4 font-serif max-w-xl">
+                Soru metnini yaz veya fotoğrafını yükle, AI sana adım adım çözüm sunsun
+              </p>
             </div>
 
-            <button
+            {/* History Button */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleShowHistory}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              className="relative flex items-center gap-2 px-6 py-3.5 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md border-2 border-neutral-200/80 dark:border-neutral-700/80 text-neutral-700 dark:text-neutral-300 rounded-2xl font-medium shadow-elegant hover:shadow-elegant-lg hover:border-primary-400 dark:hover:border-primary-600 transition-all overflow-hidden group"
             >
-              <History className="w-4 h-4" />
-              Geçmiş
-            </button>
+              {/* Grid pattern */}
+              <div className="absolute inset-0 opacity-[0.10] dark:opacity-[0.08]">
+                <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <pattern id="historyBtnGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                      <circle cx="2" cy="2" r="0.8" fill="currentColor" className="text-primary-700 dark:text-primary-400" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#historyBtnGrid)" />
+                </svg>
+              </div>
+              <History className="relative w-5 h-5" />
+              <span className="relative font-display">Geçmiş</span>
+            </motion.button>
           </div>
+        </motion.div>
 
-          <p className="text-gray-600">
-            Soru metnini yazın veya fotoğrafını yükleyin, AI size adım adım çözüm sunsun.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Input Section */}
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h2 className="text-xl font-semibold mb-6">Soru Girişi</h2>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="relative bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl rounded-3xl border-2 border-neutral-200/80 dark:border-neutral-700/80 shadow-elegant overflow-hidden"
+          >
+            {/* Top gradient accent */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500/50 via-primary-600/80 to-primary-500/50" />
 
-            <form onSubmit={handleSolveQuestion} className="space-y-6">
-              {/* Text Input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Soru Metni
-                </label>
-                <textarea
-                  value={questionText}
-                  onChange={(e) => setQuestionText(e.target.value)}
-                  placeholder="Sorunuzu buraya yazın..."
-                  className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                  disabled={isLoading}
-                />
-              </div>
+            {/* Pattern overlay */}
+            <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.04]">
+              <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern id="inputPattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="0.8" fill="currentColor" className="text-neutral-600" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#inputPattern)" />
+              </svg>
+            </div>
 
-              {/* Image Upload */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Soru Görseli (Opsiyonel)
-                </label>
+            <div className="relative p-8">
+              <h3 className="text-2xl font-normal text-neutral-900 dark:text-white mb-6 font-display tracking-wide">
+                Soru Girişi
+              </h3>
 
-                {!imagePreview ? (
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500 transition-colors"
-                  >
-                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600">
-                      Görüntü yüklemek için tıklayın
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      PNG, JPG, WebP (Maks. 10MB)
-                    </p>
-                  </div>
-                ) : (
-                  <div className="relative">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="w-full h-64 object-contain bg-gray-100 rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+              <form onSubmit={handleSolveQuestion} className="space-y-6">
+                {/* Text Input */}
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 font-sans">
+                    Soru Metni
+                  </label>
+                  <textarea
+                    value={questionText}
+                    onChange={(e) => setQuestionText(e.target.value)}
+                    placeholder="Sorunuzu buraya yazın..."
+                    className="w-full h-36 px-4 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-2 border-neutral-200 dark:border-neutral-700 rounded-2xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 dark:focus:border-primary-600 resize-none transition-all font-sans text-neutral-900 dark:text-white placeholder-neutral-400"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                {/* Image Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 font-sans">
+                    Soru Görseli (Opsiyonel)
+                  </label>
+
+                  {!imagePreview ? (
+                    <motion.div
+                      whileHover={{ scale: 1.01 }}
+                      onClick={() => fileInputRef.current?.click()}
+                      className="relative border-2 border-dashed border-neutral-300 dark:border-neutral-600 rounded-2xl p-10 text-center cursor-pointer hover:border-primary-500 dark:hover:border-primary-600 transition-all bg-neutral-50/50 dark:bg-neutral-800/30 group"
                     >
-                      <X className="w-4 h-4" />
-                    </button>
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="p-4 bg-primary-50 dark:bg-primary-950/30 rounded-2xl group-hover:bg-primary-100 dark:group-hover:bg-primary-900/40 transition-colors">
+                          <ImagePlus className="w-8 h-8 text-primary-600 dark:text-primary-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
+                            Görüntü yüklemek için tıklayın
+                          </p>
+                          <p className="text-xs text-neutral-500 dark:text-neutral-500 mt-1 font-sans">
+                            PNG, JPG, WebP (Maks. 10MB)
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className="relative rounded-2xl overflow-hidden border-2 border-neutral-200 dark:border-neutral-700">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-64 object-contain bg-neutral-100 dark:bg-neutral-800"
+                      />
+                      <motion.button
+                        type="button"
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={handleRemoveImage}
+                        className="absolute top-3 right-3 p-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors shadow-lg"
+                      >
+                        <X className="w-4 h-4" />
+                      </motion.button>
+                    </div>
+                  )}
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <motion.button
+                  type="submit"
+                  disabled={isLoading || (!questionText.trim() && !selectedImage)}
+                  whileHover={{ scale: isLoading ? 1 : 1.02 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                  className="relative w-full py-4 px-6 bg-gradient-to-r from-primary-700 via-primary-800 to-primary-900 dark:from-primary-600 dark:via-primary-700 dark:to-primary-800 text-white rounded-2xl font-medium shadow-elegant-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-3 overflow-hidden"
+                >
+                  {/* Dot pattern */}
+                  <div className="absolute inset-0 opacity-[0.15]">
+                    <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <pattern id="solveBtnDots" width="20" height="20" patternUnits="userSpaceOnUse">
+                          <circle cx="2" cy="2" r="1" fill="white" />
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#solveBtnDots)" />
+                    </svg>
                   </div>
-                )}
 
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelect}
-                  className="hidden"
-                  disabled={isLoading}
-                />
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading || (!questionText.trim() && !selectedImage)}
-                className="w-full py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Çözülüyor...
-                  </>
-                ) : (
-                  <>
-                    <Brain className="w-5 h-5" />
-                    Soruyu Çöz
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="relative w-5 h-5 animate-spin" />
+                      <span className="relative font-display">Çözülüyor...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="relative w-5 h-5" />
+                      <span className="relative font-display text-lg">Soruyu Çöz</span>
+                      <Send className="relative w-4 h-4" />
+                    </>
+                  )}
+                </motion.button>
+              </form>
+            </div>
+          </motion.div>
 
           {/* Solution Section */}
-          <div className="bg-white rounded-2xl shadow-xl p-8">
-            <h2 className="text-xl font-semibold mb-6">Çözüm</h2>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="relative bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl rounded-3xl border-2 border-neutral-200/80 dark:border-neutral-700/80 shadow-elegant overflow-hidden"
+          >
+            {/* Top gradient accent */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-secondary-500/50 via-secondary-600/80 to-secondary-500/50" />
 
-            {!solution && !isLoading && (
-              <div className="h-64 flex items-center justify-center text-gray-400">
-                <div className="text-center">
-                  <Brain className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                  <p>Çözüm burada görünecek</p>
-                </div>
-              </div>
-            )}
+            {/* Pattern overlay */}
+            <div className="absolute inset-0 opacity-[0.06] dark:opacity-[0.04]">
+              <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern id="solutionPattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="0.8" fill="currentColor" className="text-neutral-600" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#solutionPattern)" />
+              </svg>
+            </div>
 
-            {isLoading && (
-              <div className="h-64 flex items-center justify-center">
-                <div className="text-center">
-                  <Loader2 className="w-16 h-16 text-indigo-600 animate-spin mx-auto mb-4" />
-                  <p className="text-gray-600">AI sorunuzu analiz ediyor...</p>
-                </div>
-              </div>
-            )}
+            <div className="relative p-8 min-h-[500px] flex flex-col">
+              <h3 className="text-2xl font-normal text-neutral-900 dark:text-white mb-6 font-display tracking-wide">
+                Çözüm
+              </h3>
 
-            {solution && (
-              <div className="space-y-6">
-                {/* Solution Text */}
-                <div className="prose prose-sm max-w-none">
-                  <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                    {renderLatex(solution.solution)}
-                  </div>
-                </div>
-
-                {/* Metadata */}
-                <div className="pt-6 border-t border-gray-200">
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                    <span>Model: {solution.model}</span>
-                    <span>{solution.duration}ms</span>
-                  </div>
-
-                  {/* Rating */}
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-gray-700">
-                      Çözümü değerlendirin:
+              {!solution && !isLoading && (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-700 mb-6">
+                      <Brain className="w-10 h-10 text-neutral-400 dark:text-neutral-500" />
+                    </div>
+                    <p className="text-lg text-neutral-500 dark:text-neutral-400 font-serif">
+                      Çözüm burada görünecek
                     </p>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map((rating) => (
-                        <button
-                          key={rating}
-                          onClick={() => handleRateSolution(rating)}
-                          className="p-2 hover:bg-gray-100 rounded transition-colors"
-                        >
-                          <Star
-                            className={`w-6 h-6 ${
-                              currentRating && rating <= currentRating
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-gray-300'
-                            }`}
-                          />
-                        </button>
-                      ))}
+                  </div>
+                </div>
+              )}
+
+              {isLoading && (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-16 h-16 border-4 border-primary-200 dark:border-primary-800 border-t-primary-700 dark:border-t-primary-400 rounded-full mx-auto mb-6"
+                    />
+                    <p className="text-lg text-neutral-600 dark:text-neutral-400 font-serif">
+                      AI sorunuzu analiz ediyor...
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {solution && (
+                <div className="flex-1 flex flex-col">
+                  {/* Solution Text */}
+                  <div className="flex-1 prose prose-sm max-w-none dark:prose-invert overflow-y-auto">
+                    <div className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed font-serif">
+                      {renderLatex(solution.solution)}
                     </div>
                   </div>
 
-                  {/* New Question Button */}
-                  <button
-                    onClick={handleNewQuestion}
-                    className="w-full mt-4 py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-                  >
-                    Yeni Soru
-                  </button>
+                  {/* Metadata & Actions */}
+                  <div className="mt-6 pt-6 border-t border-neutral-200 dark:border-neutral-700">
+                    <div className="flex items-center justify-between text-sm text-neutral-500 dark:text-neutral-400 mb-4 font-sans">
+                      <span>Model: {solution.model}</span>
+                      <span>{solution.duration}ms</span>
+                    </div>
+
+                    {/* Rating */}
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
+                        Çözümü değerlendirin:
+                      </p>
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((rating) => (
+                          <motion.button
+                            key={rating}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => handleRateSolution(rating)}
+                            className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors"
+                          >
+                            <Star
+                              className={`w-6 h-6 ${
+                                currentRating && rating <= currentRating
+                                  ? 'fill-amber-400 text-amber-400'
+                                  : 'text-neutral-300 dark:text-neutral-600'
+                              }`}
+                            />
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* New Question Button */}
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleNewQuestion}
+                      className="w-full mt-4 py-3 px-4 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl transition-colors flex items-center justify-center gap-2 font-display"
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                      Yeni Soru
+                    </motion.button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </motion.div>
         </div>
+      </main>
 
-        {/* History Modal */}
-        {showHistory && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-              {/* Header */}
-              <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <History className="w-6 h-6 text-indigo-600" />
-                  <h2 className="text-2xl font-bold text-gray-900">Soru Geçmişi</h2>
+      {/* History Modal */}
+      {showHistory && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border-2 border-neutral-200 dark:border-neutral-800"
+          >
+            {/* Top gradient accent */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500/50 via-primary-600/80 to-primary-500/50" />
+
+            {/* Header */}
+            <div className="relative p-6 border-b border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary-50 dark:bg-primary-950/30 rounded-xl">
+                  <History className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                 </div>
-                <button
-                  onClick={() => setShowHistory(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <X className="w-6 h-6 text-gray-600" />
-                </button>
+                <h2 className="text-2xl font-normal text-neutral-900 dark:text-white font-display">
+                  Soru Geçmişi
+                </h2>
               </div>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setShowHistory(false)}
+                className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors"
+              >
+                <X className="w-6 h-6 text-neutral-600 dark:text-neutral-400" />
+              </motion.button>
+            </div>
 
-              {/* Content */}
-              <div className="flex-1 overflow-y-auto p-6">
-                {history && history.length > 0 ? (
-                  <div className="space-y-4">
-                    {history.map((item) => (
-                      <div
-                        key={item.id}
-                        className="border border-gray-200 rounded-xl overflow-hidden hover:border-indigo-300 transition-colors"
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {history && history.length > 0 ? (
+                <div className="space-y-4">
+                  {history.map((item) => (
+                    <div
+                      key={item.id}
+                      className="border-2 border-neutral-200 dark:border-neutral-700 rounded-2xl overflow-hidden hover:border-primary-400 dark:hover:border-primary-600 transition-colors"
+                    >
+                      {/* Question Summary */}
+                      <button
+                        onClick={() =>
+                          setExpandedHistoryId(
+                            expandedHistoryId === item.id ? null : item.id
+                          )
+                        }
+                        className="w-full p-4 bg-neutral-50 dark:bg-neutral-800/50 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors flex items-start justify-between gap-4"
                       >
-                        {/* Question Summary */}
-                        <button
-                          onClick={() =>
-                            setExpandedHistoryId(
-                              expandedHistoryId === item.id ? null : item.id
-                            )
-                          }
-                          className="w-full p-4 bg-gray-50 hover:bg-gray-100 transition-colors flex items-start justify-between gap-4"
-                        >
-                          <div className="flex-1 text-left">
-                            <div className="flex items-center gap-3 mb-2">
-                              <Calendar className="w-4 h-4 text-gray-400" />
-                              <span className="text-sm text-gray-600">
+                        <div className="flex-1 text-left">
+                          <div className="flex items-center gap-3 mb-2 flex-wrap">
+                            <div className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
+                              <Calendar className="w-4 h-4" />
+                              <span className="text-sm font-sans">
                                 {new Date(item.createdAt).toLocaleDateString('tr-TR', {
                                   day: 'numeric',
                                   month: 'long',
@@ -460,78 +610,88 @@ const QuestionSolver = () => {
                                   minute: '2-digit',
                                 })}
                               </span>
-                              <Clock className="w-4 h-4 text-gray-400 ml-2" />
-                              <span className="text-sm text-gray-600">
-                                {item.responseTime}ms
-                              </span>
-                              {item.rating && (
-                                <div className="flex items-center gap-1 ml-2">
-                                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                  <span className="text-sm text-gray-600">{item.rating}/5</span>
-                                </div>
-                              )}
                             </div>
-                            <p className="text-gray-900 font-medium line-clamp-2">
-                              {item.questionText}
-                            </p>
-                          </div>
-                          <ChevronDown
-                            className={`w-5 h-5 text-gray-400 transition-transform flex-shrink-0 ${
-                              expandedHistoryId === item.id ? 'rotate-180' : ''
-                            }`}
-                          />
-                        </button>
-
-                        {/* Expanded Content */}
-                        {expandedHistoryId === item.id && (
-                          <div className="p-4 bg-white border-t border-gray-200">
-                            {/* Question Image */}
-                            {item.questionImage && (
-                              <div className="mb-4">
-                                <p className="text-sm font-medium text-gray-700 mb-2">
-                                  Soru Görseli:
-                                </p>
-                                <img
-                                  src={item.questionImage}
-                                  alt="Question"
-                                  className="max-w-full h-auto rounded-lg border border-gray-200"
-                                />
+                            <div className="flex items-center gap-1.5 text-neutral-500 dark:text-neutral-400">
+                              <Clock className="w-4 h-4" />
+                              <span className="text-sm font-sans">{item.responseTime}ms</span>
+                            </div>
+                            {item.rating && (
+                              <div className="flex items-center gap-1">
+                                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                                <span className="text-sm text-neutral-600 dark:text-neutral-400 font-sans">
+                                  {item.rating}/5
+                                </span>
                               </div>
                             )}
+                          </div>
+                          <p className="text-neutral-900 dark:text-white font-medium line-clamp-2 font-sans">
+                            {item.questionText}
+                          </p>
+                        </div>
+                        <ChevronDown
+                          className={`w-5 h-5 text-neutral-400 transition-transform flex-shrink-0 ${
+                            expandedHistoryId === item.id ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </button>
 
-                            {/* Solution */}
+                      {/* Expanded Content */}
+                      {expandedHistoryId === item.id && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          className="p-4 bg-white dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800"
+                        >
+                          {/* Question Image */}
+                          {item.questionImage && (
                             <div className="mb-4">
-                              <p className="text-sm font-medium text-gray-700 mb-2">
-                                Çözüm:
+                              <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 font-sans">
+                                Soru Görseli:
                               </p>
-                              <div className="prose prose-sm max-w-none bg-gray-50 p-4 rounded-lg">
-                                <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                                  {renderLatex(item.aiResponse)}
-                                </div>
+                              <img
+                                src={item.questionImage}
+                                alt="Question"
+                                className="max-w-full h-auto rounded-xl border border-neutral-200 dark:border-neutral-700"
+                              />
+                            </div>
+                          )}
+
+                          {/* Solution */}
+                          <div className="mb-4">
+                            <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 font-sans">
+                              Çözüm:
+                            </p>
+                            <div className="prose prose-sm max-w-none dark:prose-invert bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-xl">
+                              <div className="text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap leading-relaxed font-serif">
+                                {renderLatex(item.aiResponse)}
                               </div>
                             </div>
-
-                            {/* Metadata */}
-                            <div className="flex items-center gap-4 text-sm text-gray-500 pt-3 border-t border-gray-100">
-                              <span>Model: {item.aiModel}</span>
-                              <span>Tokens: {item.tokensUsed}</span>
-                            </div>
                           </div>
-                        )}
-                      </div>
-                    ))}
+
+                          {/* Metadata */}
+                          <div className="flex items-center gap-4 text-sm text-neutral-500 dark:text-neutral-400 pt-3 border-t border-neutral-100 dark:border-neutral-800 font-sans">
+                            <span>Model: {item.aiModel}</span>
+                            <span>Tokens: {item.tokensUsed}</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-neutral-100 dark:bg-neutral-800 mb-6">
+                    <History className="w-10 h-10 text-neutral-400 dark:text-neutral-500" />
                   </div>
-                ) : (
-                  <div className="text-center py-12 text-gray-400">
-                    <History className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                    <p>Henüz soru geçmişi yok</p>
-                  </div>
-                )}
-              </div>
+                  <p className="text-lg text-neutral-500 dark:text-neutral-400 font-serif">
+                    Henüz soru geçmişi yok
+                  </p>
+                </div>
+              )}
             </div>
-          </div>
-        )}
-      </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

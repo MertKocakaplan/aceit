@@ -1,0 +1,144 @@
+"filename", "language", "JSON", "Markdown", "JavaScript", "JavaScript JSX", "PostCSS", "XML", "MS SQL", "HTML", "comment", "blank", "total"
+"c:\Users\bm123\Documents\VSCode\AceIt\.claude\settings.local.json", "JSON", 9, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10
+"c:\Users\bm123\Documents\VSCode\AceIt\AI_INTEGRATION_IMPLEMENTATION.md", "Markdown", 0, 828, 0, 0, 0, 0, 0, 0, 0, 165, 993
+"c:\Users\bm123\Documents\VSCode\AceIt\AI_INTEGRATION_PLAN.md", "Markdown", 0, 1625, 0, 0, 0, 0, 0, 0, 0, 336, 1961
+"c:\Users\bm123\Documents\VSCode\AceIt\README.md", "Markdown", 0, 30, 0, 0, 0, 0, 0, 0, 0, 8, 38
+"c:\Users\bm123\Documents\VSCode\AceIt\STUDY_PLAN_IMPLEMENTATION_PLAN.md", "Markdown", 0, 829, 0, 0, 0, 0, 0, 0, 0, 201, 1030
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\package-lock.json", "JSON", 3232, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3233
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\package.json", "JSON", 37, 0, 0, 0, 0, 0, 0, 0, 0, 1, 38
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20250930092626_init\migration.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 230, 0, 60, 76, 366
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20250930114320_update_exam_types\migration.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 9, 0, 7, 1, 17
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20251002205241_update_exam_types\migration.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 5, 0, 6, 3, 14
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20251003124721_ayt_subject_types\migration.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 9, 0, 7, 1, 17
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20251020142029_add_recommendation_system\migration.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 93, 0, 76, 55, 224
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20251020142114_add_recommendation_system\migration.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 190, 0, 80, 71, 341
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20251020142401_add_recommendation_system\migration.sql", "MS SQL", 0, 0, 0, 0, 0, 0, 50, 0, 25, 21, 96
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\app.js", "JavaScript", 0, 0, 58, 0, 0, 0, 0, 0, 10, 13, 81
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\config\database.js", "JavaScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 2, 7
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\config\jwt.js", "JavaScript", 0, 0, 29, 0, 0, 0, 0, 0, 17, 4, 50
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\config\openai.js", "JavaScript", 0, 0, 35, 0, 0, 0, 0, 0, 4, 8, 47
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\ai.controller.js", "JavaScript", 0, 0, 180, 0, 0, 0, 0, 0, 36, 28, 244
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\auth.controller.js", "JavaScript", 0, 0, 98, 0, 0, 0, 0, 0, 29, 18, 145
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\examYear.controller.js", "JavaScript", 0, 0, 84, 0, 0, 0, 0, 0, 24, 12, 120
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\pomodoro.controller.js", "JavaScript", 0, 0, 51, 0, 0, 0, 0, 0, 10, 8, 69
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\spacedRepetition.controller.js", "JavaScript", 0, 0, 79, 0, 0, 0, 0, 0, 12, 16, 107
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\stats.controller.js", "JavaScript", 0, 0, 261, 0, 0, 0, 0, 0, 68, 35, 364
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\studyPlan.controller.js", "JavaScript", 0, 0, 229, 0, 0, 0, 0, 0, 57, 44, 330
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\studyPlanAnalysis.controller.js", "JavaScript", 0, 0, 17, 0, 0, 0, 0, 0, 4, 3, 24
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\studySession.controller.js", "JavaScript", 0, 0, 86, 0, 0, 0, 0, 0, 20, 15, 121
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\subject.controller.js", "JavaScript", 0, 0, 45, 0, 0, 0, 0, 0, 12, 9, 66
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\topicQuestionCount.controller.js", "JavaScript", 0, 0, 245, 0, 0, 0, 0, 0, 31, 41, 317
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\user.controller.js", "JavaScript", 0, 0, 89, 0, 0, 0, 0, 0, 21, 15, 125
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\middleware\admin.js", "JavaScript", 0, 0, 26, 0, 0, 0, 0, 0, 7, 4, 37
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\middleware\auth.js", "JavaScript", 0, 0, 44, 0, 0, 0, 0, 0, 9, 11, 64
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\middleware\errorHandler.js", "JavaScript", 0, 0, 22, 0, 0, 0, 0, 0, 9, 5, 36
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\middleware\security.js", "JavaScript", 0, 0, 26, 0, 0, 0, 0, 0, 9, 3, 38
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\middleware\upload.js", "JavaScript", 0, 0, 83, 0, 0, 0, 0, 0, 27, 15, 125
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\adminStats.routes.js", "JavaScript", 0, 0, 8, 0, 0, 0, 0, 0, 0, 3, 11
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\ai.routes.js", "JavaScript", 0, 0, 22, 0, 0, 0, 0, 0, 25, 16, 63
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\auth.routes.js", "JavaScript", 0, 0, 12, 0, 0, 0, 0, 0, 25, 6, 43
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\examYear.routes.js", "JavaScript", 0, 0, 13, 0, 0, 0, 0, 0, 1, 3, 17
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\pomodoro.routes.js", "JavaScript", 0, 0, 8, 0, 0, 0, 0, 0, 0, 3, 11
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\spacedRepetition.routes.js", "JavaScript", 0, 0, 10, 0, 0, 0, 0, 0, 21, 7, 38
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\stats.routes.js", "JavaScript", 0, 0, 23, 0, 0, 0, 0, 0, 72, 19, 114
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\studyPlan.routes.js", "JavaScript", 0, 0, 28, 0, 0, 0, 0, 0, 59, 17, 104
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\studyPlanAnalysis.routes.js", "JavaScript", 0, 0, 7, 0, 0, 0, 0, 0, 0, 3, 10
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\studySession.routes.js", "JavaScript", 0, 0, 15, 0, 0, 0, 0, 0, 24, 7, 46
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\subject.routes.js", "JavaScript", 0, 0, 9, 0, 0, 0, 0, 0, 15, 5, 29
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\topicQuestionCount.routes.js", "JavaScript", 0, 0, 13, 0, 0, 0, 0, 0, 1, 3, 17
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\user.routes.js", "JavaScript", 0, 0, 11, 0, 0, 0, 0, 0, 1, 3, 15
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\server.js", "JavaScript", 0, 0, 9, 0, 0, 0, 0, 0, 0, 2, 11
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\ai\openai.service.js", "JavaScript", 0, 0, 119, 0, 0, 0, 0, 0, 28, 21, 168
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\ai\performanceAnalysis.service.js", "JavaScript", 0, 0, 356, 0, 0, 0, 0, 0, 38, 43, 437
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\ai\questionSolver.service.js", "JavaScript", 0, 0, 274, 0, 0, 0, 0, 0, 39, 41, 354
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\ai\studyPlanGenerator.service.js", "JavaScript", 0, 0, 554, 0, 0, 0, 0, 0, 91, 102, 747
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\auth.service.js", "JavaScript", 0, 0, 311, 0, 0, 0, 0, 0, 35, 37, 383
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\dailyGuidance.service.js", "JavaScript", 0, 0, 166, 0, 0, 0, 0, 0, 24, 21, 211
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\examDate.service.js", "JavaScript", 0, 0, 93, 0, 0, 0, 0, 0, 23, 20, 136
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\examYear.service.js", "JavaScript", 0, 0, 119, 0, 0, 0, 0, 0, 21, 17, 157
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\pomodoro.service.js", "JavaScript", 0, 0, 186, 0, 0, 0, 0, 0, 18, 29, 233
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\spacedRepetition.service.js", "JavaScript", 0, 0, 231, 0, 0, 0, 0, 0, 59, 36, 326
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\stats.service.js", "JavaScript", 0, 0, 996, 0, 0, 0, 0, 0, 100, 134, 1230
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\studyPlan.service.js", "JavaScript", 0, 0, 550, 0, 0, 0, 0, 0, 76, 85, 711
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\studyPlanAnalysis.service.js", "JavaScript", 0, 0, 354, 0, 0, 0, 0, 0, 55, 53, 462
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\studySession.service.js", "JavaScript", 0, 0, 252, 0, 0, 0, 0, 0, 25, 35, 312
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\subject.service.js", "JavaScript", 0, 0, 212, 0, 0, 0, 0, 0, 17, 28, 257
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\topicQuestionCount.service.js", "JavaScript", 0, 0, 149, 0, 0, 0, 0, 0, 24, 21, 194
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\utils\logger.js", "JavaScript", 0, 0, 18, 0, 0, 0, 0, 0, 0, 3, 21
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\validators\auth.validator.js", "JavaScript", 0, 0, 96, 0, 0, 0, 0, 0, 10, 13, 119
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\validators\studyPlan.validator.js", "JavaScript", 0, 0, 299, 0, 0, 0, 0, 0, 21, 41, 361
+"c:\Users\bm123\Documents\VSCode\AceIt\backend\src\validators\studySession.validator.js", "JavaScript", 0, 0, 155, 0, 0, 0, 0, 0, 9, 21, 185
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\README.md", "Markdown", 0, 9, 0, 0, 0, 0, 0, 0, 0, 8, 17
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\eslint.config.js", "JavaScript", 0, 0, 28, 0, 0, 0, 0, 0, 0, 2, 30
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\index.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 16, 1, 2, 19
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\package-lock.json", "JSON", 5085, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5086
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\package.json", "JSON", 43, 0, 0, 0, 0, 0, 0, 0, 0, 1, 44
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\postcss.config.js", "JavaScript", 0, 0, 6, 0, 0, 0, 0, 0, 0, 1, 7
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\public\vite.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\App.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\App.jsx", "JavaScript JSX", 0, 0, 0, 148, 0, 0, 0, 0, 4, 17, 169
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\admin.js", "JavaScript", 0, 0, 28, 0, 0, 0, 0, 0, 4, 4, 36
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\ai.js", "JavaScript", 0, 0, 50, 0, 0, 0, 0, 0, 45, 16, 111
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\auth.js", "JavaScript", 0, 0, 34, 0, 0, 0, 0, 0, 5, 5, 44
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\axios.js", "JavaScript", 0, 0, 84, 0, 0, 0, 0, 0, 8, 9, 101
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\index.js", "JavaScript", 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 8
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\pomodoro.js", "JavaScript", 0, 0, 13, 0, 0, 0, 0, 0, 2, 3, 18
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\stats.js", "JavaScript", 0, 0, 60, 0, 0, 0, 0, 0, 19, 19, 98
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\studyPlan.js", "JavaScript", 0, 0, 20, 0, 0, 0, 0, 0, 5, 15, 40
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\studySessions.js", "JavaScript", 0, 0, 16, 0, 0, 0, 0, 0, 6, 6, 28
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\subjects.js", "JavaScript", 0, 0, 6, 0, 0, 0, 0, 0, 1, 1, 8
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\assets\react.svg", "XML", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\components\StudyPlan\StudyPlanCalendar.jsx", "JavaScript JSX", 0, 0, 0, 245, 0, 0, 0, 0, 20, 33, 298
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\components\common\AdminRoute.jsx", "JavaScript JSX", 0, 0, 0, 20, 0, 0, 0, 0, 0, 6, 26
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\components\common\ProtectedRoute.jsx", "JavaScript JSX", 0, 0, 0, 20, 0, 0, 0, 0, 0, 5, 25
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\hooks\useAIAnalysis.js", "JavaScript", 0, 0, 49, 0, 0, 0, 0, 0, 8, 11, 68
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\index.css", "PostCSS", 0, 0, 0, 0, 13, 0, 0, 0, 0, 3, 16
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\main.jsx", "JavaScript JSX", 0, 0, 0, 24, 0, 0, 0, 0, 0, 1, 25
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\AI\QuestionSolver.jsx", "JavaScript JSX", 0, 0, 0, 669, 0, 0, 0, 0, 73, 63, 805
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Admin\AdminDashboard.jsx", "JavaScript JSX", 0, 0, 0, 280, 0, 0, 0, 0, 9, 19, 308
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Admin\ExamYears.jsx", "JavaScript JSX", 0, 0, 0, 278, 0, 0, 0, 0, 4, 23, 305
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Admin\TopicQuestions.jsx", "JavaScript JSX", 0, 0, 0, 322, 0, 0, 0, 0, 9, 30, 361
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Admin\Users.jsx", "JavaScript JSX", 0, 0, 0, 268, 0, 0, 0, 0, 6, 21, 295
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Auth\Login.jsx", "JavaScript JSX", 0, 0, 0, 276, 0, 0, 0, 0, 17, 20, 313
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Auth\Register.jsx", "JavaScript JSX", 0, 0, 0, 385, 0, 0, 0, 0, 22, 29, 436
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Dashboard\Dashboard.jsx", "JavaScript JSX", 0, 0, 0, 531, 0, 0, 0, 0, 38, 42, 611
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Pomodoro\PomodoroTimer.jsx", "JavaScript JSX", 0, 0, 0, 627, 0, 0, 0, 0, 28, 63, 718
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\ActivityHeatmap.jsx", "JavaScript JSX", 0, 0, 0, 216, 0, 0, 0, 0, 18, 24, 258
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\PomodoroTab.jsx", "JavaScript JSX", 0, 0, 0, 333, 0, 0, 0, 0, 11, 17, 361
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\SixMonthTrend.jsx", "JavaScript JSX", 0, 0, 0, 213, 0, 0, 0, 0, 12, 15, 240
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\StatsCharts.jsx", "JavaScript JSX", 0, 0, 0, 457, 0, 0, 0, 0, 28, 27, 512
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\StatsOverview.jsx", "JavaScript JSX", 0, 0, 0, 625, 0, 0, 0, 0, 40, 37, 702
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\StatsPage.jsx", "JavaScript JSX", 0, 0, 0, 320, 0, 0, 0, 0, 5, 19, 344
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\SubjectsTab.jsx", "JavaScript JSX", 0, 0, 0, 374, 0, 0, 0, 0, 20, 29, 423
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\TopicsTab.jsx", "JavaScript JSX", 0, 0, 0, 709, 0, 0, 0, 0, 42, 54, 805
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudyPlan\AIStudyPlanGenerator.jsx", "JavaScript JSX", 0, 0, 0, 442, 0, 0, 0, 0, 18, 46, 506
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudyPlan\StudyPlanDetail.jsx", "JavaScript JSX", 0, 0, 0, 285, 0, 0, 0, 0, 10, 32, 327
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudyPlan\StudyPlanForm.jsx", "JavaScript JSX", 0, 0, 0, 672, 0, 0, 0, 0, 22, 66, 760
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudyPlan\StudyPlanPage.jsx", "JavaScript JSX", 0, 0, 0, 436, 0, 0, 0, 0, 28, 36, 500
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudySessions\StudySessionCreate.jsx", "JavaScript JSX", 0, 0, 0, 350, 0, 0, 0, 0, 16, 28, 394
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudySessions\StudySessionEdit.jsx", "JavaScript JSX", 0, 0, 0, 403, 0, 0, 0, 0, 19, 35, 457
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudySessions\StudySessionList.jsx", "JavaScript JSX", 0, 0, 0, 465, 0, 0, 0, 0, 27, 41, 533
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\store\AuthContext.jsx", "JavaScript JSX", 0, 0, 0, 64, 0, 0, 0, 0, 8, 12, 84
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\store\ThemeContext.jsx", "JavaScript JSX", 0, 0, 0, 29, 0, 0, 0, 0, 0, 7, 36
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\AnimatedBackground.jsx", "JavaScript JSX", 0, 0, 0, 66, 0, 0, 0, 0, 5, 6, 77
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\AnimatedButton.jsx", "JavaScript JSX", 0, 0, 0, 67, 0, 0, 0, 0, 1, 5, 73
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\AnimatedIcon.jsx", "JavaScript JSX", 0, 0, 0, 54, 0, 0, 0, 0, 1, 8, 63
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\AnimatedInput.jsx", "JavaScript JSX", 0, 0, 0, 83, 0, 0, 0, 0, 5, 8, 96
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\AnimatedSelect.jsx", "JavaScript JSX", 0, 0, 0, 74, 0, 0, 0, 0, 5, 8, 87
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\ComingSoonCard.jsx", "JavaScript JSX", 0, 0, 0, 43, 0, 0, 0, 0, 0, 3, 46
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\DashboardHeader.jsx", "JavaScript JSX", 0, 0, 0, 44, 0, 0, 0, 0, 4, 8, 56
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\EmailInput.jsx", "JavaScript JSX", 0, 0, 0, 55, 0, 0, 0, 0, 1, 5, 61
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\GlassCard.jsx", "JavaScript JSX", 0, 0, 0, 44, 0, 0, 0, 0, 2, 6, 52
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\PasswordInput.jsx", "JavaScript JSX", 0, 0, 0, 123, 0, 0, 0, 0, 2, 10, 135
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\StatsCard.jsx", "JavaScript JSX", 0, 0, 0, 66, 0, 0, 0, 0, 1, 5, 72
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\ThemeToggle.jsx", "JavaScript JSX", 0, 0, 0, 40, 0, 0, 0, 0, 2, 6, 48
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\WelcomeCard.jsx", "JavaScript JSX", 0, 0, 0, 60, 0, 0, 0, 0, 0, 3, 63
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\index.js", "JavaScript", 0, 0, 13, 0, 0, 0, 0, 0, 4, 4, 21
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\utils\aiCache.js", "JavaScript", 0, 0, 107, 0, 0, 0, 0, 0, 61, 33, 201
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\utils\cn.js", "JavaScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 1, 6
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\utils\errorHandler.js", "JavaScript", 0, 0, 79, 0, 0, 0, 0, 0, 27, 19, 125
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\utils\index.js", "JavaScript", 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 3
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\utils\pdfGenerator.js", "JavaScript", 0, 0, 250, 0, 0, 0, 0, 0, 18, 52, 320
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\tailwind.config.js", "JavaScript", 0, 0, 98, 0, 0, 0, 0, 0, 5, 1, 104
+"c:\Users\bm123\Documents\VSCode\AceIt\frontend\vite.config.js", "JavaScript", 0, 0, 5, 0, 0, 0, 0, 0, 1, 2, 8
+"Total", "-", 8406, 3321, 8431, 11305, 13, 2, 586, 16, 2437, 3347, 37864

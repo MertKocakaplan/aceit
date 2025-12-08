@@ -21,6 +21,14 @@ const AnimatedInput = ({
 
   return (
     <div className="relative">
+      {/* Label - Always on top */}
+      <label
+        htmlFor={id}
+        className="block text-sm font-bold bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-400 dark:to-primary-500 bg-clip-text text-transparent mb-2"
+      >
+        {label}
+      </label>
+
       <motion.div
         animate={{
           scale: isFocused ? 1.02 : 1,
@@ -38,8 +46,8 @@ const AnimatedInput = ({
             >
               <Icon className={`h-5 w-5 transition-all duration-300 ${
                 isFocused || hasValue
-                  ? 'text-purple-500'
-                  : 'text-gray-400'
+                  ? 'text-primary-700 dark:text-primary-400'
+                  : 'text-neutral-400 dark:text-neutral-500'
               }`} />
             </motion.div>
           </div>
@@ -55,22 +63,10 @@ const AnimatedInput = ({
           onChange={onChange}
           onFocus={onFocus}
           onBlur={onBlur}
-          className={`peer block w-full ${Icon ? 'pl-12' : 'pl-4'} ${RightIcon ? 'pr-12' : 'pr-4'} py-4 bg-white/60 backdrop-blur-sm border-2 border-gray-200/50 rounded-2xl shadow-lg focus:outline-none focus:ring-4 focus:ring-purple-500/30 focus:border-purple-500 transition-all duration-300 placeholder-transparent ${className}`}
-          placeholder={label}
+          className={`peer block w-full ${Icon ? 'pl-12' : 'pl-4'} ${RightIcon ? 'pr-12' : 'pr-4'} py-4 bg-white/60 dark:bg-neutral-800/60 backdrop-blur-sm border-2 border-neutral-200/50 dark:border-neutral-700/50 rounded-2xl shadow-lg focus:outline-none focus:ring-4 focus:ring-primary-500/30 focus:border-primary-700 dark:focus:border-primary-500 transition-all duration-300 text-neutral-900 dark:text-neutral-100 ${className}`}
+          placeholder=""
           {...props}
         />
-
-        {/* Floating Label */}
-        <label
-          htmlFor={id}
-          className={`absolute ${Icon ? 'left-12' : 'left-4'} transition-all duration-300 pointer-events-none ${
-            isFocused || hasValue
-              ? '-top-6 left-2 text-xs font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'
-              : 'top-4 text-gray-500'
-          }`}
-        >
-          {label}
-        </label>
 
         {/* Right Icon */}
         {RightIcon && (
@@ -83,7 +79,7 @@ const AnimatedInput = ({
         {isFocused && (
           <motion.div
             layoutId="focusRing"
-            className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-sm -z-10"
+            className="absolute -inset-1 bg-gradient-to-r from-primary-500/20 to-primary-600/20 rounded-2xl blur-sm -z-10"
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
         )}

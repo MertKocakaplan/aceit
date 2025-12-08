@@ -163,13 +163,16 @@ const AIStudyPlanGenerator = ({ onClose }) => {
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl rounded-3xl border border-neutral-200/50 dark:border-neutral-800/50 shadow-2xl"
         >
-          {/* Close Button */}
+          {/* Close Button - Fixed positioning with higher z-index */}
           <button
-            onClick={onClose}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!generating) onClose();
+            }}
             disabled={generating}
-            className="absolute top-6 right-6 z-10 p-2 rounded-xl bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="absolute top-4 right-4 z-50 p-3 rounded-xl bg-white/90 dark:bg-neutral-800/90 hover:bg-white dark:hover:bg-neutral-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg border border-neutral-200/50 dark:border-neutral-700/50"
           >
-            <X className="w-5 h-5 text-neutral-600 dark:text-neutral-400" />
+            <X className="w-6 h-6 text-neutral-700 dark:text-neutral-300" />
           </button>
 
           {/* Header */}

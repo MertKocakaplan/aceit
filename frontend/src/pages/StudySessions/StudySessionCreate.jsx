@@ -5,7 +5,8 @@ import { subjectsAPI, studySessionsAPI } from '../../api';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { Plus, Clock, BookOpen, CheckCircle, XCircle, MinusCircle } from 'lucide-react';
-import { DashboardHeader, AnimatedBackground } from '../../ui';
+import { DashboardHeader, AnimatedInput, AnimatedSelect } from '../../ui';
+import { DashboardBackgroundEffects } from '../../components/dashboard';
 
 const StudySessionCreate = () => {
   const navigate = useNavigate();
@@ -24,6 +25,9 @@ const StudySessionCreate = () => {
     questionsWrong: '',
     questionsEmpty: '',
   });
+
+  // Focus state for animated inputs
+  const [focusedField, setFocusedField] = useState(null);
 
   useEffect(() => {
     fetchSubjects();
@@ -75,6 +79,14 @@ const StudySessionCreate = () => {
     }
   };
 
+  const handleFocus = (e) => {
+    setFocusedField(e.target.name);
+  };
+
+  const handleBlur = () => {
+    setFocusedField(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -103,7 +115,7 @@ const StudySessionCreate = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-100 via-neutral-50 to-secondary-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300">
-      <AnimatedBackground variant="dashboard" className="fixed -z-10" />
+      <DashboardBackgroundEffects />
       <DashboardHeader user={user} onLogout={logout} />
 
       {/* Main Content */}
@@ -158,65 +170,54 @@ const StudySessionCreate = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Subject Selection */}
-                  <div className="space-y-2">
-                    <label htmlFor="subjectId" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
-                      Ders *
-                    </label>
-                    <div className="relative group">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <BookOpen className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
-                      </div>
-                      <select
-                        id="subjectId"
-                        name="subjectId"
-                        value={formData.subjectId}
-                        onChange={handleChange}
-                        required
-                        disabled={loadingSubjects}
-                        className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans text-neutral-900 dark:text-white appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <option value="">Ders Seçin</option>
-                        {subjects.map((subject) => (
-                          <option key={subject.id} value={subject.id}>
-                            {subject.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
+                  <AnimatedSelect
+                    id="subjectId"
+                    name="subjectId"
+                    label="Ders *"
+                    value={formData.subjectId}
+                    onChange={handleChange}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    focusedField={focusedField}
+                    icon={BookOpen}
+                    options={[
+                      { value: '', label: 'Ders Seçin' },
+                      ...subjects.map((subject) => ({
+                        value: subject.id,
+                        label: subject.name
+                      }))
+                    ]}
+                    required
+                    disabled={loadingSubjects}
+                  />
 
                   {/* Topic Selection */}
                   {formData.subjectId && (
                     <motion.div
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="space-y-2"
                     >
-                      <label htmlFor="topicId" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans">
-                        Konu (Opsiyonel)
-                      </label>
-                      <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                          <BookOpen className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
-                        </div>
-                        <select
-                          id="topicId"
-                          name="topicId"
-                          value={formData.topicId}
-                          onChange={handleChange}
-                          disabled={loadingTopics || topics.length === 0}
-                          className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans text-neutral-900 dark:text-white appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <option value="">Genel (Konu seçilmedi)</option>
-                          {topics.map((topic) => (
-                            <option key={topic.id} value={topic.id}>
-                              {topic.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                      <AnimatedSelect
+                        id="topicId"
+                        name="topicId"
+                        label="Konu (Opsiyonel)"
+                        value={formData.topicId}
+                        onChange={handleChange}
+                        onFocus={handleFocus}
+                        onBlur={handleBlur}
+                        focusedField={focusedField}
+                        icon={BookOpen}
+                        options={[
+                          { value: '', label: 'Genel (Konu seçilmedi)' },
+                          ...topics.map((topic) => ({
+                            value: topic.id,
+                            label: topic.name
+                          }))
+                        ]}
+                        disabled={loadingTopics || topics.length === 0}
+                      />
                       {loadingTopics && (
-                        <p className="text-xs text-neutral-500 dark:text-neutral-400 font-sans">
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400 font-sans mt-2">
                           Konular yükleniyor...
                         </p>
                       )}
@@ -235,25 +236,21 @@ const StudySessionCreate = () => {
                 </div>
 
                 <div className="max-w-md">
-                  <label htmlFor="duration" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-sans mb-2">
-                    Çalışma Süresi (dakika) *
-                  </label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Clock className="w-5 h-5 text-neutral-400 group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400 transition-colors" />
-                    </div>
-                    <input
-                      id="duration"
-                      name="duration"
-                      type="number"
-                      min="1"
-                      value={formData.duration}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:border-primary-500 dark:focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all outline-none font-sans text-neutral-900 dark:text-white"
-                      placeholder="60"
-                    />
-                  </div>
+                  <AnimatedInput
+                    id="duration"
+                    name="duration"
+                    type="number"
+                    label="Çalışma Süresi (dakika) *"
+                    value={formData.duration}
+                    onChange={handleChange}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    focusedField={focusedField}
+                    icon={Clock}
+                    placeholder="60"
+                    min="1"
+                    required
+                  />
                 </div>
               </div>
 

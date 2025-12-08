@@ -1,6 +1,7 @@
 // Layout Components
 export { default as AnimatedBackground } from './AnimatedBackground';
 export { default as GlassCard } from './GlassCard';
+export { default as Modal } from './Modal';
 
 // Form Components
 export { default as AnimatedInput } from './AnimatedInput';

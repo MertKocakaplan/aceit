@@ -5,7 +5,8 @@ import { generateStatsPDF } from '../../utils/pdfGenerator';
 import { useAIAnalysis } from '../../hooks/useAIAnalysis';
 import { motion } from 'framer-motion';
 import { Activity, BarChart, BookOpen, Clock, Download } from 'lucide-react';
-import { AnimatedBackground, DashboardHeader } from '../../ui';
+import { DashboardHeader } from '../../ui';
+import { DashboardBackgroundEffects } from '../../components/dashboard';
 import StatsOverview from './StatsOverview';
 import StatsCharts from './StatsCharts';
 import ActivityHeatmap from './ActivityHeatmap';
@@ -148,8 +149,8 @@ const StatsPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300">
-      <AnimatedBackground variant="dashboard" className="fixed -z-10" />
+    <div className="min-h-screen bg-gradient-to-br from-secondary-100 via-neutral-50 to-secondary-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300 relative overflow-hidden">
+      <DashboardBackgroundEffects />
       <DashboardHeader user={user} onLogout={logout} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

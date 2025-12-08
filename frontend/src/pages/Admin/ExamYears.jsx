@@ -17,6 +17,7 @@ import {
   GlassCard,
   AnimatedButton,
   AnimatedInput,
+  Modal,
 } from '../../ui';
 
 const ExamYears = () => {
@@ -237,67 +238,62 @@ const ExamYears = () => {
       </main>
 
       {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md"
-          >
-            <GlassCard className="p-6">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">
-                {editingYear ? 'Yıl Düzenle' : 'Yeni Yıl Ekle'}
-              </h2>
+      <Modal
+        show={showModal}
+        onClose={() => {
+          setShowModal(false);
+          setEditingYear(null);
+          setFormData({ year: '', examDate: '' });
+        }}
+        title={editingYear ? 'Yıl Düzenle' : 'Yeni Yıl Ekle'}
+        maxWidth="md"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <AnimatedInput
+            id="year"
+            name="year"
+            type="number"
+            label="Yıl"
+            value={formData.year}
+            onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+            icon={Calendar}
+            required
+            disabled={!!editingYear}
+            min="2000"
+            max="2100"
+          />
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <AnimatedInput
-                  id="year"
-                  name="year"
-                  type="number"
-                  label="Yıl"
-                  value={formData.year}
-                  onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                  icon={Calendar}
-                  required
-                  disabled={!!editingYear}
-                  min="2000"
-                  max="2100"
-                />
+          <AnimatedInput
+            id="examDate"
+            name="examDate"
+            type="date"
+            label="Sınav Tarihi (Opsiyonel)"
+            value={formData.examDate}
+            onChange={(e) => setFormData({ ...formData, examDate: e.target.value })}
+            icon={Calendar}
+          />
 
-                <AnimatedInput
-                  id="examDate"
-                  name="examDate"
-                  type="date"
-                  label="Sınav Tarihi (Opsiyonel)"
-                  value={formData.examDate}
-                  onChange={(e) => setFormData({ ...formData, examDate: e.target.value })}
-                  icon={Calendar}
-                />
-
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowModal(false);
-                      setEditingYear(null);
-                      setFormData({ year: '', examDate: '' });
-                    }}
-                    className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                  >
-                    İptal
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-colors"
-                  >
-                    {editingYear ? 'Güncelle' : 'Ekle'}
-                  </button>
-                </div>
-              </form>
-            </GlassCard>
-          </motion.div>
-        </div>
-      )}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setShowModal(false);
+                setEditingYear(null);
+                setFormData({ year: '', examDate: '' });
+              }}
+              className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            >
+              İptal
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-colors"
+            >
+              {editingYear ? 'Güncelle' : 'Ekle'}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

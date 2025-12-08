@@ -16,9 +16,9 @@ import {
   X,
 } from 'lucide-react';
 import {
-  AnimatedBackground,
   DashboardHeader,
 } from '../../ui';
+import { DashboardBackgroundEffects } from '../../components/dashboard';
 
 const PomodoroTimer = () => {
   const { user, logout } = useAuth();
@@ -241,7 +241,7 @@ const PomodoroTimer = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300">
-      <AnimatedBackground variant="dashboard" className="fixed -z-10" />
+      <DashboardBackgroundEffects />
       <DashboardHeader user={user} onLogout={logout} />
 
       <main className="max-w-7xl mx-auto px-6 py-12">

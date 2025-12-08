@@ -1,0 +1,220 @@
+Date : 2025-12-05 14:58:17
+Directory : c:\Users\bm123\Documents\VSCode\AceIt
+Total : 142 files,  32080 codes, 2437 comments, 3347 blanks, all 37864 lines
+
+Languages
++----------------+------------+------------+------------+------------+------------+
+| language       | files      | code       | comment    | blank      | total      |
++----------------+------------+------------+------------+------------+------------+
+| JavaScript JSX |         44 |     11,305 |        583 |        978 |     12,866 |
+| JavaScript     |         76 |      8,431 |      1,592 |      1,412 |     11,435 |
+| JSON           |          5 |      8,406 |          0 |          5 |      8,411 |
+| Markdown       |          5 |      3,321 |          0 |        718 |      4,039 |
+| MS SQL         |          7 |        586 |        261 |        228 |      1,075 |
+| HTML           |          1 |         16 |          1 |          2 |         19 |
+| PostCSS        |          2 |         13 |          0 |          4 |         17 |
+| XML            |          2 |          2 |          0 |          0 |          2 |
++----------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                   | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                      |        142 |     32,080 |      2,437 |      3,347 |     37,864 |
+| . (Files)                                                                                                              |          4 |      3,312 |          0 |        710 |      4,022 |
+| .claude                                                                                                                |          1 |          9 |          0 |          1 |         10 |
+| backend                                                                                                                |         64 |     11,325 |      1,634 |      1,437 |     14,396 |
+| backend (Files)                                                                                                        |          2 |      3,269 |          0 |          2 |      3,271 |
+| backend\prisma                                                                                                         |          7 |        586 |        261 |        228 |      1,075 |
+| backend\prisma\migrations                                                                                              |          7 |        586 |        261 |        228 |      1,075 |
+| backend\prisma\migrations\20250930092626_init                                                                          |          1 |        230 |         60 |         76 |        366 |
+| backend\prisma\migrations\20250930114320_update_exam_types                                                             |          1 |          9 |          7 |          1 |         17 |
+| backend\prisma\migrations\20251002205241_update_exam_types                                                             |          1 |          5 |          6 |          3 |         14 |
+| backend\prisma\migrations\20251003124721_ayt_subject_types                                                             |          1 |          9 |          7 |          1 |         17 |
+| backend\prisma\migrations\20251020142029_add_recommendation_system                                                     |          1 |         93 |         76 |         55 |        224 |
+| backend\prisma\migrations\20251020142114_add_recommendation_system                                                     |          1 |        190 |         80 |         71 |        341 |
+| backend\prisma\migrations\20251020142401_add_recommendation_system                                                     |          1 |         50 |         25 |         21 |         96 |
+| backend\src                                                                                                            |         55 |      7,470 |      1,373 |      1,207 |     10,050 |
+| backend\src (Files)                                                                                                    |          2 |         67 |         10 |         15 |         92 |
+| backend\src\config                                                                                                     |          3 |         69 |         21 |         14 |        104 |
+| backend\src\controllers                                                                                                |         12 |      1,464 |        324 |        244 |      2,032 |
+| backend\src\middleware                                                                                                 |          5 |        201 |         61 |         38 |        300 |
+| backend\src\routes                                                                                                     |         13 |        179 |        244 |         95 |        518 |
+| backend\src\services                                                                                                   |         16 |      4,922 |        673 |        723 |      6,318 |
+| backend\src\services (Files)                                                                                           |         12 |      3,619 |        477 |        516 |      4,612 |
+| backend\src\services\ai                                                                                                |          4 |      1,303 |        196 |        207 |      1,706 |
+| backend\src\utils                                                                                                      |          1 |         18 |          0 |          3 |         21 |
+| backend\src\validators                                                                                                 |          3 |        550 |         40 |         75 |        665 |
+| frontend                                                                                                               |         73 |     17,434 |        803 |      1,199 |     19,436 |
+| frontend (Files)                                                                                                       |          8 |      5,290 |          7 |         18 |      5,315 |
+| frontend\public                                                                                                        |          1 |          1 |          0 |          0 |          1 |
+| frontend\src                                                                                                           |         64 |     12,143 |        796 |      1,181 |     14,120 |
+| frontend\src (Files)                                                                                                   |          4 |        185 |          4 |         22 |        211 |
+| frontend\src\api                                                                                                       |         10 |        319 |         95 |         78 |        492 |
+| frontend\src\assets                                                                                                    |          1 |          1 |          0 |          0 |          1 |
+| frontend\src\components                                                                                                |          3 |        285 |         20 |         44 |        349 |
+| frontend\src\components\StudyPlan                                                                                      |          1 |        245 |         20 |         33 |        298 |
+| frontend\src\components\common                                                                                         |          2 |         40 |          0 |         11 |         51 |
+| frontend\src\hooks                                                                                                     |          1 |         49 |          8 |         11 |         68 |
+| frontend\src\pages                                                                                                     |         24 |      9,936 |        522 |        816 |     11,274 |
+| frontend\src\pages\AI                                                                                                  |          1 |        669 |         73 |         63 |        805 |
+| frontend\src\pages\Admin                                                                                               |          4 |      1,148 |         28 |         93 |      1,269 |
+| frontend\src\pages\Auth                                                                                                |          2 |        661 |         39 |         49 |        749 |
+| frontend\src\pages\Dashboard                                                                                           |          1 |        531 |         38 |         42 |        611 |
+| frontend\src\pages\Pomodoro                                                                                            |          1 |        627 |         28 |         63 |        718 |
+| frontend\src\pages\Stats                                                                                               |          8 |      3,247 |        176 |        222 |      3,645 |
+| frontend\src\pages\StudyPlan                                                                                           |          4 |      1,835 |         78 |        180 |      2,093 |
+| frontend\src\pages\StudySessions                                                                                       |          3 |      1,218 |         62 |        104 |      1,384 |
+| frontend\src\store                                                                                                     |          2 |         93 |          8 |         19 |        120 |
+| frontend\src\ui                                                                                                        |         14 |        832 |         33 |         85 |        950 |
+| frontend\src\utils                                                                                                     |          5 |        443 |        106 |        106 |        655 |
++------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| filename                                                                                                               | language       | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+
+| c:\Users\bm123\Documents\VSCode\AceIt\.claude\settings.local.json                                                      | JSON           |          9 |          0 |          1 |         10 |
+| c:\Users\bm123\Documents\VSCode\AceIt\AI_INTEGRATION_IMPLEMENTATION.md                                                 | Markdown       |        828 |          0 |        165 |        993 |
+| c:\Users\bm123\Documents\VSCode\AceIt\AI_INTEGRATION_PLAN.md                                                           | Markdown       |      1,625 |          0 |        336 |      1,961 |
+| c:\Users\bm123\Documents\VSCode\AceIt\README.md                                                                        | Markdown       |         30 |          0 |          8 |         38 |
+| c:\Users\bm123\Documents\VSCode\AceIt\STUDY_PLAN_IMPLEMENTATION_PLAN.md                                                | Markdown       |        829 |          0 |        201 |      1,030 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\package-lock.json                                                        | JSON           |      3,232 |          0 |          1 |      3,233 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\package.json                                                             | JSON           |         37 |          0 |          1 |         38 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20250930092626_init\migration.sql                      | MS SQL         |        230 |         60 |         76 |        366 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20250930114320_update_exam_types\migration.sql         | MS SQL         |          9 |          7 |          1 |         17 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20251002205241_update_exam_types\migration.sql         | MS SQL         |          5 |          6 |          3 |         14 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20251003124721_ayt_subject_types\migration.sql         | MS SQL         |          9 |          7 |          1 |         17 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20251020142029_add_recommendation_system\migration.sql | MS SQL         |         93 |         76 |         55 |        224 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20251020142114_add_recommendation_system\migration.sql | MS SQL         |        190 |         80 |         71 |        341 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\prisma\migrations\20251020142401_add_recommendation_system\migration.sql | MS SQL         |         50 |         25 |         21 |         96 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\app.js                                                               | JavaScript     |         58 |         10 |         13 |         81 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\config\database.js                                                   | JavaScript     |          5 |          0 |          2 |          7 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\config\jwt.js                                                        | JavaScript     |         29 |         17 |          4 |         50 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\config\openai.js                                                     | JavaScript     |         35 |          4 |          8 |         47 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\ai.controller.js                                         | JavaScript     |        180 |         36 |         28 |        244 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\auth.controller.js                                       | JavaScript     |         98 |         29 |         18 |        145 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\examYear.controller.js                                   | JavaScript     |         84 |         24 |         12 |        120 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\pomodoro.controller.js                                   | JavaScript     |         51 |         10 |          8 |         69 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\spacedRepetition.controller.js                           | JavaScript     |         79 |         12 |         16 |        107 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\stats.controller.js                                      | JavaScript     |        261 |         68 |         35 |        364 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\studyPlan.controller.js                                  | JavaScript     |        229 |         57 |         44 |        330 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\studyPlanAnalysis.controller.js                          | JavaScript     |         17 |          4 |          3 |         24 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\studySession.controller.js                               | JavaScript     |         86 |         20 |         15 |        121 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\subject.controller.js                                    | JavaScript     |         45 |         12 |          9 |         66 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\topicQuestionCount.controller.js                         | JavaScript     |        245 |         31 |         41 |        317 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\controllers\user.controller.js                                       | JavaScript     |         89 |         21 |         15 |        125 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\middleware\admin.js                                                  | JavaScript     |         26 |          7 |          4 |         37 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\middleware\auth.js                                                   | JavaScript     |         44 |          9 |         11 |         64 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\middleware\errorHandler.js                                           | JavaScript     |         22 |          9 |          5 |         36 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\middleware\security.js                                               | JavaScript     |         26 |          9 |          3 |         38 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\middleware\upload.js                                                 | JavaScript     |         83 |         27 |         15 |        125 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\adminStats.routes.js                                          | JavaScript     |          8 |          0 |          3 |         11 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\ai.routes.js                                                  | JavaScript     |         22 |         25 |         16 |         63 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\auth.routes.js                                                | JavaScript     |         12 |         25 |          6 |         43 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\examYear.routes.js                                            | JavaScript     |         13 |          1 |          3 |         17 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\pomodoro.routes.js                                            | JavaScript     |          8 |          0 |          3 |         11 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\spacedRepetition.routes.js                                    | JavaScript     |         10 |         21 |          7 |         38 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\stats.routes.js                                               | JavaScript     |         23 |         72 |         19 |        114 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\studyPlan.routes.js                                           | JavaScript     |         28 |         59 |         17 |        104 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\studyPlanAnalysis.routes.js                                   | JavaScript     |          7 |          0 |          3 |         10 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\studySession.routes.js                                        | JavaScript     |         15 |         24 |          7 |         46 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\subject.routes.js                                             | JavaScript     |          9 |         15 |          5 |         29 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\topicQuestionCount.routes.js                                  | JavaScript     |         13 |          1 |          3 |         17 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\routes\user.routes.js                                                | JavaScript     |         11 |          1 |          3 |         15 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\server.js                                                            | JavaScript     |          9 |          0 |          2 |         11 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\ai\openai.service.js                                        | JavaScript     |        119 |         28 |         21 |        168 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\ai\performanceAnalysis.service.js                           | JavaScript     |        356 |         38 |         43 |        437 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\ai\questionSolver.service.js                                | JavaScript     |        274 |         39 |         41 |        354 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\ai\studyPlanGenerator.service.js                            | JavaScript     |        554 |         91 |        102 |        747 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\auth.service.js                                             | JavaScript     |        311 |         35 |         37 |        383 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\dailyGuidance.service.js                                    | JavaScript     |        166 |         24 |         21 |        211 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\examDate.service.js                                         | JavaScript     |         93 |         23 |         20 |        136 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\examYear.service.js                                         | JavaScript     |        119 |         21 |         17 |        157 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\pomodoro.service.js                                         | JavaScript     |        186 |         18 |         29 |        233 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\spacedRepetition.service.js                                 | JavaScript     |        231 |         59 |         36 |        326 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\stats.service.js                                            | JavaScript     |        996 |        100 |        134 |      1,230 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\studyPlan.service.js                                        | JavaScript     |        550 |         76 |         85 |        711 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\studyPlanAnalysis.service.js                                | JavaScript     |        354 |         55 |         53 |        462 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\studySession.service.js                                     | JavaScript     |        252 |         25 |         35 |        312 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\subject.service.js                                          | JavaScript     |        212 |         17 |         28 |        257 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\services\topicQuestionCount.service.js                               | JavaScript     |        149 |         24 |         21 |        194 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\utils\logger.js                                                      | JavaScript     |         18 |          0 |          3 |         21 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\validators\auth.validator.js                                         | JavaScript     |         96 |         10 |         13 |        119 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\validators\studyPlan.validator.js                                    | JavaScript     |        299 |         21 |         41 |        361 |
+| c:\Users\bm123\Documents\VSCode\AceIt\backend\src\validators\studySession.validator.js                                 | JavaScript     |        155 |          9 |         21 |        185 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\README.md                                                               | Markdown       |          9 |          0 |          8 |         17 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\eslint.config.js                                                        | JavaScript     |         28 |          0 |          2 |         30 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\index.html                                                              | HTML           |         16 |          1 |          2 |         19 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\package-lock.json                                                       | JSON           |      5,085 |          0 |          1 |      5,086 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\package.json                                                            | JSON           |         43 |          0 |          1 |         44 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\postcss.config.js                                                       | JavaScript     |          6 |          0 |          1 |          7 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\public\vite.svg                                                         | XML            |          1 |          0 |          0 |          1 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\App.css                                                             | PostCSS        |          0 |          0 |          1 |          1 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\App.jsx                                                             | JavaScript JSX |        148 |          4 |         17 |        169 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\admin.js                                                        | JavaScript     |         28 |          4 |          4 |         36 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\ai.js                                                           | JavaScript     |         50 |         45 |         16 |        111 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\auth.js                                                         | JavaScript     |         34 |          5 |          5 |         44 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\axios.js                                                        | JavaScript     |         84 |          8 |          9 |        101 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\index.js                                                        | JavaScript     |          8 |          0 |          0 |          8 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\pomodoro.js                                                     | JavaScript     |         13 |          2 |          3 |         18 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\stats.js                                                        | JavaScript     |         60 |         19 |         19 |         98 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\studyPlan.js                                                    | JavaScript     |         20 |          5 |         15 |         40 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\studySessions.js                                                | JavaScript     |         16 |          6 |          6 |         28 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\api\subjects.js                                                     | JavaScript     |          6 |          1 |          1 |          8 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\assets\react.svg                                                    | XML            |          1 |          0 |          0 |          1 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\components\StudyPlan\StudyPlanCalendar.jsx                          | JavaScript JSX |        245 |         20 |         33 |        298 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\components\common\AdminRoute.jsx                                    | JavaScript JSX |         20 |          0 |          6 |         26 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\components\common\ProtectedRoute.jsx                                | JavaScript JSX |         20 |          0 |          5 |         25 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\hooks\useAIAnalysis.js                                              | JavaScript     |         49 |          8 |         11 |         68 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\index.css                                                           | PostCSS        |         13 |          0 |          3 |         16 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\main.jsx                                                            | JavaScript JSX |         24 |          0 |          1 |         25 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\AI\QuestionSolver.jsx                                         | JavaScript JSX |        669 |         73 |         63 |        805 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Admin\AdminDashboard.jsx                                      | JavaScript JSX |        280 |          9 |         19 |        308 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Admin\ExamYears.jsx                                           | JavaScript JSX |        278 |          4 |         23 |        305 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Admin\TopicQuestions.jsx                                      | JavaScript JSX |        322 |          9 |         30 |        361 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Admin\Users.jsx                                               | JavaScript JSX |        268 |          6 |         21 |        295 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Auth\Login.jsx                                                | JavaScript JSX |        276 |         17 |         20 |        313 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Auth\Register.jsx                                             | JavaScript JSX |        385 |         22 |         29 |        436 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Dashboard\Dashboard.jsx                                       | JavaScript JSX |        531 |         38 |         42 |        611 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Pomodoro\PomodoroTimer.jsx                                    | JavaScript JSX |        627 |         28 |         63 |        718 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\ActivityHeatmap.jsx                                     | JavaScript JSX |        216 |         18 |         24 |        258 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\PomodoroTab.jsx                                         | JavaScript JSX |        333 |         11 |         17 |        361 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\SixMonthTrend.jsx                                       | JavaScript JSX |        213 |         12 |         15 |        240 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\StatsCharts.jsx                                         | JavaScript JSX |        457 |         28 |         27 |        512 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\StatsOverview.jsx                                       | JavaScript JSX |        625 |         40 |         37 |        702 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\StatsPage.jsx                                           | JavaScript JSX |        320 |          5 |         19 |        344 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\SubjectsTab.jsx                                         | JavaScript JSX |        374 |         20 |         29 |        423 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\Stats\TopicsTab.jsx                                           | JavaScript JSX |        709 |         42 |         54 |        805 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudyPlan\AIStudyPlanGenerator.jsx                            | JavaScript JSX |        442 |         18 |         46 |        506 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudyPlan\StudyPlanDetail.jsx                                 | JavaScript JSX |        285 |         10 |         32 |        327 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudyPlan\StudyPlanForm.jsx                                   | JavaScript JSX |        672 |         22 |         66 |        760 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudyPlan\StudyPlanPage.jsx                                   | JavaScript JSX |        436 |         28 |         36 |        500 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudySessions\StudySessionCreate.jsx                          | JavaScript JSX |        350 |         16 |         28 |        394 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudySessions\StudySessionEdit.jsx                            | JavaScript JSX |        403 |         19 |         35 |        457 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\pages\StudySessions\StudySessionList.jsx                            | JavaScript JSX |        465 |         27 |         41 |        533 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\store\AuthContext.jsx                                               | JavaScript JSX |         64 |          8 |         12 |         84 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\store\ThemeContext.jsx                                              | JavaScript JSX |         29 |          0 |          7 |         36 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\AnimatedBackground.jsx                                           | JavaScript JSX |         66 |          5 |          6 |         77 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\AnimatedButton.jsx                                               | JavaScript JSX |         67 |          1 |          5 |         73 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\AnimatedIcon.jsx                                                 | JavaScript JSX |         54 |          1 |          8 |         63 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\AnimatedInput.jsx                                                | JavaScript JSX |         83 |          5 |          8 |         96 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\AnimatedSelect.jsx                                               | JavaScript JSX |         74 |          5 |          8 |         87 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\ComingSoonCard.jsx                                               | JavaScript JSX |         43 |          0 |          3 |         46 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\DashboardHeader.jsx                                              | JavaScript JSX |         44 |          4 |          8 |         56 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\EmailInput.jsx                                                   | JavaScript JSX |         55 |          1 |          5 |         61 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\GlassCard.jsx                                                    | JavaScript JSX |         44 |          2 |          6 |         52 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\PasswordInput.jsx                                                | JavaScript JSX |        123 |          2 |         10 |        135 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\StatsCard.jsx                                                    | JavaScript JSX |         66 |          1 |          5 |         72 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\ThemeToggle.jsx                                                  | JavaScript JSX |         40 |          2 |          6 |         48 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\WelcomeCard.jsx                                                  | JavaScript JSX |         60 |          0 |          3 |         63 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\ui\index.js                                                         | JavaScript     |         13 |          4 |          4 |         21 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\utils\aiCache.js                                                    | JavaScript     |        107 |         61 |         33 |        201 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\utils\cn.js                                                         | JavaScript     |          5 |          0 |          1 |          6 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\utils\errorHandler.js                                               | JavaScript     |         79 |         27 |         19 |        125 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\utils\index.js                                                      | JavaScript     |          2 |          0 |          1 |          3 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\src\utils\pdfGenerator.js                                               | JavaScript     |        250 |         18 |         52 |        320 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\tailwind.config.js                                                      | JavaScript     |         98 |          5 |          1 |        104 |
+| c:\Users\bm123\Documents\VSCode\AceIt\frontend\vite.config.js                                                          | JavaScript     |          5 |          1 |          2 |          8 |
+| Total                                                                                                                  |                |     32,080 |      2,437 |      3,347 |     37,864 |
++------------------------------------------------------------------------------------------------------------------------+----------------+------------+------------+------------+------------+

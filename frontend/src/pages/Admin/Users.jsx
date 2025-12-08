@@ -17,6 +17,9 @@ import {
 import {
   AnimatedBackground,
   DashboardHeader,
+  AnimatedInput,
+  AnimatedSelect,
+  GlassCard,
 } from '../../ui';
 
 const Users = () => {
@@ -24,6 +27,7 @@ const Users = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [focusedField, setFocusedField] = useState(null);
   const [filters, setFilters] = useState({
     search: '',
     role: '',
@@ -79,6 +83,14 @@ const Users = () => {
       toast.error('Kullanıcı silinemedi');
       console.error(error);
     }
+  };
+
+  const handleFocus = (e) => {
+    setFocusedField(e.target.name);
+  };
+
+  const handleBlur = () => {
+    setFocusedField(null);
   };
 
   const handleSearch = () => {
@@ -151,32 +163,37 @@ const Users = () => {
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div className="md:col-span-2">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Search className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                    <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 font-display">Ara</label>
-                  </div>
-                  <input
+                  <AnimatedInput
+                    id="search"
+                    name="search"
                     type="text"
-                    placeholder="Email, kullanıcı adı veya ad ile ara..."
+                    label="Ara"
                     value={filters.search}
                     onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-800 dark:text-neutral-200 font-display focus:outline-none focus:border-blue-500"
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    focusedField={focusedField}
+                    icon={Search}
+                    placeholder="Email, kullanıcı adı veya ad ile ara..."
                   />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Filter className="w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                    <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 font-display">Rol</label>
-                  </div>
-                  <select
+                  <AnimatedSelect
+                    id="role"
+                    name="role"
+                    label="Rol"
                     value={filters.role}
                     onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-                    className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl text-neutral-800 dark:text-neutral-200 font-display focus:outline-none focus:border-blue-500 cursor-pointer"
-                  >
-                    <option value="">Tüm Roller</option>
-                    <option value="USER">Kullanıcı</option>
-                    <option value="ADMIN">Admin</option>
-                  </select>
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    focusedField={focusedField}
+                    icon={Filter}
+                    options={[
+                      { value: '', label: 'Tüm Roller' },
+                      { value: 'USER', label: 'Kullanıcı' },
+                      { value: 'ADMIN', label: 'Admin' },
+                    ]}
+                  />
                 </div>
               </div>
               <button
