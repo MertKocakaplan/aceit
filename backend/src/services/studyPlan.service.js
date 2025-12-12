@@ -465,14 +465,27 @@ const updateSlot = async (slotId, userId, updateData) => {
 /**
  * Slot'u tamamlandı olarak işaretle
  */
-const markSlotComplete = async (slotId, userId, completed) => {
+const markSlotComplete = async (slotId, userId, completed, sessionData = {}) => {
   try {
-    // Ownership check
+    // Ownership check ve slot bilgilerini al
     const existingSlot = await prisma.studyPlanSlot.findFirst({
       where: {
         id: slotId,
         day: {
           plan: { userId }
+        }
+      },
+      include: {
+        subject: {
+          select: { id: true, name: true, code: true, color: true }
+        },
+        topic: {
+          select: { id: true, name: true, code: true }
+        },
+        day: {
+          select: {
+            date: true
+          }
         }
       }
     });
@@ -481,6 +494,7 @@ const markSlotComplete = async (slotId, userId, completed) => {
       throw new Error('Slot bulunamadı');
     }
 
+    // Slot'u güncelle
     const slot = await prisma.studyPlanSlot.update({
       where: { id: slotId },
       data: {
@@ -496,6 +510,54 @@ const markSlotComplete = async (slotId, userId, completed) => {
         }
       }
     });
+
+    // Eğer slot complete ediliyorsa ve daha önce complete edilmemişse, StudySession oluştur
+    if (completed && !existingSlot.isCompleted) {
+      const { questionsCorrect = 0, questionsWrong = 0, questionsEmpty = 0 } = sessionData;
+
+      await prisma.studySession.create({
+        data: {
+          userId,
+          subjectId: existingSlot.subject.id,
+          topicId: existingSlot.topic?.id || null,
+          duration: existingSlot.duration,
+          date: existingSlot.day.date, // Planın tarihi (hangi gün için tanımlandıysa)
+          questionsCorrect,
+          questionsWrong,
+          questionsEmpty,
+          notes: `Çalışma Planı: ${existingSlot.startTime} - ${existingSlot.endTime}`
+        }
+      });
+
+      logger.info(`StudySession created from slot completion`, {
+        slotId,
+        userId,
+        subjectId: existingSlot.subject.id,
+        duration: existingSlot.duration,
+        plannedDate: existingSlot.day.date
+      });
+    }
+
+    // Eğer slot incomplete yapılıyorsa ve daha önce complete ise, StudySession'ı sil
+    if (!completed && existingSlot.isCompleted) {
+      // Notes field'ı unique identifier olarak kullan
+      const notePattern = `Çalışma Planı: ${existingSlot.startTime} - ${existingSlot.endTime}`;
+
+      const deletedSession = await prisma.studySession.deleteMany({
+        where: {
+          userId,
+          subjectId: existingSlot.subject.id,
+          duration: existingSlot.duration,
+          notes: notePattern
+        }
+      });
+
+      logger.info(`StudySession deleted from slot incompletion`, {
+        slotId,
+        userId,
+        deletedCount: deletedSession.count
+      });
+    }
 
     logger.info(`Slot marked ${completed ? 'complete' : 'incomplete'}: ${slotId}`);
     return slot;
@@ -693,6 +755,97 @@ function calculateDuration(startTime, endTime) {
   return parseTime(endTime) - parseTime(startTime);
 }
 
+/**
+ * Bugünkü aktif plan günlük hedefini ve ilerlemesini getir
+ */
+const getActiveDaily = async (userId) => {
+  try {
+    // Bugünün başlangıç ve bitiş saatini al
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Aktif planı bul
+    const activePlan = await prisma.studyPlan.findFirst({
+      where: { userId, isActive: true },
+      include: {
+        days: {
+          where: {
+            date: { gte: today, lt: tomorrow }
+          },
+          include: {
+            slots: {
+              include: {
+                subject: { select: { name: true, color: true } }
+              },
+              orderBy: { startTime: 'asc' }
+            }
+          }
+        }
+      }
+    });
+
+    // Aktif plan veya bugünün günü yoksa
+    if (!activePlan || !activePlan.days[0]) {
+      return {
+        hasActiveDay: false,
+        dailyGoalMinutes: null,
+        completedMinutes: 0,
+        remainingMinutes: 0,
+        percentComplete: 0,
+        slots: []
+      };
+    }
+
+    const day = activePlan.days[0];
+
+    // Bugün tamamlanan çalışma süresini al
+    const todaySessions = await prisma.studySession.findMany({
+      where: {
+        userId,
+        date: { gte: today, lt: tomorrow }
+      }
+    });
+
+    const completedMinutes = todaySessions.reduce(
+      (sum, s) => sum + (s.duration || 0),
+      0
+    );
+
+    const remainingMinutes = Math.max(
+      0,
+      day.dailyGoalMinutes - completedMinutes
+    );
+
+    const percentComplete = day.dailyGoalMinutes > 0
+      ? Math.min(100, (completedMinutes / day.dailyGoalMinutes) * 100)
+      : 0;
+
+    return {
+      hasActiveDay: true,
+      planId: activePlan.id,
+      planTitle: activePlan.title,
+      dailyGoalMinutes: day.dailyGoalMinutes,
+      completedMinutes,
+      remainingMinutes,
+      percentComplete: parseFloat(percentComplete.toFixed(1)),
+      slots: day.slots.map(slot => ({
+        id: slot.id,
+        subject: slot.subject.name,
+        subjectColor: slot.subject.color,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        duration: slot.duration,
+        isCompleted: slot.isCompleted
+      }))
+    };
+  } catch (error) {
+    logger.error(`getActiveDaily error: ${error.message}`);
+    throw error;
+  }
+};
+
 module.exports = {
   getUserPlans,
   getActivePlan,
@@ -706,5 +859,6 @@ module.exports = {
   updateSlot,
   markSlotComplete,
   deleteSlot,
-  getPlanProgress
+  getPlanProgress,
+  getActiveDaily
 };

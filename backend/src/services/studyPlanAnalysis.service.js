@@ -78,7 +78,6 @@ const analyzeUserPerformance = async (userId) => {
         targetDate: examDateInfo.examDate, // Resmi veya kullanıcı tarihi
         targetScore: user.targetScore,
         learningVelocity: user.learningVelocity,
-        dailyStudyGoal: user.dailyStudyGoal,
         preferences: user.preferences,
       },
       examInfo: {
@@ -416,7 +415,7 @@ const calculateTimeAvailable = (user, examDateInfo = {}) => {
       hasTargetDate: false,
       remainingDays: null,
       totalAvailableHours: null,
-      dailyCapacity: user.dailyStudyGoal || 4,
+      dailyCapacity: user.preferences?.dailyStudyHoursTarget || 4,
       studyStartHour: user.preferences?.preferredStudyStartHour || 9,
       studyEndHour: user.preferences?.preferredStudyEndHour || 22,
       dateSource: 'none'
@@ -424,7 +423,7 @@ const calculateTimeAvailable = (user, examDateInfo = {}) => {
   }
 
   const dailyCapacity =
-    user.preferences?.dailyStudyHoursTarget || user.dailyStudyGoal || 4;
+    user.preferences?.dailyStudyHoursTarget || 4;
   const totalAvailableHours = Math.max(0, daysRemaining) * dailyCapacity;
 
   return {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../store/AuthContext';
-import { statsAPI, studySessionsAPI } from '../../api';
+import { statsAPI, studySessionsAPI, studyPlanAPI } from '../../api';
 import {
   Clock,
   Target,
@@ -27,6 +27,7 @@ import {
   DashboardBackgroundEffects,
   ExamCountdownCard,
   DailyGuidanceCard,
+  DailyGoalProgressCard,
   StatsBarItem,
   NavigationCard
 } from '../../components/dashboard';
@@ -36,6 +37,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [examCountdown, setExamCountdown] = useState(null);
   const [dailyGuidance, setDailyGuidance] = useState(null);
+  const [dailyGoal, setDailyGoal] = useState(null);
   const [recentSessions, setRecentSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -46,15 +48,17 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      // Stats, exam countdown ve recent sessions paralel olarak al
-      const [statsResponse, examResponse, sessionsResponse] = await Promise.all([
+      // Stats, exam countdown, recent sessions ve daily goal paralel olarak al
+      const [statsResponse, examResponse, sessionsResponse, dailyGoalResponse] = await Promise.all([
         statsAPI.getSummary(),
         statsAPI.getExamCountdown(),
-        studySessionsAPI.getAll({ limit: 5 })
+        studySessionsAPI.getAll({ limit: 5 }),
+        studyPlanAPI.getActiveDaily().catch(() => ({ data: null })) // Hata olursa null dön
       ]);
       setStats(statsResponse.data);
       setExamCountdown(examResponse.data);
       setRecentSessions(sessionsResponse.data || []);
+      setDailyGoal(dailyGoalResponse.data);
 
       // Daily Guidance: Önce cache kontrol et (kullanıcıya özel)
       let guidanceData = getDailyGuidanceCache(user?.id);
@@ -299,6 +303,9 @@ const Dashboard = () => {
           />
         </div>
 
+        {/* Daily Goal Progress */}
+        <DailyGoalProgressCard dailyGoal={dailyGoal} />
+
         {/* Recent Activity */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -356,7 +363,7 @@ const Dashboard = () => {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 * idx }}
-                    onClick={() => navigate(`/study-sessions/${session.id}`)}
+                    onClick={() => navigate(`/study-sessions/${session.id}/edit`)}
                     className="flex items-center gap-4 p-4 rounded-2xl bg-neutral-50/80 dark:bg-neutral-700/30 hover:bg-neutral-100 dark:hover:bg-neutral-700/50 transition-colors cursor-pointer group"
                   >
                     {/* Subject color indicator */}

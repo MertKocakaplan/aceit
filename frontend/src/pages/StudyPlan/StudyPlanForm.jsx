@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { DashboardHeader, AnimatedInput, AnimatedSelect } from '../../ui';
 import { DashboardBackgroundEffects } from '../../components/dashboard';
+import { getTodayDate, getDateAfterDays, getLocalDateString } from '../../utils/dateUtils';
 
 const DAYS_OF_WEEK = [
   { id: 0, name: 'Pazar', short: 'Pz' },
@@ -41,8 +42,8 @@ const StudyPlanForm = () => {
   const [planInfo, setPlanInfo] = useState({
     title: '',
     description: '',
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    startDate: getTodayDate(),
+    endDate: getDateAfterDays(30),
     isActive: true
   });
 
@@ -220,7 +221,7 @@ const StudyPlanForm = () => {
 
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
         const dayOfWeek = d.getDay();
-        const dateStr = d.toISOString().split('T')[0];
+        const dateStr = getLocalDateString(d);
 
         // Find slots that apply to this day
         const daySlots = slots.filter(slot => slot.selectedDays.includes(dayOfWeek));

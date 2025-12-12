@@ -1,5 +1,6 @@
 const prisma = require('../config/database');
 const logger = require('../utils/logger');
+const { getLocalDateString } = require('../utils/dateUtils');
 
 /**
  * Tamamlanan pomodoro'yu kaydet
@@ -97,12 +98,12 @@ const getPomodoroStats = async (userId) => {
       orderBy: { date: 'asc' },
     });
 
-    // Günlük gruplama
+    // Günlük gruplama (local timezone)
     const dailyMap = {};
     for (let i = 0; i < 7; i++) {
       const date = new Date();
       date.setDate(date.getDate() - (6 - i));
-      const dateKey = date.toISOString().split('T')[0];
+      const dateKey = getLocalDateString(date);
       dailyMap[dateKey] = {
         date: dateKey,
         count: 0,
@@ -111,7 +112,7 @@ const getPomodoroStats = async (userId) => {
     }
 
     weeklyPomodoros.forEach((session) => {
-      const dateKey = new Date(session.date).toISOString().split('T')[0];
+      const dateKey = getLocalDateString(new Date(session.date));
       if (dailyMap[dateKey]) {
         dailyMap[dateKey].count += 1;
         dailyMap[dateKey].duration += session.duration;
@@ -143,7 +144,7 @@ const getPomodoroStats = async (userId) => {
       weekStart.setDate(date.getDate() + daysToMonday);
       weekStart.setHours(0, 0, 0, 0);
 
-      const weekKey = weekStart.toISOString().split('T')[0];
+      const weekKey = getLocalDateString(weekStart);
       if (!weeklyMap[weekKey]) {
         weeklyMap[weekKey] = {
           week: weekKey,

@@ -31,7 +31,7 @@ class OpenAIService {
       text,
       reasoning_effort = 'medium',
       verbosity = 'medium',
-      max_output_tokens = 8000,
+      max_output_tokens = 20000,
       stream = false,
     } = options;
 
@@ -89,6 +89,7 @@ class OpenAIService {
         error: error.message,
         code: error.code,
         type: error.type,
+        name: error.name,
       });
 
       // User-friendly error messages
@@ -100,8 +101,10 @@ class OpenAIService {
         throw new Error('AI servisi yapılandırma hatası.');
       } else if (error.code === 'context_length_exceeded') {
         throw new Error('Soru çok uzun. Lütfen kısaltın.');
+      } else if (error.name === 'APIConnectionTimeoutError' || error.message?.includes('timeout')) {
+        throw new Error('AI analizi zaman aşımına uğradı. Lütfen tekrar deneyin.');
       } else {
-        throw new Error('AI servisi geçici olarak kullanılamıyor.');
+        throw new Error(`AI servisi hatası: ${error.message || 'Geçici olarak kullanılamıyor'}`);
       }
     }
   }

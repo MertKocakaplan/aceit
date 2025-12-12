@@ -111,4 +111,10 @@ router.get('/exam-countdown', statsController.getExamCountdown);
  */
 router.get('/daily-guidance', statsController.getDailyGuidance);
 
+/**
+ * GET /api/stats/ai-analysis
+ * AI performans analizi ve koçluk önerileri
+ */
+router.get('/ai-analysis', statsController.getAIAnalysis);
+
 module.exports = router;

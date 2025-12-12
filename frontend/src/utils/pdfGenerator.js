@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { getTodayDate } from './dateUtils';
 
 /**
  * Kullanıcı istatistiklerini PDF olarak indir
@@ -315,6 +316,6 @@ export const generateStatsPDF = (data) => {
   }
   
   // PDF'i indir
-  const fileName = `AceIt_Rapor_${new Date().toISOString().split('T')[0]}.pdf`;
+  const fileName = `AceIt_Rapor_${getTodayDate()}.pdf`;
   doc.save(fileName);
 };

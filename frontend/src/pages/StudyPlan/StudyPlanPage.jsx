@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
-import { studyPlanAPI } from '../../api';
+import { studyPlanAPI, statsAPI } from '../../api';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import {
@@ -14,11 +14,196 @@ import {
   Clock,
   Target,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  TrendingUp,
+  TrendingDown
 } from 'lucide-react';
 import { DashboardHeader } from '../../ui';
 import { DashboardBackgroundEffects } from '../../components/dashboard';
 import AIStudyPlanGenerator from './AIStudyPlanGenerator';
+import { getAIAnalysisCache, setAIAnalysisCache } from '../../utils/aiCache';
+
+/**
+ * AI Recommendation Card Component
+ * Displays AI's recommended daily study hours and current pace
+ * Günlük cache ile çalışır (kullanıcıya özel)
+ */
+const AIRecommendationCard = () => {
+  const { user } = useAuth();
+  const [recommendation, setRecommendation] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchRecommendation();
+    }
+  }, [user?.id]);
+
+  const fetchRecommendation = async () => {
+    if (!user?.id) return;
+
+    try {
+      setLoading(true);
+
+      // Önce cache'i kontrol et (kullanıcıya özel)
+      const cached = getAIAnalysisCache(user.id);
+
+      if (cached) {
+        console.log('AI recommendation loaded from cache');
+        setRecommendation(cached);
+        setLoading(false);
+        return;
+      }
+
+      // Cache yoksa API'den al
+      console.log('Fetching AI recommendation from API');
+      const response = await statsAPI.getAIAnalysis();
+
+      if (response.data) {
+        // Cache'e kaydet (kullanıcıya özel)
+        setAIAnalysisCache(user.id, response.data);
+        setRecommendation(response.data);
+      }
+    } catch (error) {
+      console.error('AI recommendation error:', error?.response?.data || error?.message || error);
+      // Timeout veya hata olursa kartı gizle
+      setRecommendation(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30 rounded-2xl p-6 border-2 border-purple-200 dark:border-purple-800"
+      >
+        <div className="flex items-center gap-4">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-purple-200 dark:border-purple-800 border-t-purple-600 dark:border-t-purple-400 rounded-full"
+          />
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 font-sans">
+            AI tavsiyesi yükleniyor...
+          </p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (!recommendation?.coaching) return null;
+
+  const { coaching, metrics } = recommendation;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mb-8 relative overflow-hidden"
+    >
+      {/* Glow effect */}
+      <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/20 via-indigo-500/30 to-purple-600/20 rounded-2xl blur-xl opacity-50"></div>
+
+      <div className="relative bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/40 dark:to-indigo-950/40 backdrop-blur-xl rounded-2xl p-6 border-2 border-purple-200/80 dark:border-purple-800/80 shadow-elegant-lg">
+        {/* Dot pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.08]">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="aiRecommendPattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1" fill="currentColor" className="text-purple-600" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#aiRecommendPattern)" />
+          </svg>
+        </div>
+
+        <div className="relative flex items-start gap-4">
+          {/* Icon */}
+          <div className="p-3 bg-purple-600 rounded-xl shrink-0 shadow-lg">
+            <Brain className="w-6 h-6 text-white" />
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-300 mb-2 font-display">
+              AI Tavsiyesi: Günlük Çalışma Hedefi
+            </h3>
+
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              {/* Recommended Pace */}
+              <div className="bg-white/60 dark:bg-neutral-900/60 backdrop-blur-sm rounded-xl p-4 border border-purple-200/50 dark:border-purple-800/50">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1 font-sans">
+                  Önerilen Günlük Tempo
+                </p>
+                <p className="text-3xl font-bold text-purple-600 dark:text-purple-400 font-display">
+                  {coaching.recommendedDailyHours} saat
+                </p>
+              </div>
+
+              {/* Current Pace */}
+              <div className="bg-white/60 dark:bg-neutral-900/60 backdrop-blur-sm rounded-xl p-4 border border-purple-200/50 dark:border-purple-800/50">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-1 font-sans">
+                  Mevcut Ortalaman
+                </p>
+                <p className="text-3xl font-bold text-neutral-700 dark:text-neutral-300 font-display">
+                  {coaching.currentPace.toFixed(1)} saat
+                </p>
+              </div>
+            </div>
+
+            {/* Weekly Trend */}
+            {coaching.weeklyTrend && (
+              <div className="flex items-center gap-2 mb-3 p-3 bg-white/40 dark:bg-neutral-900/40 rounded-xl">
+                {coaching.weeklyTrend === 'improving' ? (
+                  <>
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                    <p className="text-sm text-green-700 dark:text-green-400 font-medium font-sans">
+                      Haftalık tempo artışta 📈
+                    </p>
+                  </>
+                ) : coaching.weeklyTrend === 'declining' ? (
+                  <>
+                    <TrendingDown className="w-5 h-5 text-red-600" />
+                    <p className="text-sm text-red-700 dark:text-red-400 font-medium font-sans">
+                      Haftalık tempo düşüşte 📉
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-5 h-5 flex items-center justify-center">
+                      <div className="w-4 h-0.5 bg-neutral-600 rounded-full"></div>
+                    </div>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 font-sans">
+                      Haftalık tempo sabit ➡️
+                    </p>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Motivational Message */}
+            {coaching.motivationalMessage && (
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 italic font-serif">
+                "{coaching.motivationalMessage}"
+              </p>
+            )}
+
+            {/* Footer */}
+            <div className="mt-4 pt-4 border-t border-purple-200/50 dark:border-purple-800/50">
+              <p className="text-xs text-neutral-500 dark:text-neutral-500 font-sans">
+                💡 Plan oluştururken bu tavsiyeyi göz önünde bulundur
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 const StudyPlanPage = () => {
   const navigate = useNavigate();
@@ -152,6 +337,9 @@ const StudyPlanPage = () => {
             </div>
           </div>
         </motion.div>
+
+        {/* AI Recommendation Card */}
+        <AIRecommendationCard />
 
         {/* Content */}
         {loading ? (

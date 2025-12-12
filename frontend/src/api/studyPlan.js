@@ -6,6 +6,8 @@ export const studyPlanAPI = {
 
   getActive: () => api.get('/study-plans/active'),
 
+  getActiveDaily: () => api.get('/study-plans/active/daily'),
+
   getById: (id) => api.get(`/study-plans/${id}`),
 
   create: (planData) => api.post('/study-plans', planData),
@@ -29,8 +31,13 @@ export const studyPlanAPI = {
 
   updateSlot: (slotId, updateData) => api.put(`/study-plans/slots/${slotId}`, updateData),
 
-  markSlotComplete: (slotId, completed) =>
-    api.put(`/study-plans/slots/${slotId}/complete`, { completed }),
+  markSlotComplete: (slotId, completed, questionData = {}) =>
+    api.put(`/study-plans/slots/${slotId}/complete`, {
+      completed,
+      questionsCorrect: questionData.questionsCorrect || 0,
+      questionsWrong: questionData.questionsWrong || 0,
+      questionsEmpty: questionData.questionsEmpty || 0
+    }),
 
   deleteSlot: (slotId) => api.delete(`/study-plans/slots/${slotId}`),
 

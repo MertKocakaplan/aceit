@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { DashboardHeader, AnimatedBackground } from '../../ui';
 import StudyPlanCalendar from '../../components/StudyPlan/StudyPlanCalendar';
+import SlotCompleteModal from '../../components/modals/SlotCompleteModal';
 
 const StudyPlanDetail = () => {
   const { id } = useParams();
@@ -25,6 +26,8 @@ const StudyPlanDetail = () => {
   const [plan, setPlan] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedWeek, setSelectedWeek] = useState(new Date());
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState(null);
 
   useEffect(() => {
     fetchPlan();
@@ -49,16 +52,43 @@ const StudyPlanDetail = () => {
   };
 
   const handleSlotComplete = async (slotId, completed) => {
-    try {
-      await studyPlanAPI.markSlotComplete(slotId, completed);
-      toast.success(completed ? 'Tamamlandı! 🎉' : 'Tamamlanmadı olarak işaretlendi');
+    // Eğer kullanıcı slot'u tamamladı olarak işaretliyorsa modal aç
+    if (completed) {
+      setSelectedSlot(slotId);
+      setModalOpen(true);
+    } else {
+      // Tamamlanmadı işaretliyorsa direkt API çağır
+      try {
+        await studyPlanAPI.markSlotComplete(slotId, false);
+        toast.success('Tamamlanmadı olarak işaretlendi');
+        fetchPlan();
+      } catch (error) {
+        console.error('Mark slot incomplete error:', error);
+        toast.error('İşlem başarısız oldu');
+      }
+    }
+  };
 
-      // Refresh plan
+  const handleModalSubmit = async (questionData) => {
+    try {
+      await studyPlanAPI.markSlotComplete(selectedSlot, true, questionData);
+      toast.success('Tamamlandı! 🎉');
+
+      // Modal'ı kapat
+      setModalOpen(false);
+      setSelectedSlot(null);
+
+      // Plan'ı yenile
       fetchPlan();
     } catch (error) {
       console.error('Mark slot complete error:', error);
       toast.error('İşlem başarısız oldu');
     }
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setSelectedSlot(null);
   };
 
   const handleWeekChange = (direction) => {
@@ -81,8 +111,21 @@ const StudyPlanDetail = () => {
       const currentDate = new Date(startOfWeek);
       currentDate.setDate(startOfWeek.getDate() + i);
 
-      const dateStr = currentDate.toISOString().split('T')[0];
-      const dayData = plan.days?.find(d => d.date.split('T')[0] === dateStr);
+      // Local timezone kullanarak date string oluştur (timezone offset olmadan)
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+
+      // Backend'den gelen tarihi de local timezone'a çevir
+      const dayData = plan.days?.find(d => {
+        const backendDate = new Date(d.date);
+        const backendYear = backendDate.getFullYear();
+        const backendMonth = String(backendDate.getMonth() + 1).padStart(2, '0');
+        const backendDay = String(backendDate.getDate()).padStart(2, '0');
+        const backendDateStr = `${backendYear}-${backendMonth}-${backendDay}`;
+        return backendDateStr === dateStr;
+      });
 
       weekDays.push({
         date: currentDate,
@@ -319,6 +362,20 @@ const StudyPlanDetail = () => {
           </div>
         </motion.div>
       </main>
+
+      {/* Slot Complete Modal */}
+      <SlotCompleteModal
+        isOpen={modalOpen}
+        onClose={handleModalClose}
+        onSubmit={handleModalSubmit}
+        slotInfo={
+          selectedSlot && plan
+            ? plan.days
+                ?.flatMap((d) => d.slots || [])
+                .find((s) => s.id === selectedSlot)
+            : null
+        }
+      />
     </div>
   );
 };

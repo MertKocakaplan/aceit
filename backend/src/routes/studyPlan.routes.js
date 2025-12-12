@@ -23,6 +23,12 @@ router.use(authenticate);
 router.get('/active', studyPlanController.getActivePlan);
 
 /**
+ * GET /api/study-plans/active/daily
+ * Bugünkü aktif plan günlük hedefini ve ilerlemesini getir
+ */
+router.get('/active/daily', studyPlanController.getActiveDaily);
+
+/**
  * GET /api/study-plans
  * Kullanıcının tüm planlarını getir
  */

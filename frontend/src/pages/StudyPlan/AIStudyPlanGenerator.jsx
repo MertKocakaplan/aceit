@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Loader2
 } from 'lucide-react';
+import { getTodayDate, getDateAfterDays } from '../../utils/dateUtils';
 
 const AIStudyPlanGenerator = ({ onClose }) => {
   const navigate = useNavigate();
@@ -36,14 +37,11 @@ const AIStudyPlanGenerator = ({ onClose }) => {
   useEffect(() => {
     fetchSubjects();
 
-    // Set default start date to today
-    const today = new Date();
-    const startDateStr = today.toISOString().split('T')[0];
+    // Set default start date to today (local timezone)
+    const startDateStr = getTodayDate();
 
-    // Set default end date to 30 days from now
-    const endDate = new Date(today);
-    endDate.setDate(endDate.getDate() + 30);
-    const endDateStr = endDate.toISOString().split('T')[0];
+    // Set default end date to 30 days from now (local timezone)
+    const endDateStr = getDateAfterDays(30);
 
     setPreferences(prev => ({
       ...prev,

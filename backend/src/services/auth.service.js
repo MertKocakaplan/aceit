@@ -147,7 +147,6 @@ const getUserById = async (userId) => {
         role: true,
         targetScore: true,
         targetDate: true,
-        dailyStudyGoal: true,
         createdAt: true,
         lastLoginAt: true,
       },
@@ -200,7 +199,6 @@ const getAllUsers = async (filters = {}) => {
           examType: true,
           role: true,
           targetScore: true,
-          dailyStudyGoal: true,
           lastLoginAt: true,
           createdAt: true,
           _count: {
@@ -247,7 +245,6 @@ const getUserByIdAdmin = async (userId) => {
         role: true,
         targetScore: true,
         targetDate: true,
-        dailyStudyGoal: true,
         lastLoginAt: true,
         createdAt: true,
         updatedAt: true,
@@ -256,7 +253,6 @@ const getUserByIdAdmin = async (userId) => {
           select: {
             studySessions: true,
             studyPlans: true,
-            goals: true,
             achievements: true,
             pomodoroSessions: true,
             aiQuestions: true,

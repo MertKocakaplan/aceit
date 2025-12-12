@@ -1,6 +1,7 @@
 const statsService = require('../services/stats.service');
 const examDateService = require('../services/examDate.service');
 const dailyGuidanceService = require('../services/dailyGuidance.service');
+const performanceAnalysisService = require('../services/ai/performanceAnalysis.service');
 const logger = require('../utils/logger');
 
 /**
@@ -359,6 +360,25 @@ exports.getDailyGuidance = async (req, res, next) => {
     });
   } catch (error) {
     logger.error(`getDailyGuidance controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
+ * AI performans analizi ve koçluk önerileri
+ * GET /api/stats/ai-analysis
+ */
+exports.getAIAnalysis = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const analysis = await performanceAnalysisService.analyzePerformanceWithAI(userId);
+
+    res.status(200).json({
+      success: true,
+      data: analysis,
+    });
+  } catch (error) {
+    logger.error(`getAIAnalysis controller error: ${error.message}`);
     next(error);
   }
 };

@@ -44,6 +44,26 @@ exports.getActivePlan = async (req, res, next) => {
 };
 
 /**
+ * Bugünkü aktif plan günlük hedefini ve ilerlemesini getir
+ * GET /api/study-plans/active/daily
+ */
+exports.getActiveDaily = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    const dailyGoal = await studyPlanService.getActiveDaily(userId);
+
+    res.status(200).json({
+      success: true,
+      data: dailyGoal
+    });
+  } catch (error) {
+    logger.error(`getActiveDaily controller error: ${error.message}`);
+    next(error);
+  }
+};
+
+/**
  * Tek bir planı getir
  * GET /api/study-plans/:id
  */
@@ -237,9 +257,16 @@ exports.markSlotComplete = async (req, res, next) => {
   try {
     const { slotId } = req.params;
     const userId = req.user.id;
-    const { completed } = req.body;
+    const { completed, questionsCorrect, questionsWrong, questionsEmpty } = req.body;
 
-    const slot = await studyPlanService.markSlotComplete(slotId, userId, completed);
+    // Soru bilgilerini sessionData olarak gönder
+    const sessionData = {
+      questionsCorrect: questionsCorrect || 0,
+      questionsWrong: questionsWrong || 0,
+      questionsEmpty: questionsEmpty || 0
+    };
+
+    const slot = await studyPlanService.markSlotComplete(slotId, userId, completed, sessionData);
 
     res.status(200).json({
       success: true,

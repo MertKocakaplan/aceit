@@ -4,12 +4,13 @@
  * Tüm cache'ler kullanıcıya özeldir (userId ile ayrılır)
  */
 
+import { getLocalDateString } from './dateUtils';
+
 /**
- * Bugünün tarihini YYYY-MM-DD formatında döner
+ * Bugünün tarihini YYYY-MM-DD formatında döner (local timezone)
  */
 export const getTodayDate = () => {
-  const today = new Date();
-  return today.toISOString().split('T')[0]; // YYYY-MM-DD
+  return getLocalDateString(new Date());
 };
 
 // ==========================================

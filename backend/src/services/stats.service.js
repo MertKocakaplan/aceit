@@ -1,5 +1,6 @@
 const prisma = require('../config/database');
 const logger = require('../utils/logger');
+const { getLocalDateString } = require('../utils/dateUtils');
 
 /**
  * Genel özet istatistikler
@@ -92,12 +93,12 @@ const getDailyStats = async (userId, days = 7) => {
       orderBy: { date: 'asc' },
     });
 
-    // Günlük olarak grupla
+    // Günlük olarak grupla (local timezone)
     const dailyMap = {};
     for (let i = 0; i < days; i++) {
       const date = new Date();
       date.setDate(date.getDate() - (days - 1 - i));
-      const dateKey = date.toISOString().split('T')[0];
+      const dateKey = getLocalDateString(date);
       dailyMap[dateKey] = {
         date: dateKey,
         duration: 0,
@@ -109,7 +110,7 @@ const getDailyStats = async (userId, days = 7) => {
     }
 
     sessions.forEach((session) => {
-      const dateKey = new Date(session.date).toISOString().split('T')[0];
+      const dateKey = getLocalDateString(new Date(session.date));
       if (dailyMap[dateKey]) {
         dailyMap[dateKey].duration += session.duration;
         dailyMap[dateKey].sessions += 1;
@@ -403,9 +404,9 @@ const getStreakData = async (userId) => {
       };
     }
 
-    // Benzersiz günleri al
-    const uniqueDates = [...new Set(sessions.map(s => 
-      new Date(s.date).toISOString().split('T')[0]
+    // Benzersiz günleri al (local timezone)
+    const uniqueDates = [...new Set(sessions.map(s =>
+      getLocalDateString(new Date(s.date))
     ))].sort().reverse();
 
     // Mevcut streak hesapla
@@ -483,10 +484,10 @@ const getRecords = async (userId) => {
       },
     });
 
-    // Günlük toplamlar
+    // Günlük toplamlar (local timezone)
     const dailyTotals = {};
     allSessions.forEach(session => {
-      const dateKey = new Date(session.date).toISOString().split('T')[0];
+      const dateKey = getLocalDateString(new Date(session.date));
       if (!dailyTotals[dateKey]) {
         dailyTotals[dateKey] = {
           date: dateKey,
@@ -518,8 +519,8 @@ const getRecords = async (userId) => {
       const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
       weekStart.setDate(date.getDate() + daysToMonday);
       weekStart.setHours(0, 0, 0, 0);
-      
-      const weekKey = weekStart.toISOString().split('T')[0];
+
+      const weekKey = getLocalDateString(weekStart);
       if (!weeklyTotals[weekKey]) {
         weeklyTotals[weekKey] = {
           weekStart: weekKey,
@@ -594,8 +595,8 @@ const getSuccessRateTrend = async (userId) => {
       const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
       weekStart.setDate(date.getDate() + daysToMonday);
       weekStart.setHours(0, 0, 0, 0);
-      
-      const weekKey = weekStart.toISOString().split('T')[0];
+
+      const weekKey = getLocalDateString(weekStart);
       if (!weeklyData[weekKey]) {
         weeklyData[weekKey] = {
           week: weekKey,
@@ -776,25 +777,25 @@ const getYearlyActivity = async (userId) => {
       },
     });
 
-    // Günlük toplamlar
+    // Günlük toplamlar (local timezone)
     const dailyMap = {};
     sessions.forEach(session => {
-      const dateKey = new Date(session.date).toISOString().split('T')[0];
+      const dateKey = getLocalDateString(new Date(session.date));
       if (!dailyMap[dateKey]) {
         dailyMap[dateKey] = 0;
       }
       dailyMap[dateKey] += session.duration;
     });
 
-    // 365 günlük array oluştur (boş günler 0)
+    // 365 günlük array oluştur (boş günler 0, local timezone)
     const yearData = [];
     const today = new Date();
-    
+
     for (let i = 364; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(today.getDate() - i);
-      const dateKey = date.toISOString().split('T')[0];
-      
+      const dateKey = getLocalDateString(date);
+
       yearData.push({
         date: dateKey,
         duration: dailyMap[dateKey] || 0,

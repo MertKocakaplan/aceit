@@ -93,5 +93,13 @@ export const statsAPI = {
     const response = await api.get('/stats/daily-guidance');
     return response;
   },
+
+  // AI performans analizi (koçluk ve öneriler)
+  getAIAnalysis: async () => {
+    const response = await api.get('/stats/ai-analysis', {
+      timeout: 120000 // 2 dakika (AI analiz uzun sürebilir)
+    });
+    return response;
+  },
 };
 

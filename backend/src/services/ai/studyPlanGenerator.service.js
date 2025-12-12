@@ -2,6 +2,7 @@ const prisma = require('../../config/database');
 const logger = require('../../utils/logger');
 const studyPlanAnalysisService = require('../studyPlanAnalysis.service');
 const openaiService = require('./openai.service');
+const { getLocalDateString } = require('../../utils/dateUtils');
 
 /**
  * AI ile çalışma planı oluştur
@@ -82,7 +83,7 @@ async function generateStudyPlan(userId, preferences) {
         i // Day index için
       );
 
-      dailySchedule.set(currentDate.toISOString().split('T')[0], daySlots);
+      dailySchedule.set(getLocalDateString(currentDate), daySlots);
     }
 
     logger.info('Daily schedule generated', {

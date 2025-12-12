@@ -667,6 +667,71 @@ const StatsOverview = ({ data, aiAnalysis, aiLoading }) => {
                 </div>
               )}
 
+              {/* Gelişim Takibi (Development Trend Card) */}
+              {aiAnalysis.metrics && (
+                <div className="p-5 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30 rounded-2xl border border-cyan-200/50 dark:border-cyan-800/50">
+                  <div className="flex items-center gap-2 mb-4">
+                    <TrendingUp className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
+                    <h4 className="text-sm font-semibold text-cyan-900 dark:text-cyan-300 font-display uppercase tracking-wide">
+                      Gelişim Takibi
+                    </h4>
+                  </div>
+
+                  {/* Haftalık Karşılaştırma */}
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="bg-white/60 dark:bg-neutral-900/60 backdrop-blur-sm rounded-xl p-3 border border-cyan-200/50 dark:border-cyan-800/50">
+                      <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1 font-sans">
+                        Bu Hafta
+                      </p>
+                      <p className="text-2xl font-bold text-neutral-900 dark:text-white font-display">
+                        {aiAnalysis.metrics.weeklyComparison.current.avgDaily.toFixed(0)} dk/gün
+                      </p>
+                    </div>
+                    <div className="bg-white/60 dark:bg-neutral-900/60 backdrop-blur-sm rounded-xl p-3 border border-cyan-200/50 dark:border-cyan-800/50">
+                      <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-1 font-sans">
+                        Geçen Hafta
+                      </p>
+                      <p className="text-2xl font-bold text-neutral-400 dark:text-neutral-500 font-display">
+                        {aiAnalysis.metrics.weeklyComparison.previous.avgDaily.toFixed(0)} dk/gün
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Trend Badge */}
+                  <div className="flex items-center gap-2 mb-3 p-3 bg-white/40 dark:bg-neutral-900/40 rounded-xl">
+                    {aiAnalysis.metrics.weeklyComparison.change.trend === 'improving' ? (
+                      <>
+                        <ArrowUp className="w-5 h-5 text-green-600" />
+                        <span className="text-green-700 dark:text-green-400 font-semibold font-sans">
+                          %{Math.abs(aiAnalysis.metrics.weeklyComparison.change.percentage)} artış 📈
+                        </span>
+                      </>
+                    ) : aiAnalysis.metrics.weeklyComparison.change.trend === 'declining' ? (
+                      <>
+                        <ArrowDown className="w-5 h-5 text-red-600" />
+                        <span className="text-red-700 dark:text-red-400 font-semibold font-sans">
+                          %{Math.abs(aiAnalysis.metrics.weeklyComparison.change.percentage)} azalış 📉
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Minus className="w-5 h-5 text-neutral-600" />
+                        <span className="text-neutral-600 dark:text-neutral-400 font-sans">
+                          Sabit tempo ➡️
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Motivasyon Mesajı */}
+                  {aiAnalysis.coaching?.motivationalMessage && (
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 italic font-serif border-t border-cyan-200/50 dark:border-cyan-800/50 pt-3">
+                      "{aiAnalysis.coaching.motivationalMessage}"
+                    </p>
+                  )}
+                </div>
+              )}
+
               {/* Meta Info */}
               {aiAnalysis.meta && (
                 <div className="flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-500 pt-3 border-t border-indigo-200/30 dark:border-indigo-800/30">

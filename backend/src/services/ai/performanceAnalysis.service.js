@@ -1,6 +1,7 @@
 const prisma = require('../../config/database');
 const logger = require('../../utils/logger');
 const openaiService = require('./openai.service');
+const { getLocalDateString } = require('../../utils/dateUtils');
 const examDateService = require('../examDate.service');
 
 /**
@@ -212,9 +213,9 @@ function calculateMetrics(userData) {
       ).toFixed(0)
     : 0;
 
-  // Consistency (son 7 gün kaç gün çalışmış)
+  // Consistency (son 7 gün kaç gün çalışmış, local timezone)
   const last7DaysUnique = new Set(
-    recentActivity.map((a) => a.date.toISOString().split('T')[0])
+    recentActivity.map((a) => getLocalDateString(a.date))
   ).size;
   const consistencyScore = ((last7DaysUnique / 7) * 100).toFixed(0);
 
@@ -262,6 +263,60 @@ function calculateMetrics(userData) {
     }
   });
 
+  // ====== YENİ: Zamansal Karşılaştırma ======
+  // Son 7 gün vs önceki 7 gün
+  const last7Days = getLast7DaysStats(studySessions);
+  const previous7Days = getPrevious7DaysStats(studySessions);
+
+  const weeklyComparison = {
+    current: {
+      totalMinutes: last7Days.totalMinutes,
+      avgDaily: parseFloat((last7Days.totalMinutes / 7).toFixed(1)),
+      studyDays: last7Days.uniqueDays,
+    },
+    previous: {
+      totalMinutes: previous7Days.totalMinutes,
+      avgDaily: parseFloat((previous7Days.totalMinutes / 7).toFixed(1)),
+      studyDays: previous7Days.uniqueDays,
+    },
+    change: {
+      minutes: last7Days.totalMinutes - previous7Days.totalMinutes,
+      percentage: calculatePercentageChange(
+        previous7Days.totalMinutes,
+        last7Days.totalMinutes
+      ),
+      trend: getTrend(previous7Days.totalMinutes, last7Days.totalMinutes),
+    },
+  };
+
+  // Başarı oranı trendi
+  const successRateTrend = {
+    current: parseFloat(last7Days.successRate),
+    previous: parseFloat(previous7Days.successRate),
+    change: parseFloat(
+      (parseFloat(last7Days.successRate) - parseFloat(previous7Days.successRate)).toFixed(1)
+    ),
+    trend: getTrend(
+      parseFloat(previous7Days.successRate),
+      parseFloat(last7Days.successRate)
+    ),
+  };
+
+  // Günlük önerilen tempo hesabı
+  const recommendedDailyHours = calculateRecommendedPace({
+    daysUntilExam,
+    currentPace: parseFloat(dailyAverage) / 60,
+    totalTopics: uniqueTopics.size,
+    studiedTopics: spacedRepetition.length,
+    currentSuccessRate: parseFloat(overallAccuracy),
+  });
+
+  // Gelişim durumu
+  const developmentStatus = calculateDevelopmentStatus({
+    weeklyComparison,
+    successRateTrend,
+  });
+
   return {
     totalStudyTime,
     totalSessions: studySessions.length,
@@ -279,6 +334,11 @@ function calculateMetrics(userData) {
     avgEasiness,
     uniqueTopicsCount: uniqueTopics.size,
     spacedRepetitionCount: spacedRepetition.length,
+    // YENİ METRIKLER
+    weeklyComparison,
+    successRateTrend,
+    recommendedDailyHours,
+    developmentStatus,
   };
 }
 
@@ -291,57 +351,108 @@ async function analyzePerformanceWithAI(userId) {
     const userData = await gatherUserData(userId);
     const metrics = calculateMetrics(userData);
 
-    // AI için kısa ve öz prompt hazırla
-    const systemPrompt = `Sen Türkiye'deki LGS, TYT ve AYT sınavlarına hazırlanan öğrenciler için uzman bir eğitim danışmanısın.
+    // AI için koçluk odaklı prompt hazırla
+    const systemPrompt = `Sen Türkiye'deki LGS, TYT ve AYT sınavlarına hazırlanan öğrenciler için UZMAN KOÇLUK YAPAN, GELİŞİMİ TAKİP EDEN ve MOTİVE EDEN bir eğitim danışmanısın.
 
-GÖREV: Öğrencinin performansını analiz edip KISA VE ÖZ yorumlar yap.
+KOÇLUK YAKLAŞIMIN:
+1. **Gelişimi Takip Et**: Öğrencinin GEÇMİŞTEKİ performansıyla BUGÜNKÜNÜ karşılaştır
+2. **Trend Analizi Yap**: İyiye mi kötüye mi gidiyor, NET söyle
+3. **Somut Geri Bildirim**: "Geçen haftaya göre %X daha fazla çalıştın"
+4. **Tempo Tavsiyesi**: Günde kaç saat çalışması gerektiğini HESAPLA ve öner
+5. **Motive Et ama Gerçekçi Ol**: Gelişiyorsa ÖVGÜ, azalıyorsa UYARI
 
 KURALLAR:
-1. Her yorum MAKSIMUM 2-3 cümle olmalı
-2. Somut verilere dayanmalı
-3. Teşvik edici ve motive edici ol
-4. Öğrenciye "sen" diye hitap et
-5. Gereksiz açıklamalar yapma
+1. Her yorum MAKSIMUM 2-3 cümle
+2. "Sen" diye hitap et
+3. **MUTLaka zamansal karşılaştırma yap**:
+   - ❌ "Toplam 50 saat çalıştın" (sadece rakam)
+   - ✅ "Geçen haftaya göre %20 daha az çalıştın, dikkat!" (karşılaştırma)
 
-RESPONSE FORMATI (JSON olarak dön):
+4. **Trend belirt**:
+   - ✅ "Son günlerde temponu artırdın, harika!"
+   - ✅ "Bu hafta geçen haftadan daha az çalıştın, toparlanman lazım"
+   - ✅ "Başarı oranın yükselişte, böyle devam"
+
+5. **Günlük tempo tavsiyesi ver**:
+   - "Sınava yetişmek için günde [X] saat çalışmalısın"
+   - Mevcut tempo vs önerilen tempo karşılaştır
+
+6. **Gelişim durumu NET**:
+   - 🟢 Mükemmel: "Harika gidiyorsun, bu performansı sürdür!"
+   - 🟡 İyi: "İyi gidiyorsun ama biraz daha tempo artırabilirsin"
+   - 🟠 Gelişmeli: "Tempo düştü, son günlerde daha az çalışıyorsun!"
+   - 🔴 Kritik: "DİKKAT! Bu tempoyla hedefine ulaşamazsın!"
+
+RESPONSE FORMATI (JSON):
 {
   "overview": {
-    "summary": "Genel durum hakkında 2-3 cümle",
-    "weeklyGoal": "Bu hafta için 1-2 cümle öneri"
+    "summary": "GELİŞİM ve TREND odaklı 2-3 cümle. Geçen hafta/ay ile karşılaştırma YAP.",
+    "weeklyGoal": "Bu hafta için SOMUT hedef",
+    "developmentStatus": "excellent | good | needs_improvement | critical"
   },
   "subjects": [
     {
       "subjectName": "Ders adı",
-      "comment": "Bu ders hakkında 2-3 cümle yorum"
+      "comment": "Bu dersteki GELİŞİM ve TREND (2-3 cümle)"
     }
   ],
   "topics": {
-    "weakComment": "Zayıf konular için 2-3 cümle öneri",
-    "strongComment": "Güçlü konular için 2-3 cümle motivasyon"
+    "weakComment": "Zayıf konular için öneri (gelişim odaklı)",
+    "strongComment": "Güçlü konular için motivasyon"
+  },
+  "coaching": {
+    "recommendedDailyHours": 5.5,
+    "currentPace": 3.2,
+    "urgentActions": [
+      "En acil yapılması gereken 1-2 somut aksiyon"
+    ],
+    "weeklyTrend": "improving | declining | stable",
+    "motivationalMessage": "Kısa motivasyon mesajı"
   }
 }
 
-ÖNEMLİ: Sadece JSON formatında yanıt ver, başka hiçbir şey ekleme!`;
+ÖNEMLİ: Sadece JSON formatında yanıt ver!`;
 
     const userPrompt = `Öğrenci Profili:
 - Sınav: ${userData.user.examType}
-- Hedef: ${userData.user.targetScore || 'Belirtilmemiş'}
-- Kalan Süre: ${metrics.daysUntilExam ? `${metrics.daysUntilExam} gün` : 'Belirtilmemiş'}
+- Sınava Kalan: ${metrics.daysUntilExam ? `${metrics.daysUntilExam} gün` : 'Belirtilmemiş'}
 
-İstatistikler:
-- Toplam: ${(metrics.totalStudyTime / 60).toFixed(1)} saat, ${metrics.totalSessions} oturum
-- Günlük Ort: ${metrics.dailyAverage} dk
-- Düzenlilik: %${metrics.consistencyScore} (Son 7 gün: ${metrics.last7DaysActive}/7)
-- Başarı: %${metrics.overallAccuracy} (${metrics.totalCorrect} doğru, ${metrics.totalWrong} yanlış)
+GELİŞİM ANALİZİ (ZAMANSAL KARŞILAŞTIRMA):
+
+Son 7 Gün vs Önceki 7 Gün:
+- Şu anki hafta: ${metrics.weeklyComparison.current.totalMinutes} dk (günde ${metrics.weeklyComparison.current.avgDaily.toFixed(0)} dk)
+- Önceki hafta: ${metrics.weeklyComparison.previous.totalMinutes} dk (günde ${metrics.weeklyComparison.previous.avgDaily.toFixed(0)} dk)
+- FARK: ${metrics.weeklyComparison.change.minutes > 0 ? '+' : ''}${metrics.weeklyComparison.change.minutes} dk (${metrics.weeklyComparison.change.percentage}%)
+- TREND: ${metrics.weeklyComparison.change.trend === 'improving' ? '📈 YÜKSELIŞ' : metrics.weeklyComparison.change.trend === 'declining' ? '📉 DÜŞÜŞ' : '➡️ SABIT'}
+
+Başarı Oranı Gelişimi:
+- Bu hafta: %${metrics.successRateTrend.current}
+- Geçen hafta: %${metrics.successRateTrend.previous}
+- FARK: ${metrics.successRateTrend.change > 0 ? '+' : ''}${metrics.successRateTrend.change}%
+- TREND: ${metrics.successRateTrend.trend === 'improving' ? '📈 YÜKSELIŞ' : metrics.successRateTrend.trend === 'declining' ? '📉 DÜŞÜŞ' : '➡️ SABIT'}
+
+Tempo Analizi:
+- Önerilen günlük tempo: ${metrics.recommendedDailyHours} saat
+- Mevcut günlük ortalama: ${(metrics.dailyAverage / 60).toFixed(1)} saat
+- ${(metrics.dailyAverage / 60) >= metrics.recommendedDailyHours ? '✅ YETERLI' : '⚠️ YETERSIZ (günde ' + (metrics.recommendedDailyHours - (metrics.dailyAverage / 60)).toFixed(1) + ' saat DAHA çalışmalısın)'}
+
+Genel Durum:
+- Gelişim Durumu: ${metrics.developmentStatus}
+  * excellent: Mükemmel gelişim
+  * good: İyi gidiyor
+  * needs_improvement: Gelişmeli
+  * critical: Kritik durum!
+- Düzenlilik: Son 7 gün ${metrics.last7DaysActive}/7 gün çalıştı
+- Toplam: ${(metrics.totalStudyTime / 60).toFixed(1)} saat
 
 Dersler:
 ${userData.subjectStats.map((s) => `- ${s.subject}: ${Math.floor(s.totalDuration / 60)}s, %${s.accuracy}`).join('\n')}
 
-Konular:
-- Toplam: ${metrics.uniqueTopicsCount} konu
-- Spaced Rep: ${metrics.spacedRepetitionCount}
-${metrics.worstAccuracySubject ? `- Zayıf: ${metrics.worstAccuracySubject.subject} (%${metrics.worstAccuracySubject.accuracy})` : ''}
-${metrics.bestAccuracySubject ? `- Güçlü: ${metrics.bestAccuracySubject.subject} (%${metrics.bestAccuracySubject.accuracy})` : ''}
+KOÇLUK YAP!
+- Gelişimi VURGULA (geçen haftaya göre nasıl)
+- Trend belirt (yükseliyor mu, düşüyor mu)
+- Günlük tempo tavsiyesi ver
+- Motive et veya uyar (duruma göre)
 
 KISA VE ÖZ JSON yanıt ver!`;
 
@@ -369,7 +480,7 @@ KISA VE ÖZ JSON yanıt ver!`;
       input,
       reasoning_effort: 'medium', // Orta seviye düşünme yeterli
       verbosity: 'low', // Kısa yanıt
-      max_output_tokens: 2000, // Kısa analiz için yeterli
+      max_output_tokens: 5000, // JSON response için yeterli (7+ ders analizi)
     });
 
     const duration = Date.now() - startTime;
@@ -392,9 +503,27 @@ KISA VE ÖZ JSON yanıt ver!`;
 
       return {
         generatedAt: new Date(),
-        overview: parsedAnalysis.overview || { summary: '', weeklyGoal: '' },
+        overview: parsedAnalysis.overview || {
+          summary: '',
+          weeklyGoal: '',
+          developmentStatus: 'good',
+        },
         subjects: parsedAnalysis.subjects || [],
         topics: parsedAnalysis.topics || { weakComment: '', strongComment: '' },
+        coaching: parsedAnalysis.coaching || {
+          recommendedDailyHours: metrics.recommendedDailyHours,
+          currentPace: parseFloat((metrics.dailyAverage / 60).toFixed(1)),
+          urgentActions: [],
+          weeklyTrend: metrics.weeklyComparison.change.trend,
+          motivationalMessage: '',
+        },
+        // Metrikleri de döndür (frontend kullanabilsin)
+        metrics: {
+          weeklyComparison: metrics.weeklyComparison,
+          successRateTrend: metrics.successRateTrend,
+          recommendedDailyHours: metrics.recommendedDailyHours,
+          developmentStatus: metrics.developmentStatus,
+        },
         meta: {
           tokensUsed,
           duration,
@@ -410,11 +539,25 @@ KISA VE ÖZ JSON yanıt ver!`;
         overview: {
           summary: 'Analiz oluşturulurken bir hata oluştu.',
           weeklyGoal: 'Lütfen daha sonra tekrar deneyin.',
+          developmentStatus: 'good',
         },
         subjects: [],
         topics: {
           weakComment: '',
           strongComment: '',
+        },
+        coaching: {
+          recommendedDailyHours: metrics.recommendedDailyHours,
+          currentPace: parseFloat((metrics.dailyAverage / 60).toFixed(1)),
+          urgentActions: [],
+          weeklyTrend: metrics.weeklyComparison.change.trend,
+          motivationalMessage: '',
+        },
+        metrics: {
+          weeklyComparison: metrics.weeklyComparison,
+          successRateTrend: metrics.successRateTrend,
+          recommendedDailyHours: metrics.recommendedDailyHours,
+          developmentStatus: metrics.developmentStatus,
         },
         meta: {
           tokensUsed,
@@ -427,6 +570,167 @@ KISA VE ÖZ JSON yanıt ver!`;
     logger.error(`Performance analysis error: ${error.message}`);
     throw error;
   }
+}
+
+/**
+ * Son 7 günün çalışma istatistiklerini hesapla
+ */
+function getLast7DaysStats(sessions) {
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const recentSessions = sessions.filter(
+    (s) => new Date(s.date) >= sevenDaysAgo
+  );
+
+  const uniqueDays = new Set(
+    recentSessions.map((s) =>
+      getLocalDateString(new Date(s.date))
+    )
+  ).size;
+
+  // Doğru/yanlış sayısı
+  const correctAnswers = recentSessions.reduce(
+    (sum, s) => sum + (s.questionsCorrect || 0),
+    0
+  );
+  const wrongAnswers = recentSessions.reduce(
+    (sum, s) => sum + (s.questionsWrong || 0),
+    0
+  );
+
+  return {
+    totalMinutes: recentSessions.reduce(
+      (sum, s) => sum + (s.duration || 0),
+      0
+    ),
+    uniqueDays,
+    sessions: recentSessions,
+    correctAnswers,
+    wrongAnswers,
+    successRate:
+      correctAnswers + wrongAnswers > 0
+        ? ((correctAnswers / (correctAnswers + wrongAnswers)) * 100).toFixed(1)
+        : 0,
+  };
+}
+
+/**
+ * Önceki 7 günün çalışma istatistiklerini hesapla (8-14 gün önce)
+ */
+function getPrevious7DaysStats(sessions) {
+  const fourteenDaysAgo = new Date();
+  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const previousSessions = sessions.filter((s) => {
+    const date = new Date(s.date);
+    return date >= fourteenDaysAgo && date < sevenDaysAgo;
+  });
+
+  const uniqueDays = new Set(
+    previousSessions.map((s) =>
+      getLocalDateString(new Date(s.date))
+    )
+  ).size;
+
+  // Doğru/yanlış sayısı
+  const correctAnswers = previousSessions.reduce(
+    (sum, s) => sum + (s.questionsCorrect || 0),
+    0
+  );
+  const wrongAnswers = previousSessions.reduce(
+    (sum, s) => sum + (s.questionsWrong || 0),
+    0
+  );
+
+  return {
+    totalMinutes: previousSessions.reduce(
+      (sum, s) => sum + (s.duration || 0),
+      0
+    ),
+    uniqueDays,
+    sessions: previousSessions,
+    correctAnswers,
+    wrongAnswers,
+    successRate:
+      correctAnswers + wrongAnswers > 0
+        ? ((correctAnswers / (correctAnswers + wrongAnswers)) * 100).toFixed(1)
+        : 0,
+  };
+}
+
+/**
+ * Yüzde değişim hesapla
+ */
+function calculatePercentageChange(oldValue, currentValue) {
+  if (oldValue === 0) return currentValue > 0 ? 100 : 0;
+  return parseFloat((((currentValue - oldValue) / oldValue) * 100).toFixed(1));
+}
+
+/**
+ * Trend belirle (improving, declining, stable)
+ */
+function getTrend(oldValue, currentValue) {
+  const diff = currentValue - oldValue;
+  const threshold = oldValue * 0.1; // %10 değişim eşiği
+
+  if (diff > threshold) return 'improving';
+  if (diff < -threshold) return 'declining';
+  return 'stable';
+}
+
+/**
+ * Günlük önerilen çalışma temposunu hesapla
+ */
+function calculateRecommendedPace({
+  daysUntilExam,
+  currentPace,
+  totalTopics,
+  studiedTopics,
+  currentSuccessRate,
+}) {
+  // Sınav tarihi yoksa varsayılan 4 saat
+  if (!daysUntilExam || daysUntilExam <= 0) {
+    return 4;
+  }
+
+  // Kalan konular
+  const remainingTopics = Math.max(0, totalTopics - studiedTopics);
+
+  // Başarı oranı düşükse daha fazla çalışma gerekli
+  const successMultiplier =
+    currentSuccessRate < 70 ? 1.3 : currentSuccessRate < 80 ? 1.1 : 1.0;
+
+  // Sınav yaklaştıkça tempo artmalı
+  const urgencyMultiplier =
+    daysUntilExam < 30 ? 1.4 : daysUntilExam < 60 ? 1.2 : 1.0;
+
+  // Temel tempo: kalan konular / kalan günler
+  const basePace =
+    remainingTopics > 0
+      ? Math.max(3, Math.min(8, (remainingTopics / daysUntilExam) * 0.5))
+      : 4;
+
+  const recommendedPace = basePace * successMultiplier * urgencyMultiplier;
+
+  // 0.5 saate yuvarla (örn: 4.5, 5.0, 5.5)
+  return Math.round(recommendedPace * 2) / 2;
+}
+
+/**
+ * Gelişim durumunu değerlendir
+ */
+function calculateDevelopmentStatus({ weeklyComparison, successRateTrend }) {
+  const paceChange = weeklyComparison.change.percentage;
+  const successChange = successRateTrend.change;
+
+  // İki metriği de dikkate al
+  if (paceChange > 20 && successChange > 5) return 'excellent';
+  if (paceChange > 0 && successChange >= 0) return 'good';
+  if (paceChange < -20 || successChange < -10) return 'critical';
+  return 'needs_improvement';
 }
 
 module.exports = {
