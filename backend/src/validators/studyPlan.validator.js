@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { createValidator } = require('./validationFactory');
 
 /**
  * Plan oluşturma validasyonu
@@ -323,38 +324,53 @@ const updateSlotSchema = Joi.object({
   });
 
 /**
- * Validation middleware factory
+ * Slot tamamlama validasyonu
  */
-const validate = (schema) => {
-  return (req, res, next) => {
-    const { error, value } = schema.validate(req.body, {
-      abortEarly: false,
-      stripUnknown: true
-    });
+const markSlotCompleteSchema = Joi.object({
+  completed: Joi.boolean()
+    .required()
+    .messages({
+      'boolean.base': 'Tamamlanma durumu boolean olmalıdır',
+      'any.required': 'Tamamlanma durumu gereklidir'
+    }),
 
-    if (error) {
-      const errors = error.details.map((detail) => ({
-        field: detail.path[0],
-        message: detail.message
-      }));
+  questionsCorrect: Joi.number()
+    .integer()
+    .min(0)
+    .optional()
+    .default(0)
+    .messages({
+      'number.base': 'Doğru soru sayısı sayı olmalıdır',
+      'number.min': 'Doğru soru sayısı 0\'dan küçük olamaz'
+    }),
 
-      return res.status(400).json({
-        success: false,
-        message: 'Validasyon hatası',
-        errors: errors
-      });
-    }
+  questionsWrong: Joi.number()
+    .integer()
+    .min(0)
+    .optional()
+    .default(0)
+    .messages({
+      'number.base': 'Yanlış soru sayısı sayı olmalıdır',
+      'number.min': 'Yanlış soru sayısı 0\'dan küçük olamaz'
+    }),
 
-    req.validatedData = value;
-    next();
-  };
-};
+  questionsEmpty: Joi.number()
+    .integer()
+    .min(0)
+    .optional()
+    .default(0)
+    .messages({
+      'number.base': 'Boş soru sayısı sayı olmalıdır',
+      'number.min': 'Boş soru sayısı 0\'dan küçük olamaz'
+    })
+});
 
 module.exports = {
-  validateCreatePlan: validate(createPlanSchema),
-  validateUpdatePlan: validate(updatePlanSchema),
-  validateGenerateAI: validate(generateAISchema),
-  validateCreateDay: validate(createDaySchema),
-  validateCreateSlot: validate(createSlotSchema),
-  validateUpdateSlot: validate(updateSlotSchema)
+  validateCreatePlan: createValidator(createPlanSchema),
+  validateUpdatePlan: createValidator(updatePlanSchema),
+  validateGenerateAI: createValidator(generateAISchema),
+  validateCreateDay: createValidator(createDaySchema),
+  validateCreateSlot: createValidator(createSlotSchema),
+  validateUpdateSlot: createValidator(updateSlotSchema),
+  validateMarkSlotComplete: createValidator(markSlotCompleteSchema)
 };

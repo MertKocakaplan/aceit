@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { createValidator } = require('./validationFactory');
 
 /**
  * Kayıt (Register) validasyonu
@@ -84,36 +85,7 @@ const loginSchema = Joi.object({
     }),
 });
 
-/**
- * Validation middleware factory
- */
-const validate = (schema) => {
-  return (req, res, next) => {
-    const { error, value } = schema.validate(req.body, {
-      abortEarly: false, // Tüm hataları göster
-      stripUnknown: true, // Bilinmeyen alanları kaldır
-    });
-
-    if (error) {
-      const errors = error.details.map(detail => ({
-        field: detail.path[0],
-        message: detail.message,
-      }));
-
-      return res.status(400).json({
-        success: false,
-        message: 'Validasyon hatası',
-        errors: errors,
-      });
-    }
-
-    // Validated data'yı request'e ekle
-    req.validatedData = value;
-    next();
-  };
-};
-
 module.exports = {
-  validateRegister: validate(registerSchema),
-  validateLogin: validate(loginSchema),
+  validateRegister: createValidator(registerSchema),
+  validateLogin: createValidator(loginSchema),
 };

@@ -93,18 +93,4 @@ export const aiAPI = {
     });
     return response;
   },
-
-  /**
-   * Future AI Features (to be implemented)
-   */
-
-  // createStudyPlan: async (params) => {
-  //   const response = await api.post('/ai/create-study-plan', params);
-  //   return response;
-  // },
-
-  // getDailyGuidance: async () => {
-  //   const response = await api.get('/ai/daily-guidance');
-  //   return response;
-  // },
 };

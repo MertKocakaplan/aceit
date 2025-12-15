@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { createValidator } = require('./validationFactory');
 
 /**
  * Study Session oluşturma validasyonu
@@ -151,35 +152,7 @@ const updateStudySessionSchema = Joi.object({
     'object.min': 'Güncellenecek en az bir alan belirtmelisiniz',
   });
 
-/**
- * Validation middleware factory
- */
-const validate = (schema) => {
-  return (req, res, next) => {
-    const { error, value } = schema.validate(req.body, {
-      abortEarly: false,
-      stripUnknown: true,
-    });
-
-    if (error) {
-      const errors = error.details.map((detail) => ({
-        field: detail.path[0],
-        message: detail.message,
-      }));
-
-      return res.status(400).json({
-        success: false,
-        message: 'Validasyon hatası',
-        errors: errors,
-      });
-    }
-
-    req.validatedData = value;
-    next();
-  };
-};
-
 module.exports = {
-  validateCreateStudySession: validate(createStudySessionSchema),
-  validateUpdateStudySession: validate(updateStudySessionSchema),
+  validateCreateStudySession: createValidator(createStudySessionSchema),
+  validateUpdateStudySession: createValidator(updateStudySessionSchema),
 };

@@ -7,7 +7,8 @@ const {
   validateGenerateAI,
   validateCreateDay,
   validateCreateSlot,
-  validateUpdateSlot
+  validateUpdateSlot,
+  validateMarkSlotComplete
 } = require('../validators/studyPlan.validator');
 const { authenticate } = require('../middleware/auth');
 
@@ -98,7 +99,7 @@ router.put('/slots/:slotId', validateUpdateSlot, studyPlanController.updateSlot)
  * PUT /api/study-plans/slots/:slotId/complete
  * Slot'u tamamlandı olarak işaretle
  */
-router.put('/slots/:slotId/complete', studyPlanController.markSlotComplete);
+router.put('/slots/:slotId/complete', validateMarkSlotComplete, studyPlanController.markSlotComplete);
 
 /**
  * DELETE /api/study-plans/slots/:slotId

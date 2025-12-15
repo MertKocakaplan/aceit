@@ -49,14 +49,4 @@ router.get('/stats', aiController.getAIStats);
 // GET /api/ai/performance-analysis - Performans analizi ve koçluk
 router.get('/performance-analysis', aiController.getPerformanceAnalysis);
 
-/**
- * Future AI Features (to be implemented)
- */
-
-// POST /api/ai/create-study-plan - Kişiselleştirilmiş çalışma planı oluştur
-// router.post('/create-study-plan', aiController.createStudyPlan);
-
-// GET /api/ai/daily-guidance - Günlük rehberlik
-// router.get('/daily-guidance', aiController.getDailyGuidance);
-
 module.exports = router;

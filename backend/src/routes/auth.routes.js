@@ -22,9 +22,9 @@ router.post('/login', authLimiter, validateLogin, authController.login);
 /**
  * POST /api/auth/refresh
  * Access token yenileme
- * Public route
+ * Public route (rate limited)
  */
-router.post('/refresh', authController.refresh);
+router.post('/refresh', authLimiter, authController.refresh);
 
 /**
  * POST /api/auth/logout

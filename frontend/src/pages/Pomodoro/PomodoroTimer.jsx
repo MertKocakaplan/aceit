@@ -158,9 +158,9 @@ const PomodoroTimer = () => {
   const playSound = () => {
     try {
       const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZUBAMT6Ln8LpmHgU7k9r00H4pBS19zu/akj4KFmS56+qnWBETU6jn9L5xJAU1jNP01IU2Bx9zwO/mnlINCFCm5O+9byEGNI/Y8tGAKwUme8vv3ZU+ChZhtuvsp1oTElOo5/S+cyQFNo3T9NWHNwcfccDv5p5SDQhPpeTvvW0hBTOP1/LQgCoFJnrK792UPQoVYLXr7KdbExJTqOf0vnMkBTaM0/TUhzYHH3HA7+aeUg0IT6Xk771tIQU0j9fy0IArBSZ6yu/dlD0KFV+16+ynWxMSU6jn9L5zJAU2jNP01Ic2Bx9xwO/mnlINCE+l5O+9bSEFNI/X8tCAKwUmesrv3ZQ9ChVftevsp1sTElOo5/S+cyQFNozT9NSHNgcfccDv5p5SDQhPpeTvvW0hBTSP1/LQgCsFJnrK792UPQoVX7Xr7KdbExJTqOf0vnMkBTaM0/TUhzYHH3HA7+aeUg0IT6Xk771tIQU0j9fy0IArBSZ6yu/dlD0KFV+16+ynWxMSU6jn9L5zJAU2jNP01Ic2Bx9xwO/mnlINCE+l5O+9bSEFNI/X8tCAKwUmesrv3ZQ9ChVftevsp1sTElOo5/S+cyQFNozT9NSHNgcfccDv5p5SDQhPpeTvvW0hBTSP1/LQgCsFJnrK792UPQoVX7Xr7KdbExJTqOf0vnMkBTaM0/TUhzYHH3HA7+aeUg0IT6Xk771tIQU0j9fy0IArBSZ6yu/dlD0KFV+16+ynWxMSU6jn9L5zJAU2jNP01Ic2Bx9xwO/mnlINCE+l5O+9bSEFNI/X8tCAKwUmesrv3ZQ9ChVftevsp1sTElOo5/S+cyQFNozT9NSHNgcfccDv5p5SDQhPpeTvvW0hBTSP1/LQgCsFJnrK792UPQoVX7Xr7KdbExJTqOf0vnMkBTaM0/TUhzYHH3HA7+aeUg0IT6Xk771tIQU0j9fy0IArBSZ6yu/dlD0KFV+16+ynWxMSU6jn9L5zJAU2jNP01Ic2Bx9xwO/mnlINCE+l5O+9bSEFNI/X8tCAKwUmesrv3ZQ9ChVftevsp1sTElOo5/S+cw==');
-      audio.play().catch(e => console.log('Audio play failed:', e));
-    } catch (error) {
-      console.log('Sound play error:', error);
+      audio.play().catch(() => {}); // Ses çalmazsa sessizce devam et
+    } catch {
+      // Ses çalma hatası - önemsiz
     }
   };
 

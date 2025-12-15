@@ -139,7 +139,6 @@ exports.deleteCount = async (req, res, next) => {
 exports.uploadCSV = async (req, res, next) => {
   try {
     const { csvData } = req.body;
-    console.log('📥 CSV Upload - csvData uzunluğu:', csvData?.length);
 
     if (!csvData) {
       return res.status(400).json({
@@ -149,9 +148,7 @@ exports.uploadCSV = async (req, res, next) => {
     }
 
     const lines = csvData.trim().split('\n');
-    console.log('📄 Toplam satır sayısı:', lines.length);
-    console.log('📄 İlk 3 satır:', lines.slice(0, 3));
-    
+
     if (lines.length < 2) {
       return res.status(400).json({
         success: false,
@@ -160,29 +157,21 @@ exports.uploadCSV = async (req, res, next) => {
     }
 
     const dataLines = lines.slice(1);
-    console.log('📊 Data satır sayısı:', dataLines.length);
-
     let successCount = 0;
     let errorCount = 0;
     const errors = [];
 
     for (const line of dataLines) {
-      console.log('🔍 İşlenen satır:', line);
       try {
         const parts = line.split(',').map(p => p.trim());
-        console.log('📌 Parts:', parts);
-        console.log('📌 Parts uzunluk:', parts.length);
 
         if (parts.length < 9) {
-          console.log('⚠️ Satır atlandı (9 sütundan az)');
           continue;
         }
 
         const [dersAdi, konuAdi, ...yillar] = parts;
-        console.log('📚 Ders:', dersAdi, 'Konu:', konuAdi);
 
         if (konuAdi === 'Toplam Soru') {
-          console.log('⚠️ Toplam Soru atlandı');
           continue;
         }
 

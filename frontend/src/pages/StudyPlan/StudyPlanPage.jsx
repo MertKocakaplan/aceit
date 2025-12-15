@@ -49,14 +49,12 @@ const AIRecommendationCard = () => {
       const cached = getAIAnalysisCache(user.id);
 
       if (cached) {
-        console.log('AI recommendation loaded from cache');
         setRecommendation(cached);
         setLoading(false);
         return;
       }
 
       // Cache yoksa API'den al
-      console.log('Fetching AI recommendation from API');
       const response = await statsAPI.getAIAnalysis();
 
       if (response.data) {
@@ -65,7 +63,6 @@ const AIRecommendationCard = () => {
         setRecommendation(response.data);
       }
     } catch (error) {
-      console.error('AI recommendation error:', error?.response?.data || error?.message || error);
       // Timeout veya hata olursa kartı gizle
       setRecommendation(null);
     } finally {

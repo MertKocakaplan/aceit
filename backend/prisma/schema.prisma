@@ -22,13 +22,10 @@ model User {
   role              UserRole                  @default(USER)
   learningVelocity  Float                     @default(1.0)
   aiQuestions       AIQuestionLog[]
-  examAttempts      ExamAttempt[]
   pomodoroSessions  PomodoroSession[]
   studyPlans        StudyPlan[]
   studySessions     StudySession[]
-  achievements      UserAchievement[]
   preferences       UserPreference?
-  recommendations   UserTopicRecommendation[]
   spacedRepetitions UserTopicSpacedRepetition[]
 
   @@index([email])
@@ -84,8 +81,6 @@ model Subject {
   examType         ExamType
   color            String            @default("#3b82f6")
   createdAt        DateTime          @default(now())
-  examResults      ExamResult[]
-  examTopics       ExamTopic[]
   pomodoroSessions PomodoroSession[]
   studySessions    StudySession[]
   studyPlanSlots   StudyPlanSlot[]
@@ -106,47 +101,15 @@ model Topic {
   importanceScore     Float?
   difficultyLevel     Int                         @default(3)
   updatedAt           DateTime                    @updatedAt
-  examTopics          ExamTopic[]
   studySessions       StudySession[]
   studyPlanSlots      StudyPlanSlot[]
   subject             Subject                     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   questionCounts      TopicQuestionCount[]
-  userRecommendations UserTopicRecommendation[]
   spacedRepetitions   UserTopicSpacedRepetition[]
 
   @@unique([subjectId, code])
   @@index([subjectId])
   @@map("Topic")
-}
-
-model ExamData {
-  id          String      @id @default(uuid())
-  examType    ExamType    @unique
-  year        Int
-  description String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  examTopics  ExamTopic[]
-
-  @@map("ExamData")
-}
-
-model ExamTopic {
-  id            String   @id @default(uuid())
-  examDataId    String
-  subjectId     String
-  topicId       String?
-  outcome       String
-  weight        Float
-  questionCount Int      @default(0)
-  createdAt     DateTime @default(now())
-  examData      ExamData @relation(fields: [examDataId], references: [id], onDelete: Cascade)
-  subject       Subject  @relation(fields: [subjectId], references: [id])
-  topic         Topic?   @relation(fields: [topicId], references: [id])
-
-  @@index([examDataId])
-  @@index([subjectId])
-  @@map("ExamTopic")
 }
 
 model ExamYear {
@@ -175,61 +138,6 @@ model TopicQuestionCount {
   @@index([topicId])
   @@index([examYearId])
   @@map("TopicQuestionCount")
-}
-
-model UserTopicRecommendation {
-  id                 String   @id @default(uuid())
-  userId             String
-  topicId            String
-  priorityScore      Float
-  reason             String
-  recommendedMinutes Int
-  lastCalculated     DateTime @default(now())
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  topic              Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, topicId])
-  @@index([userId, priorityScore])
-  @@map("UserTopicRecommendation")
-}
-
-model ExamAttempt {
-  id             String       @id @default(uuid())
-  userId         String
-  examType       String
-  examName       String
-  attemptDate    DateTime
-  totalNet       Float
-  estimatedRank  Int?
-  estimatedScore Float?
-  notes          String?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  examResults    ExamResult[]
-
-  @@index([userId, attemptDate])
-  @@map("ExamAttempt")
-}
-
-model ExamResult {
-  id            String      @id @default(uuid())
-  examAttemptId String
-  subjectId     String
-  correct       Int
-  wrong         Int
-  empty         Int
-  net           Float
-  targetNet     Float?
-  createdAt     DateTime    @default(now())
-  examAttempt   ExamAttempt @relation(fields: [examAttemptId], references: [id], onDelete: Cascade)
-  subject       Subject     @relation(fields: [subjectId], references: [id])
-
-  @@index([examAttemptId])
-  @@index([subjectId])
-  @@map("ExamResult")
 }
 
 model StudyPlan {
@@ -322,33 +230,6 @@ model AIQuestionLog {
 
   @@index([userId, createdAt])
   @@map("AIQuestionLog")
-}
-
-model Achievement {
-  id               String            @id @default(uuid())
-  code             String            @unique
-  name             String
-  description      String
-  icon             String
-  category         String
-  condition        String
-  createdAt        DateTime          @default(now())
-  userAchievements UserAchievement[]
-
-  @@map("Achievement")
-}
-
-model UserAchievement {
-  id            String      @id @default(uuid())
-  userId        String
-  achievementId String
-  unlockedAt    DateTime    @default(now())
-  achievement   Achievement @relation(fields: [achievementId], references: [id])
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, achievementId])
-  @@index([userId])
-  @@map("UserAchievement")
 }
 
 model UserTopicSpacedRepetition {

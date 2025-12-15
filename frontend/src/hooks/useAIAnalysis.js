@@ -30,14 +30,12 @@ export const useAIAnalysis = () => {
       const cached = getAIAnalysisCache(user.id);
 
       if (cached) {
-        console.log('AI analysis loaded from cache');
         setAnalysis(cached);
         setLoading(false);
         return;
       }
 
       // Cache yoksa API'den al
-      console.log('Fetching AI analysis from API');
       const response = await aiAPI.getPerformanceAnalysis();
 
       if (response.data) {
