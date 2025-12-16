@@ -15,12 +15,11 @@ import {
   Filter,
 } from 'lucide-react';
 import {
-  AnimatedBackground,
   DashboardHeader,
   AnimatedInput,
   AnimatedSelect,
-  GlassCard,
 } from '../../ui';
+import { DashboardBackgroundEffects } from '../../components/dashboard';
 
 const Users = () => {
   const { user, logout } = useAuth();
@@ -42,9 +41,8 @@ const Users = () => {
     try {
       const response = await adminAPI.users.getAll(filters);
       setUsers(response.data);
-    } catch (error) {
-      toast.error('Kullanıcılar yüklenemedi');
-      console.error(error);
+    } catch {
+      // Axios interceptor will show the error toast
     } finally {
       setLoading(false);
     }
@@ -59,9 +57,8 @@ const Users = () => {
       await adminAPI.users.updateRole(userId, newRole);
       toast.success('Rol güncellendi');
       fetchUsers();
-    } catch (error) {
-      toast.error('Rol güncellenemedi');
-      console.error(error);
+    } catch {
+      // Axios interceptor will show the error toast
     }
   };
 
@@ -79,9 +76,8 @@ const Users = () => {
       await adminAPI.users.delete(userId);
       toast.success('Kullanıcı silindi');
       fetchUsers();
-    } catch (error) {
-      toast.error('Kullanıcı silinemedi');
-      console.error(error);
+    } catch {
+      // Axios interceptor will show the error toast
     }
   };
 
@@ -126,7 +122,7 @@ const Users = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300">
-      <AnimatedBackground variant="dashboard" className="fixed -z-10" />
+      <DashboardBackgroundEffects />
       <DashboardHeader user={user} onLogout={logout} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

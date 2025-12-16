@@ -92,10 +92,12 @@ async function generateStudyPlan(userId, preferences) {
 
     // 5. AI ile plan açıklaması oluştur
     const aiExplanation = await generateAIExplanation(
+      userId,
       userData,
       dailySchedule,
       totalDays,
-      netStudyMinutesPerDay
+      netStudyMinutesPerDay,
+      preferences.title
     );
 
     logger.info('AI explanation generated');
@@ -477,7 +479,9 @@ function formatTime(minutes) {
 /**
  * AI ile plan açıklaması oluştur
  */
-async function generateAIExplanation(userData, dailySchedule, totalDays, netStudyMinutesPerDay) {
+async function generateAIExplanation(userId, userData, dailySchedule, totalDays, netStudyMinutesPerDay, planTitle) {
+  const startTime = Date.now();
+
   try {
     const totalSlots = Array.from(dailySchedule.values())
       .reduce((sum, slots) => sum + slots.filter(s => s.slotType !== 'break').length, 0);
@@ -632,12 +636,27 @@ JSON formatında yanıt ver!`;
 
     const aiText = response.output_text;
     const tokensUsed = response.usage?.total_tokens || 0;
+    const duration = Date.now() - startTime;
 
     // JSON parse
     let cleanedText = aiText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     const parsed = JSON.parse(cleanedText);
 
-    logger.info('AI explanation generated successfully', { tokensUsed });
+    logger.info('AI explanation generated successfully', { tokensUsed, duration: `${duration}ms` });
+
+    // Token kullanımını veritabanına kaydet
+    await prisma.aIQuestionLog.create({
+      data: {
+        userId,
+        questionText: `Çalışma Planı: ${planTitle || 'Yeni Plan'}`,
+        questionImage: null,
+        aiResponse: JSON.stringify(parsed),
+        aiModel: response.model,
+        tokensUsed,
+        responseTime: duration,
+        rating: null,
+      },
+    });
 
     return {
       explanation: parsed.explanation || 'Plan açıklaması oluşturulamadı',

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { aiAPI } from '../api';
 import { getAIAnalysisCache, setAIAnalysisCache } from '../utils/aiCache';
 import { useAuth } from '../store/AuthContext';
+import logger from '../utils/logger';
 
 /**
  * AI Performance Analysis Hook
@@ -44,7 +45,7 @@ export const useAIAnalysis = () => {
         setAnalysis(response.data);
       }
     } catch (err) {
-      console.error('AI analysis fetch error:', err);
+      logger.error('AI analysis fetch error:', err);
       setError(err.message || 'AI analizi alınamadı');
     } finally {
       setLoading(false);

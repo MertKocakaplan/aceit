@@ -15,9 +15,11 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import { DashboardHeader, AnimatedBackground } from '../../ui';
+import { DashboardHeader } from '../../ui';
+import { DashboardBackgroundEffects } from '../../components/dashboard';
 import StudyPlanCalendar from '../../components/StudyPlan/StudyPlanCalendar';
 import SlotCompleteModal from '../../components/modals/SlotCompleteModal';
+import logger from '../../utils/logger';
 
 const StudyPlanDetail = () => {
   const { id } = useParams();
@@ -43,8 +45,8 @@ const StudyPlanDetail = () => {
         setSelectedWeek(new Date(response.data.startDate));
       }
     } catch (error) {
-      console.error('Fetch plan error:', error);
-      toast.error('Plan yüklenemedi');
+      logger.error('Fetch plan error:', error);
+      // Axios interceptor will show the error toast
       navigate('/study-plans');
     } finally {
       setLoading(false);
@@ -63,8 +65,8 @@ const StudyPlanDetail = () => {
         toast.success('Tamamlanmadı olarak işaretlendi');
         fetchPlan();
       } catch (error) {
-        console.error('Mark slot incomplete error:', error);
-        toast.error('İşlem başarısız oldu');
+        logger.error('Mark slot incomplete error:', error);
+        // Axios interceptor will show the error toast
       }
     }
   };
@@ -81,8 +83,8 @@ const StudyPlanDetail = () => {
       // Plan'ı yenile
       fetchPlan();
     } catch (error) {
-      console.error('Mark slot complete error:', error);
-      toast.error('İşlem başarısız oldu');
+      logger.error('Mark slot complete error:', error);
+      // Axios interceptor will show the error toast
     }
   };
 
@@ -143,15 +145,15 @@ const StudyPlanDetail = () => {
     try {
       return JSON.parse(plan.weeklyGoals);
     } catch (error) {
-      console.error('Parse weekly goals error:', error);
+      logger.error('Parse weekly goals error:', error);
       return [];
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-secondary-100 via-neutral-50 to-secondary-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300">
-        <AnimatedBackground variant="dashboard" className="fixed -z-10" />
+      <div className="min-h-screen bg-gradient-to-br from-secondary-100 via-neutral-50 to-secondary-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300 relative overflow-hidden">
+        <DashboardBackgroundEffects />
         <DashboardHeader user={user} onLogout={logout} />
         <div className="flex items-center justify-center h-96">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
@@ -168,8 +170,8 @@ const StudyPlanDetail = () => {
   const weeklyGoals = parseWeeklyGoals();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-secondary-100 via-neutral-50 to-secondary-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300">
-      <AnimatedBackground variant="dashboard" className="fixed -z-10" />
+    <div className="min-h-screen bg-gradient-to-br from-secondary-100 via-neutral-50 to-secondary-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300 relative overflow-hidden">
+      <DashboardBackgroundEffects />
       <DashboardHeader user={user} onLogout={logout} />
 
       {/* Main Content */}

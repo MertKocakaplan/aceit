@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
-const { validateRegister, validateLogin } = require('../validators/auth.validator');
+const { validateRegister, validateLogin, validateUpdateProfile } = require('../validators/auth.validator');
 const { authenticate } = require('../middleware/auth');
 const { authLimiter } = require('../middleware/security');
 
@@ -39,5 +39,12 @@ router.post('/logout', authenticate, authController.logout);
  * Protected route
  */
 router.get('/me', authenticate, authController.getCurrentUser);
+
+/**
+ * PUT /api/auth/profile
+ * Update user profile
+ * Protected route
+ */
+router.put('/profile', authenticate, validateUpdateProfile, authController.updateProfile);
 
 module.exports = router;

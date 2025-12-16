@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { LogIn, Mail, ArrowRight, TrendingUp, Target, Award } from 'lucide-react';
 import { ThemeToggle, AnimatedInput, PasswordInput } from '../../ui';
 import { DashboardBackgroundEffects } from '../../components/dashboard';
+import logger from '../../utils/logger';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const Login = () => {
       });
       navigate('/dashboard');
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
     } finally {
       setLoading(false);
     }

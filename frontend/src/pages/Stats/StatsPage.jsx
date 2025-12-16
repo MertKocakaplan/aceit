@@ -14,6 +14,7 @@ import SixMonthTrend from './SixMonthTrend';
 import SubjectsTab from './SubjectsTab';
 import TopicsTab from './TopicsTab';
 import PomodoroTab from './PomodoroTab';
+import logger from '../../utils/logger';
 
 const StatsPage = () => {
   const { user, logout } = useAuth();
@@ -80,7 +81,7 @@ const StatsPage = () => {
       setTopicsDetailed(topicsDetailedResponse.data);
       setPomodoroStats(pomodoroStatsResponse.data);
     } catch (err) {
-      console.error('Initial data fetch error:', err);
+      logger.error('Initial data fetch error:', err);
       setError('İstatistikler yüklenirken bir hata oluştu');
     } finally {
       setLoading(false);
@@ -96,7 +97,7 @@ const StatsPage = () => {
         daily: dailyResponse.data,
       }));
     } catch (err) {
-      console.error('Daily data fetch error:', err);
+      logger.error('Daily data fetch error:', err);
     }
   };
 
@@ -116,7 +117,7 @@ const StatsPage = () => {
 
       generateStatsPDF(pdfData);
     } catch (error) {
-      console.error('PDF oluşturma hatası:', error);
+      logger.error('PDF oluşturma hatası:', error);
       alert('PDF oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.');
     }
   };

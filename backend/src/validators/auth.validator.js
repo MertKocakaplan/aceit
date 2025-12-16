@@ -77,7 +77,7 @@ const loginSchema = Joi.object({
     .messages({
       'any.required': 'Email veya kullanıcı adı zorunludur',
     }),
-  
+
   password: Joi.string()
     .required()
     .messages({
@@ -85,7 +85,49 @@ const loginSchema = Joi.object({
     }),
 });
 
+/**
+ * Update profile validation schema
+ */
+const updateProfileSchema = Joi.object({
+  fullName: Joi.string().min(2).max(100).optional().messages({
+    'string.min': 'İsim en az 2 karakter olmalıdır',
+    'string.max': 'İsim en fazla 100 karakter olabilir',
+  }),
+  email: Joi.string().email().optional().messages({
+    'string.email': 'Geçerli bir email adresi giriniz',
+  }),
+  examType: Joi.string()
+    .valid(
+      'LGS',
+      'TYT',
+      'AYT',
+      'AYT_MATEMATIK',
+      'AYT_GEOMETRI',
+      'AYT_FIZIK',
+      'AYT_KIMYA',
+      'AYT_BIYOLOJI',
+      'AYT_EDEBIYAT',
+      'AYT_TARIH',
+      'AYT_COGRAFYA',
+      'AYT_FELSEFE',
+      'AYT_DIN',
+      'YKS_SAYISAL',
+      'YKS_ESIT_AGIRLIK',
+      'YKS_SOZEL',
+      'YKS_DIL'
+    )
+    .optional()
+    .messages({
+      'any.only': 'Geçersiz sınav türü',
+    }),
+  currentPassword: Joi.string().optional(),
+  newPassword: Joi.string().min(6).optional().messages({
+    'string.min': 'Yeni şifre en az 6 karakter olmalıdır',
+  }),
+});
+
 module.exports = {
   validateRegister: createValidator(registerSchema),
   validateLogin: createValidator(loginSchema),
+  validateUpdateProfile: createValidator(updateProfileSchema),
 };

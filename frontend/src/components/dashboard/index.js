@@ -7,6 +7,7 @@ export { default as DashboardBackgroundEffects } from './DashboardBackgroundEffe
 export { default as ExamCountdownCard } from './ExamCountdownCard';
 export { default as DailyGuidanceCard } from './DailyGuidanceCard';
 export { default as DailyGoalProgressCard } from './DailyGoalProgressCard';
+export { default as DueReviewsCard } from './DueReviewsCard';
 export { default as StatsBarItem } from './StatsBarItem';
 export { default as NavigationCard } from './NavigationCard';
 export { default as GradientCard } from './GradientCard';

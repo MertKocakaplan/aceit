@@ -12,13 +12,12 @@ import {
   Check,
 } from 'lucide-react';
 import {
-  AnimatedBackground,
   DashboardHeader,
-  GlassCard,
   AnimatedButton,
   AnimatedInput,
   Modal,
 } from '../../ui';
+import { DashboardBackgroundEffects } from '../../components/dashboard';
 
 const ExamYears = () => {
   const { user, logout } = useAuth();
@@ -41,9 +40,8 @@ const ExamYears = () => {
       const response = await adminAPI.examYears.getAll();
       // response = { success: true, data: [...] }
       setYears(response.data);
-    } catch (error) {
-      toast.error('Yıllar yüklenemedi');
-      console.error(error);
+    } catch {
+      // Axios interceptor will show the error toast
     } finally {
       setLoading(false);
     }
@@ -70,8 +68,8 @@ const ExamYears = () => {
       setFormData({ year: '', examDate: '' });
       setEditingYear(null);
       fetchYears();
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'İşlem başarısız');
+    } catch {
+      // Axios interceptor will show the error toast
     }
   };
 
@@ -80,8 +78,8 @@ const ExamYears = () => {
       await adminAPI.examYears.setActive(id);
       toast.success('Aktif yıl değiştirildi');
       fetchYears();
-    } catch (error) {
-      toast.error('İşlem başarısız');
+    } catch {
+      // Axios interceptor will show the error toast
     }
   };
 
@@ -94,8 +92,8 @@ const ExamYears = () => {
       await adminAPI.examYears.delete(id);
       toast.success('Yıl silindi');
       fetchYears();
-    } catch (error) {
-      toast.error('Yıl silinemedi');
+    } catch {
+      // Axios interceptor will show the error toast
     }
   };
 
@@ -115,8 +113,8 @@ const ExamYears = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
-      <AnimatedBackground variant="dashboard" className="fixed -z-10" />
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300">
+      <DashboardBackgroundEffects />
       <DashboardHeader user={user} onLogout={logout} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -125,49 +123,64 @@ const ExamYears = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between"
           >
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-                Sınav Yılları
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Sınav yıllarını yönet ve aktif yılı belirle
-              </p>
-            </div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="p-4 bg-gradient-to-br from-purple-600 to-fuchsia-600 rounded-2xl shadow-elegant">
+                  <Calendar className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-normal bg-gradient-to-r from-purple-600 to-fuchsia-600 bg-clip-text text-transparent font-display">
+                    Sınav Yılları
+                  </h1>
+                  <p className="text-neutral-600 dark:text-neutral-400 mt-1 font-display">
+                    Sınav yıllarını yönet ve aktif yılı belirle
+                  </p>
+                </div>
+              </div>
 
-            <AnimatedButton
-              onClick={openAddModal}
-              variant="primary"
-              icon={Plus}
-            >
-              Yeni Yıl Ekle
-            </AnimatedButton>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={openAddModal}
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white rounded-xl hover:from-purple-700 hover:to-fuchsia-700 transition-colors shadow-elegant font-display font-medium flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                Yeni Yıl Ekle
+              </motion.button>
+            </div>
           </motion.div>
 
           {/* Years List */}
           {loading ? (
-            <GlassCard className="p-12 text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-400">Yükleniyor...</p>
-            </GlassCard>
+            <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant p-12 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-neutral-200 dark:border-neutral-800 border-t-purple-600 mx-auto"></div>
+              <p className="mt-4 text-neutral-600 dark:text-neutral-400 font-display">Yükleniyor...</p>
+            </div>
           ) : years.length === 0 ? (
-            <GlassCard className="p-12 text-center">
-              <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant p-12 text-center"
+            >
+              <Calendar className="w-16 h-16 text-neutral-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-neutral-800 dark:text-neutral-200 mb-2 font-display">
                 Henüz yıl yok
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-neutral-600 dark:text-neutral-400 mb-6 font-display">
                 İlk sınav yılını ekleyerek başla
               </p>
-              <AnimatedButton
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={openAddModal}
-                variant="primary"
-                icon={Plus}
+                className="px-6 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white rounded-xl hover:from-purple-700 hover:to-fuchsia-700 transition-colors shadow-elegant font-display font-medium inline-flex items-center gap-2"
               >
+                <Plus className="w-5 h-5" />
                 İlk Yılı Ekle
-              </AnimatedButton>
-            </GlassCard>
+              </motion.button>
+            </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {years.map((year, index) => (
@@ -175,20 +188,25 @@ const ExamYears = () => {
                   key={year.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: 0.1 + index * 0.05 }}
+                  className={`relative bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant overflow-hidden group hover:shadow-elegant-lg transition-shadow ${
+                    year.isActive ? 'ring-2 ring-emerald-500 dark:ring-emerald-400' : ''
+                  }`}
                 >
-                  <GlassCard className={`p-6 ${year.isActive ? 'ring-2 ring-green-500' : ''}`}>
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-fuchsia-600"></div>
+
+                  <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-3">
-                        <div className="p-3 bg-blue-100 dark:bg-blue-900/50 rounded-xl">
-                          <Calendar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                        <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl border-2 border-purple-200 dark:border-purple-800">
+                          <Calendar className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div>
-                          <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                          <h3 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 font-display">
                             {year.year}
                           </h3>
                           {year.isActive && (
-                            <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 dark:text-green-400">
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg text-xs font-medium border border-emerald-200 dark:border-emerald-800 font-display">
                               <Check className="w-3 h-3" />
                               Aktif
                             </span>
@@ -198,38 +216,44 @@ const ExamYears = () => {
                     </div>
 
                     {year.examDate && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                        Sınav Tarihi: {new Date(year.examDate).toLocaleDateString('tr-TR')}
+                      <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3 font-display">
+                        <span className="font-semibold">Sınav Tarihi:</span> {new Date(year.examDate).toLocaleDateString('tr-TR')}
                       </p>
                     )}
 
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                      {year._count?.topicStats || 0} konu verisi
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-4 font-display">
+                      <span className="font-semibold">{year._count?.topicStats || 0}</span> konu verisi
                     </p>
 
                     <div className="flex gap-2">
                       {!year.isActive && (
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => handleSetActive(year.id)}
-                          className="flex-1 px-3 py-2 text-sm bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                          className="flex-1 px-3 py-2 text-sm bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors font-display font-medium border-2 border-emerald-200 dark:border-emerald-800"
                         >
                           Aktif Yap
-                        </button>
+                        </motion.button>
                       )}
-                      <button
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => openEditModal(year)}
-                        className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors"
+                        className="p-2.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors border-2 border-blue-200 dark:border-blue-800"
                       >
                         <Edit className="w-4 h-4" />
-                      </button>
-                      <button
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => handleDelete(year.id)}
-                        className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                        className="p-2.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-xl hover:bg-rose-200 dark:hover:bg-rose-900/50 transition-colors border-2 border-rose-200 dark:border-rose-800"
                       >
                         <Trash2 className="w-4 h-4" />
-                      </button>
+                      </motion.button>
                     </div>
-                  </GlassCard>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -274,23 +298,27 @@ const ExamYears = () => {
           />
 
           <div className="flex gap-3">
-            <button
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => {
                 setShowModal(false);
                 setEditingYear(null);
                 setFormData({ year: '', examDate: '' });
               }}
-              className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="flex-1 px-4 py-3 bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded-xl hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors font-display font-medium"
             >
               İptal
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               type="submit"
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white rounded-xl hover:from-purple-700 hover:to-fuchsia-700 transition-colors shadow-elegant font-display font-medium"
             >
               {editingYear ? 'Güncelle' : 'Ekle'}
-            </button>
+            </motion.button>
           </div>
         </form>
       </Modal>

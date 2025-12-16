@@ -501,6 +501,20 @@ KISA VE ÖZ JSON yanıt ver!`;
         duration: `${duration}ms`,
       });
 
+      // Token kullanımını veritabanına kaydet
+      await prisma.aIQuestionLog.create({
+        data: {
+          userId,
+          questionText: 'Performans Analizi',
+          questionImage: null,
+          aiResponse: JSON.stringify(parsedAnalysis),
+          aiModel: response.model,
+          tokensUsed,
+          responseTime: duration,
+          rating: null,
+        },
+      });
+
       return {
         generatedAt: new Date(),
         overview: parsedAnalysis.overview || {

@@ -8,16 +8,19 @@ import {
   Calendar,
   BookOpen,
   BarChart3,
-  Settings,
   Shield,
   ArrowRight,
   Activity,
   TrendingUp,
+  Brain,
+  Zap,
+  Clock,
 } from 'lucide-react';
 import {
   DashboardHeader,
 } from '../../ui';
 import { DashboardBackgroundEffects } from '../../components/dashboard';
+import logger from '../../utils/logger';
 
 const AdminDashboard = () => {
   const { user, logout } = useAuth();
@@ -34,7 +37,7 @@ const AdminDashboard = () => {
       const response = await adminAPI.stats.get();
       setStats(response.data);
     } catch (error) {
-      console.error('Stats error:', error);
+      logger.error('Stats error:', error);
     } finally {
       setLoading(false);
     }
@@ -99,14 +102,6 @@ const AdminDashboard = () => {
       path: '/admin/topic-questions',
       gradient: 'from-emerald-600 to-teal-600',
       pattern: 'dots',
-    },
-    {
-      title: 'Sistem Ayarları',
-      description: 'Genel ayarlar ve yapılandırma',
-      icon: Settings,
-      path: '/admin/settings',
-      gradient: 'from-orange-600 to-rose-600',
-      pattern: 'waves',
     },
   ];
 
@@ -174,6 +169,202 @@ const AdminDashboard = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* AI Token Usage Section */}
+          {stats?.aiUsage && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <h2 className="text-2xl font-normal text-neutral-800 dark:text-neutral-200 mb-6 font-display flex items-center gap-3">
+                <Brain className="w-7 h-7 text-primary-600" />
+                AI Token Kullanımı
+              </h2>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                {/* Token Stats Cards */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Total Tokens */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl p-5 text-white shadow-elegant relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 opacity-10">
+                      <svg className="w-full h-full">
+                        <defs>
+                          <pattern id="tokenDots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <circle cx="2" cy="2" r="1" fill="white" />
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#tokenDots)" />
+                      </svg>
+                    </div>
+                    <div className="relative">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Zap className="w-5 h-5" />
+                        <p className="text-sm font-medium opacity-90">Toplam Token</p>
+                      </div>
+                      <p className="text-3xl font-light font-display">
+                        {(stats.aiUsage.totalTokens / 1000000).toFixed(2)}M
+                      </p>
+                      <p className="text-xs opacity-75 mt-1">
+                        {stats.aiUsage.totalQuestions} soru
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Today's Tokens */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.55 }}
+                    className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-5 text-white shadow-elegant relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 opacity-10">
+                      <svg className="w-full h-full">
+                        <defs>
+                          <pattern id="todayDots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <circle cx="2" cy="2" r="1" fill="white" />
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#todayDots)" />
+                      </svg>
+                    </div>
+                    <div className="relative">
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendingUp className="w-5 h-5" />
+                        <p className="text-sm font-medium opacity-90">Bugün</p>
+                      </div>
+                      <p className="text-3xl font-light font-display">
+                        {(stats.aiUsage.todayTokens / 1000).toFixed(1)}K
+                      </p>
+                      <p className="text-xs opacity-75 mt-1">
+                        {stats.aiUsage.todayQuestions} soru
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Average Tokens */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="bg-gradient-to-br from-amber-600 to-orange-700 rounded-2xl p-5 text-white shadow-elegant relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 opacity-10">
+                      <svg className="w-full h-full">
+                        <defs>
+                          <pattern id="avgDots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <circle cx="2" cy="2" r="1" fill="white" />
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#avgDots)" />
+                      </svg>
+                    </div>
+                    <div className="relative">
+                      <div className="flex items-center gap-2 mb-2">
+                        <BarChart3 className="w-5 h-5" />
+                        <p className="text-sm font-medium opacity-90">Ort. Token</p>
+                      </div>
+                      <p className="text-3xl font-light font-display">
+                        {stats.aiUsage.avgTokensPerQuestion}
+                      </p>
+                      <p className="text-xs opacity-75 mt-1">
+                        soru başına
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Average Response Time */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.65 }}
+                    className="bg-gradient-to-br from-rose-600 to-pink-700 rounded-2xl p-5 text-white shadow-elegant relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 opacity-10">
+                      <svg className="w-full h-full">
+                        <defs>
+                          <pattern id="timeDots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <circle cx="2" cy="2" r="1" fill="white" />
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#timeDots)" />
+                      </svg>
+                    </div>
+                    <div className="relative">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Clock className="w-5 h-5" />
+                        <p className="text-sm font-medium opacity-90">Ort. Yanıt</p>
+                      </div>
+                      <p className="text-3xl font-light font-display">
+                        {(stats.aiUsage.avgResponseTime / 1000).toFixed(1)}s
+                      </p>
+                      <p className="text-xs opacity-75 mt-1">
+                        süre
+                      </p>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Daily Usage Chart */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.7 }}
+                  className="bg-white dark:bg-neutral-900 rounded-2xl p-6 shadow-elegant"
+                >
+                  <h3 className="text-lg font-medium text-neutral-800 dark:text-neutral-200 mb-4 font-display flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-primary-600" />
+                    Son 30 Gün Kullanım
+                  </h3>
+                  <div className="space-y-2">
+                    {stats.aiUsage.dailyUsage.slice(0, 7).map((day, index) => {
+                      const date = new Date(day.date);
+                      const maxTokens = Math.max(...stats.aiUsage.dailyUsage.map(d => d.tokens));
+                      const percentage = (day.tokens / maxTokens) * 100;
+
+                      return (
+                        <div key={index} className="flex items-center gap-3">
+                          <span className="text-xs text-neutral-600 dark:text-neutral-400 w-20 font-display">
+                            {date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+                          </span>
+                          <div className="flex-1 bg-neutral-100 dark:bg-neutral-800 rounded-full h-8 overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${percentage}%` }}
+                              transition={{ delay: 0.8 + index * 0.05, duration: 0.5 }}
+                              className="h-full bg-gradient-to-r from-primary-600 to-primary-800 rounded-full flex items-center justify-end pr-3"
+                            >
+                              {percentage > 20 && (
+                                <span className="text-xs font-medium text-white font-display">
+                                  {(day.tokens / 1000).toFixed(1)}K
+                                </span>
+                              )}
+                            </motion.div>
+                          </div>
+                          <span className="text-xs text-neutral-500 dark:text-neutral-500 w-12 text-right font-display">
+                            {day.questions}q
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-neutral-600 dark:text-neutral-400 font-display">Son 30 Gün</span>
+                      <span className="font-medium text-neutral-800 dark:text-neutral-200 font-display">
+                        {(stats.aiUsage.last30DaysTokens / 1000).toFixed(1)}K token
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Menu Cards - 2x2 Grid */}
           <div>

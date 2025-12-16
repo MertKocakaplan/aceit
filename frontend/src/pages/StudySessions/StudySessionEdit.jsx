@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Save, Clock, BookOpen, CheckCircle, XCircle, MinusCircle, Edit3, X } from 'lucide-react';
 import { DashboardHeader, AnimatedInput, AnimatedSelect } from '../../ui';
 import { DashboardBackgroundEffects } from '../../components/dashboard';
+import logger from '../../utils/logger';
 
 const StudySessionEdit = () => {
   const navigate = useNavigate();
@@ -61,12 +62,11 @@ const StudySessionEdit = () => {
           const topicsResponse = await subjectsAPI.getTopics(session.subjectId);
           setTopics(topicsResponse.data);
         } catch (error) {
-          console.error('Konular yüklenemedi:', error);
+          logger.error('Konular yüklenemedi:', error);
         }
       }
     } catch (error) {
-      toast.error('Kayıt yüklenemedi');
-      console.error(error);
+      // Axios interceptor will show the error toast
       navigate('/study-sessions');
     } finally {
       setLoadingData(false);
@@ -87,7 +87,7 @@ const StudySessionEdit = () => {
         const response = await subjectsAPI.getTopics(subjectId);
         setTopics(response.data);
       } catch (error) {
-        console.error('Konular yüklenemedi:', error);
+        logger.error('Konular yüklenemedi:', error);
         setTopics([]);
       } finally {
         setLoadingTopics(false);
@@ -136,7 +136,7 @@ const StudySessionEdit = () => {
       });
       navigate('/study-sessions');
     } catch (error) {
-      console.error('Update error:', error);
+      logger.error('Update error:', error);
     } finally {
       setLoading(false);
     }

@@ -19,6 +19,7 @@ import {
   DashboardHeader,
 } from '../../ui';
 import { DashboardBackgroundEffects } from '../../components/dashboard';
+import logger from '../../utils/logger';
 
 const PomodoroTimer = () => {
   const { user, logout } = useAuth();
@@ -77,7 +78,7 @@ const PomodoroTimer = () => {
       const stats = response.data || response;
       setCompletedPomodoros(stats.workSessions || 0);
     } catch (error) {
-      console.error('Bugünkü istatistikler yüklenemedi:', error);
+      logger.error('Bugünkü istatistikler yüklenemedi:', error);
       setCompletedPomodoros(0);
     } finally {
       setLoadingStats(false);
@@ -124,7 +125,7 @@ const PomodoroTimer = () => {
         });
         await fetchTodayStats();
       } catch (error) {
-        console.error('Pomodoro kayıt hatası:', error);
+        logger.error('Pomodoro kayıt hatası:', error);
         setCompletedPomodoros(completedPomodoros + 1);
       }
 

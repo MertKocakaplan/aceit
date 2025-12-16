@@ -217,9 +217,8 @@ const StudyPlanPage = () => {
     try {
       const response = await studyPlanAPI.getAll();
       setPlans(response.data);
-    } catch (error) {
-      console.error('Fetch plans error:', error);
-      toast.error('Planlar yüklenemedi');
+    } catch {
+      // Axios interceptor will show the error toast
     } finally {
       setLoading(false);
     }
@@ -238,9 +237,8 @@ const StudyPlanPage = () => {
       await studyPlanAPI.delete(planId);
       toast.success('Plan silindi');
       fetchPlans();
-    } catch (error) {
-      console.error('Delete plan error:', error);
-      toast.error('Plan silinemedi');
+    } catch {
+      // Axios interceptor will show the error toast
     }
   };
 
@@ -249,9 +247,8 @@ const StudyPlanPage = () => {
       await studyPlanAPI.activate(planId);
       toast.success('Plan aktif edildi');
       fetchPlans();
-    } catch (error) {
-      console.error('Activate plan error:', error);
-      toast.error('Plan aktif edilemedi');
+    } catch {
+      // Axios interceptor will show the error toast
     }
   };
 

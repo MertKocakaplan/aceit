@@ -143,3 +143,46 @@ exports.getCurrentUser = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Update user profile
+ * PUT /api/auth/profile
+ */
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const userId = req.user.id; // From authenticate middleware
+    const updateData = req.body;
+
+    // Validate current password if changing password
+    if (updateData.newPassword) {
+      if (!updateData.currentPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Mevcut şifre gereklidir'
+        });
+      }
+    }
+
+    // Update user
+    const updatedUser = await authService.updateUserProfile(userId, updateData);
+
+    // Generate new token if email changed
+    const accessToken = generateToken({
+      userId: updatedUser.id,
+      email: updatedUser.email,
+      role: updatedUser.role,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Profil güncellendi',
+      data: {
+        user: updatedUser,
+        accessToken
+      },
+    });
+  } catch (error) {
+    logger.error(`Update profile error: ${error.message}`);
+    next(error);
+  }
+};

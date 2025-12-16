@@ -72,9 +72,8 @@ const StudyPlanForm = () => {
     try {
       const response = await subjectsAPI.getAll();
       setSubjects(response.data);
-    } catch (error) {
-      console.error('Fetch subjects error:', error);
-      toast.error('Dersler yüklenemedi');
+    } catch {
+      // Axios interceptor will show the error toast
     } finally {
       setLoadingSubjects(false);
     }
@@ -257,9 +256,8 @@ const StudyPlanForm = () => {
 
       toast.success('Çalışma planı oluşturuldu! 🎉');
       navigate(`/study-plans/${planId}`);
-    } catch (error) {
-      console.error('Create plan error:', error);
-      toast.error(error.response?.data?.message || 'Plan oluşturulamadı');
+    } catch {
+      // Axios interceptor will show the error toast
     } finally {
       setLoading(false);
     }

@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { toast } from 'sonner';
 
-const API_URL = 'http://localhost:5000/api';
+// Environment variable for API URL (with fallback for development)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Axios instance
 const api = axios.create({

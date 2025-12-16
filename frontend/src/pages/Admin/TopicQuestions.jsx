@@ -11,13 +11,13 @@ import {
   Upload,
 } from 'lucide-react';
 import {
-  AnimatedBackground,
   DashboardHeader,
-  GlassCard,
   AnimatedButton,
   AnimatedSelect,
   Modal,
 } from '../../ui';
+import { DashboardBackgroundEffects } from '../../components/dashboard';
+import logger from '../../utils/logger';
 
 const TopicQuestions = () => {
   const { user, logout } = useAuth();
@@ -63,7 +63,7 @@ const TopicQuestions = () => {
         setSelectedYear(activeYear.id);
       }
     } catch (error) {
-      console.error(error);
+      logger.error('Failed to fetch exam years:', error);
     }
   };
 
@@ -73,7 +73,7 @@ const TopicQuestions = () => {
       // response = { success: true, data: [...] }
       setSubjects(response.data);
     } catch (error) {
-      console.error(error);
+      logger.error('Failed to fetch subjects:', error);
     }
   };
 
@@ -83,8 +83,8 @@ const TopicQuestions = () => {
       const response = await subjectsAPI.getTopics(selectedSubject);
       // response = { success: true, data: [...] }
       setTopics(response.data);
-    } catch (error) {
-      toast.error('Konular yüklenemedi');
+    } catch {
+      // Axios interceptor will show the error toast
     } finally {
       setLoading(false);
     }
@@ -103,7 +103,7 @@ const TopicQuestions = () => {
       });
       setQuestionCounts(counts);
     } catch (error) {
-      console.error(error);
+      logger.error('Failed to fetch question counts:', error);
     } finally {
       setLoading(false);
     }
@@ -138,8 +138,8 @@ const TopicQuestions = () => {
       });
 
       toast.success(`${data.length} konu güncellendi`);
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Kayıt başarısız');
+    } catch {
+      // Axios interceptor will show the error toast
     } finally {
       setSaving(false);
     }
@@ -153,8 +153,8 @@ const TopicQuestions = () => {
       setShowUploadModal(false);
       setCsvData('');
       fetchYears();
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Yükleme başarısız');
+    } catch {
+      // Axios interceptor will show the error toast
     } finally {
       setUploading(false);
     }
@@ -171,8 +171,8 @@ const TopicQuestions = () => {
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300">
-      <AnimatedBackground variant="dashboard" className="fixed -z-10" />
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-100 to-neutral-50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950 transition-colors duration-300">
+      <DashboardBackgroundEffects />
       <DashboardHeader user={user} onLogout={logout} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -181,118 +181,150 @@ const TopicQuestions = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-start justify-between"
           >
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
-                Konu-Soru Dağılımı
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Her yıl hangi konudan kaç soru çıktığını kaydet
-              </p>
-            </div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="p-4 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl shadow-elegant">
+                  <BookOpen className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-normal bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-display">
+                    Konu-Soru Dağılımı
+                  </h1>
+                  <p className="text-neutral-600 dark:text-neutral-400 mt-1 font-display">
+                    Her yıl hangi konudan kaç soru çıktığını kaydet
+                  </p>
+                </div>
+              </div>
 
-            <AnimatedButton
-              onClick={() => setShowUploadModal(true)}
-              variant="primary"
-              icon={Upload}
-            >
-              CSV Toplu Yükle
-            </AnimatedButton>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowUploadModal(true)}
+                className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-colors shadow-elegant font-display font-medium flex items-center gap-2"
+              >
+                <Upload className="w-5 h-5" />
+                CSV Toplu Yükle
+              </motion.button>
+            </div>
           </motion.div>
 
           {/* Filters */}
-          <GlassCard className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <AnimatedSelect
-                id="year"
-                name="year"
-                label="Sınav Yılı"
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
-                icon={Calendar}
-                options={[
-                  { value: '', label: 'Yıl Seçin' },
-                  ...yearOptions,
-                ]}
-                required
-              />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="relative bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant overflow-hidden"
+          >
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-600 to-teal-600"></div>
 
-              <AnimatedSelect
-                id="subject"
-                name="subject"
-                label="Ders"
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
-                icon={BookOpen}
-                options={[
-                  { value: '', label: 'Ders Seçin' },
-                  ...subjectOptions,
-                ]}
-                required
-              />
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <AnimatedSelect
+                  id="year"
+                  name="year"
+                  label="Sınav Yılı"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  icon={Calendar}
+                  options={[
+                    { value: '', label: 'Yıl Seçin' },
+                    ...yearOptions,
+                  ]}
+                  required
+                />
+
+                <AnimatedSelect
+                  id="subject"
+                  name="subject"
+                  label="Ders"
+                  value={selectedSubject}
+                  onChange={(e) => setSelectedSubject(e.target.value)}
+                  icon={BookOpen}
+                  options={[
+                    { value: '', label: 'Ders Seçin' },
+                    ...subjectOptions,
+                  ]}
+                  required
+                />
+              </div>
             </div>
-          </GlassCard>
+          </motion.div>
 
           {/* Topics */}
           {selectedYear && selectedSubject && (
             <>
               {loading ? (
-                <GlassCard className="p-12 text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-                  <p className="mt-4 text-gray-600 dark:text-gray-400">Konular yükleniyor...</p>
-                </GlassCard>
+                <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant p-12 text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-neutral-200 dark:border-neutral-800 border-t-emerald-600 mx-auto"></div>
+                  <p className="mt-4 text-neutral-600 dark:text-neutral-400 font-display">Konular yükleniyor...</p>
+                </div>
               ) : topics.length === 0 ? (
-                <GlassCard className="p-12 text-center">
-                  <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant p-12 text-center"
+                >
+                  <BookOpen className="w-16 h-16 text-neutral-400 mx-auto mb-4" />
+                  <p className="text-neutral-600 dark:text-neutral-400 font-display">
                     Bu derste henüz konu yok
                   </p>
-                </GlassCard>
+                </motion.div>
               ) : (
                 <>
-                  <GlassCard className="p-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
-                          Konular ve Soru Sayıları
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {topics.length} konu
-                        </p>
-                      </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="relative bg-white dark:bg-neutral-900 rounded-2xl shadow-elegant overflow-hidden"
+                  >
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-600 to-teal-600"></div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {topics.map((topic) => (
-                          <div key={topic.id} className="space-y-2">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                              {topic.name}
-                            </label>
-                            <input
-                              type="number"
-                              min="0"
-                              max="100"
-                              value={questionCounts[topic.id] ?? ''}
-                              onChange={(e) => handleCountChange(topic.id, e.target.value)}
-                              placeholder="Soru sayısı"
-                              className="w-full px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                            />
-                          </div>
-                        ))}
+                    <div className="p-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-bold text-neutral-800 dark:text-neutral-200 font-display">
+                            Konular ve Soru Sayıları
+                          </h3>
+                          <p className="text-sm text-neutral-600 dark:text-neutral-400 font-display">
+                            <span className="font-semibold">{topics.length}</span> konu
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {topics.map((topic) => (
+                            <div key={topic.id} className="space-y-2">
+                              <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 font-display">
+                                {topic.name}
+                              </label>
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={questionCounts[topic.id] ?? ''}
+                                onChange={(e) => handleCountChange(topic.id, e.target.value)}
+                                placeholder="Soru sayısı"
+                                className="w-full px-4 py-2.5 bg-neutral-50 dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all font-display"
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </GlassCard>
+                  </motion.div>
 
                   <div className="flex justify-end">
-                    <AnimatedButton
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={handleSubmit}
-                      variant="primary"
-                      icon={Save}
-                      loading={saving}
                       disabled={saving}
+                      className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-colors shadow-elegant font-display font-medium inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Kaydet
-                    </AnimatedButton>
+                      <Save className="w-5 h-5" />
+                      {saving ? 'Kaydediliyor...' : 'Kaydet'}
+                    </motion.button>
                   </div>
                 </>
               )}
@@ -313,7 +345,7 @@ const TopicQuestions = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 font-display">
               CSV Verisi (Virgülle ayrılmış)
             </label>
             <textarea
@@ -324,28 +356,32 @@ TÜRKÇE,Ses Bilgisi,0,1,0,1,0,1,3
 TÜRKÇE,Dil Bilgisi,0,2,3,2,3,8,1
 ..."
               rows={15}
-              className="w-full px-4 py-2 bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 font-mono text-sm"
+              className="w-full px-4 py-2.5 bg-neutral-50 dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-mono text-sm transition-all"
             />
           </div>
 
           <div className="flex gap-3">
-            <button
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => {
                 setShowUploadModal(false);
                 setCsvData('');
               }}
-              className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="flex-1 px-4 py-3 bg-neutral-200 dark:bg-neutral-700 text-neutral-800 dark:text-neutral-200 rounded-xl hover:bg-neutral-300 dark:hover:bg-neutral-600 transition-colors font-display font-medium"
             >
               İptal
-            </button>
-            <button
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleUploadCSV}
               disabled={uploading || !csvData}
-              className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg disabled:opacity-50 hover:from-blue-700 hover:to-purple-700 transition-colors"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl disabled:opacity-50 hover:from-emerald-700 hover:to-teal-700 transition-colors shadow-elegant font-display font-medium"
             >
               {uploading ? 'Yükleniyor...' : 'Yükle'}
-            </button>
+            </motion.button>
           </div>
         </div>
       </Modal>

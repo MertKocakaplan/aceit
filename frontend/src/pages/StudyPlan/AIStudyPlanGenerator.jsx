@@ -15,6 +15,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { getTodayDate, getDateAfterDays } from '../../utils/dateUtils';
+import logger from '../../utils/logger';
 
 const AIStudyPlanGenerator = ({ onClose }) => {
   const navigate = useNavigate();
@@ -55,8 +56,8 @@ const AIStudyPlanGenerator = ({ onClose }) => {
       const response = await subjectsAPI.getAll();
       setSubjects(response.data);
     } catch (error) {
-      console.error('Fetch subjects error:', error);
-      toast.error('Dersler yüklenemedi');
+      logger.error('Fetch subjects error:', error);
+      // Axios interceptor will show the error toast
     } finally {
       setLoadingSubjects(false);
     }
@@ -133,10 +134,8 @@ const AIStudyPlanGenerator = ({ onClose }) => {
       onClose();
       navigate(`/study-plans/${response.data.id}`);
     } catch (error) {
-      console.error('Generate AI plan error:', error);
-
-      const errorMessage = error.response?.data?.message || 'Plan oluşturulamadı';
-      toast.error(errorMessage);
+      logger.error('Generate AI plan error:', error);
+      // Axios interceptor will show the error toast
     } finally {
       setGenerating(false);
     }

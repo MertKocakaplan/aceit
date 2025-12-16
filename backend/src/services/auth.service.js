@@ -320,19 +320,25 @@ const deleteUser = async (userId) => {
  */
 const getAdminStats = async () => {
   try {
+    const todayStart = new Date(new Date().setHours(0, 0, 0, 0));
+    const last30Days = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
     const [
       totalUsers,
       adminCount,
       todayUsers,
       totalSessions,
       activeUsers,
+      aiStats,
+      todayAiStats,
+      last30DaysAiStats,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.user.count({ where: { role: 'ADMIN' } }),
       prisma.user.count({
         where: {
           createdAt: {
-            gte: new Date(new Date().setHours(0, 0, 0, 0)),
+            gte: todayStart,
           },
         },
       }),
@@ -344,6 +350,41 @@ const getAdminStats = async () => {
           },
         },
       }),
+      // Toplam AI kullanımı
+      prisma.aIQuestionLog.aggregate({
+        _count: true,
+        _sum: {
+          tokensUsed: true,
+        },
+        _avg: {
+          tokensUsed: true,
+          responseTime: true,
+        },
+      }),
+      // Bugünkü AI kullanımı
+      prisma.aIQuestionLog.aggregate({
+        where: {
+          createdAt: {
+            gte: todayStart,
+          },
+        },
+        _count: true,
+        _sum: {
+          tokensUsed: true,
+        },
+      }),
+      // Son 30 günlük AI kullanımı
+      prisma.aIQuestionLog.aggregate({
+        where: {
+          createdAt: {
+            gte: last30Days,
+          },
+        },
+        _count: true,
+        _sum: {
+          tokensUsed: true,
+        },
+      }),
     ]);
 
     // Sınav türüne göre dağılım
@@ -352,6 +393,19 @@ const getAdminStats = async () => {
       _count: true,
     });
 
+    // Günlük token kullanımı trend (son 30 gün)
+    const dailyTokenUsage = await prisma.$queryRaw`
+      SELECT
+        DATE("createdAt") as date,
+        COUNT(*)::int as questions,
+        COALESCE(SUM("tokensUsed"), 0)::int as tokens
+      FROM "AIQuestionLog"
+      WHERE "createdAt" >= ${last30Days}
+      GROUP BY DATE("createdAt")
+      ORDER BY date DESC
+      LIMIT 30
+    `;
+
     return {
       totalUsers,
       adminCount,
@@ -359,6 +413,17 @@ const getAdminStats = async () => {
       totalSessions,
       activeUsers,
       examTypeDistribution,
+      aiUsage: {
+        totalQuestions: aiStats._count || 0,
+        totalTokens: aiStats._sum.tokensUsed || 0,
+        avgTokensPerQuestion: aiStats._avg.tokensUsed ? Math.round(aiStats._avg.tokensUsed) : 0,
+        avgResponseTime: aiStats._avg.responseTime ? Math.round(aiStats._avg.responseTime) : 0,
+        todayQuestions: todayAiStats._count || 0,
+        todayTokens: todayAiStats._sum.tokensUsed || 0,
+        last30DaysQuestions: last30DaysAiStats._count || 0,
+        last30DaysTokens: last30DaysAiStats._sum.tokensUsed || 0,
+        dailyUsage: dailyTokenUsage,
+      },
     };
   } catch (error) {
     logger.error(`getAdminStats error: ${error.message}`);
@@ -366,10 +431,86 @@ const getAdminStats = async () => {
   }
 };
 
+/**
+ * Update user profile
+ */
+const updateUserProfile = async (userId, updateData) => {
+  const { fullName, email, examType, currentPassword, newPassword } = updateData;
+
+  // Get current user
+  const user = await prisma.user.findUnique({
+    where: { id: userId }
+  });
+
+  if (!user) {
+    const error = new Error('Kullanıcı bulunamadı');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // If changing password, verify current password
+  if (newPassword) {
+    if (!currentPassword) {
+      const error = new Error('Mevcut şifre gereklidir');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isPasswordValid) {
+      const error = new Error('Mevcut şifre yanlış');
+      error.statusCode = 401;
+      throw error;
+    }
+  }
+
+  // Prepare update data
+  const dataToUpdate = {};
+  if (fullName) dataToUpdate.fullName = fullName;
+  if (email && email !== user.email) {
+    // Check if email already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+    if (existingUser) {
+      const error = new Error('Bu email zaten kullanılıyor');
+      error.statusCode = 409;
+      throw error;
+    }
+    dataToUpdate.email = email;
+  }
+  if (examType) dataToUpdate.examType = examType;
+  if (newPassword) {
+    dataToUpdate.password = await bcrypt.hash(newPassword, 10);
+  }
+
+  // Update user
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: dataToUpdate,
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      fullName: true,
+      examType: true,
+      role: true,
+      targetScore: true,
+      targetDate: true,
+      createdAt: true,
+      lastLoginAt: true,
+    }
+  });
+
+  logger.info(`Kullanıcı profili güncellendi: ${updatedUser.email}`);
+  return updatedUser;
+};
+
 module.exports = {
   createUser,
   loginUser,
   getUserById,
+  updateUserProfile,
   // Admin fonksiyonları
   getAllUsers,
   getUserByIdAdmin,

@@ -5,6 +5,7 @@
  */
 
 import { getLocalDateString } from './dateUtils';
+import logger from './logger';
 
 /**
  * Bugünün tarihini YYYY-MM-DD formatında döner (local timezone)
@@ -52,7 +53,7 @@ export const getAIAnalysisCache = (userId) => {
     localStorage.removeItem(cacheKey);
     return null;
   } catch (error) {
-    console.error('AI cache read error:', error);
+    logger.error('AI cache read error:', error);
     return null;
   }
 };
@@ -75,7 +76,7 @@ export const setAIAnalysisCache = (userId, analysis) => {
 
     localStorage.setItem(cacheKey, JSON.stringify(cacheData));
   } catch (error) {
-    console.error('AI cache write error:', error);
+    logger.error('AI cache write error:', error);
   }
 };
 
@@ -90,7 +91,7 @@ export const clearAIAnalysisCache = (userId) => {
     const cacheKey = getAICacheKey(userId);
     localStorage.removeItem(cacheKey);
   } catch (error) {
-    console.error('AI cache clear error:', error);
+    logger.error('AI cache clear error:', error);
   }
 };
 
@@ -158,7 +159,7 @@ export const getDailyGuidanceCache = (userId) => {
     localStorage.removeItem(cacheKey);
     return null;
   } catch (error) {
-    console.error('Daily guidance cache read error:', error);
+    logger.error('Daily guidance cache read error:', error);
     return null;
   }
 };
@@ -181,7 +182,7 @@ export const setDailyGuidanceCache = (userId, guidance) => {
 
     localStorage.setItem(cacheKey, JSON.stringify(cacheData));
   } catch (error) {
-    console.error('Daily guidance cache write error:', error);
+    logger.error('Daily guidance cache write error:', error);
   }
 };
 
@@ -196,6 +197,6 @@ export const clearDailyGuidanceCache = (userId) => {
     const cacheKey = getDailyGuidanceCacheKey(userId);
     localStorage.removeItem(cacheKey);
   } catch (error) {
-    console.error('Daily guidance cache clear error:', error);
+    logger.error('Daily guidance cache clear error:', error);
   }
 };

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext';
 import { subjectsAPI, studySessionsAPI } from '../../api';
 import { toast } from 'sonner';
@@ -7,10 +7,12 @@ import { motion } from 'framer-motion';
 import { Plus, Clock, BookOpen, CheckCircle, XCircle, MinusCircle } from 'lucide-react';
 import { DashboardHeader, AnimatedInput, AnimatedSelect } from '../../ui';
 import { DashboardBackgroundEffects } from '../../components/dashboard';
+import logger from '../../utils/logger';
 
 const StudySessionCreate = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [subjects, setSubjects] = useState([]);
   const [loadingSubjects, setLoadingSubjects] = useState(true);
@@ -33,12 +35,45 @@ const StudySessionCreate = () => {
     fetchSubjects();
   }, []);
 
+  // URL'den gelen parametreleri işle
+  useEffect(() => {
+    const urlTopicId = searchParams.get('topicId');
+    const urlSubjectId = searchParams.get('subjectId');
+
+    if (urlSubjectId && urlTopicId) {
+      // Subject ve topic'i otomatik seç
+      setFormData(prev => ({
+        ...prev,
+        subjectId: urlSubjectId,
+        topicId: urlTopicId,
+      }));
+
+      // Subject seçildiyse topics'leri fetch et
+      fetchTopicsForSubject(urlSubjectId);
+    }
+  }, [searchParams, subjects]);
+
+  const fetchTopicsForSubject = async (subjectId) => {
+    if (!subjectId) return;
+
+    setLoadingTopics(true);
+    try {
+      const response = await subjectsAPI.getTopics(subjectId);
+      setTopics(response.data);
+    } catch (error) {
+      logger.error('Konular yüklenemedi:', error);
+      setTopics([]);
+    } finally {
+      setLoadingTopics(false);
+    }
+  };
+
   const fetchSubjects = async () => {
     try {
       const response = await subjectsAPI.getAll();
       setSubjects(response.data);
     } catch (error) {
-      console.error('Fetch subjects error:', error);
+      logger.error('Fetch subjects error:', error);
     } finally {
       setLoadingSubjects(false);
     }
@@ -58,7 +93,7 @@ const StudySessionCreate = () => {
         const response = await subjectsAPI.getTopics(subjectId);
         setTopics(response.data);
       } catch (error) {
-        console.error('Konular yüklenemedi:', error);
+        logger.error('Konular yüklenemedi:', error);
         setTopics([]);
       } finally {
         setLoadingTopics(false);
@@ -107,7 +142,7 @@ const StudySessionCreate = () => {
       });
       navigate('/dashboard');
     } catch (error) {
-      console.error('Create session error:', error);
+      logger.error('Create session error:', error);
     } finally {
       setLoading(false);
     }

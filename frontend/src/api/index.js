@@ -6,3 +6,4 @@ export { adminAPI } from './admin';
 export { pomodoroAPI } from './pomodoro';
 export { aiAPI } from './ai';
 export { studyPlanAPI } from './studyPlan';
+export { spacedRepetitionAPI } from './spacedRepetition';

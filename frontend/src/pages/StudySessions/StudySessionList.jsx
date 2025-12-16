@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { DashboardHeader } from '../../ui';
 import { DashboardBackgroundEffects } from '../../components/dashboard';
+import logger from '../../utils/logger';
 
 const StudySessionList = () => {
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ const StudySessionList = () => {
       const response = await subjectsAPI.getAll();
       setSubjects(response.data);
     } catch (error) {
-      console.error('Subjects error:', error);
+      logger.error('Subjects error:', error);
     }
   };
 
@@ -61,9 +62,8 @@ const StudySessionList = () => {
       const response = await studySessionsAPI.getAll(filters);
       setSessions(response.data || []);
       setPagination(response.pagination || null);
-    } catch (error) {
-      toast.error('Kayıtlar yüklenemedi');
-      console.error(error);
+    } catch {
+      // Axios interceptor will show the error toast
       setSessions([]);
     } finally {
       setLoading(false);
@@ -79,9 +79,8 @@ const StudySessionList = () => {
       await studySessionsAPI.delete(id);
       toast.success('Kayıt silindi');
       fetchSessions();
-    } catch (error) {
-      toast.error('Kayıt silinemedi');
-      console.error(error);
+    } catch {
+      // Axios interceptor will show the error toast
     }
   };
 

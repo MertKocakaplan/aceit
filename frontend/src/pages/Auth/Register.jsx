@@ -43,8 +43,8 @@ const Register = () => {
       await register(formData);
       toast.success('Kayıt başarılı! Hoş geldiniz.');
       navigate('/dashboard');
-    } catch (error) {
-      toast.error(error.message || 'Kayıt başarısız');
+    } catch {
+      // Axios interceptor will show the error toast
     } finally {
       setLoading(false);
     }

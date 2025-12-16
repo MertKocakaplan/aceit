@@ -490,25 +490,11 @@ const TopicsTab = ({ topicsData, aiAnalysis, aiLoading }) => {
               </svg>
             </div>
 
-            {/* Corner Decorative Circles */}
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1 + index * 0.02 }}
-              className="absolute top-3 right-3 w-16 h-16 opacity-5 dark:opacity-10 group-hover:opacity-10 dark:group-hover:opacity-20 transition-opacity"
-            >
-              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary-700 dark:text-primary-400" />
-                <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="1" className="text-primary-700 dark:text-primary-400" />
-                <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" strokeWidth="1" className="text-primary-700 dark:text-primary-400" />
-              </svg>
-            </motion.div>
-
             {/* Bottom Decorative Wave */}
-            <div className="absolute bottom-0 left-0 right-0 h-20 opacity-[0.02] dark:opacity-[0.04]">
-              <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20">
+            <div className="absolute bottom-0 left-0 right-0 h-24 opacity-[0.03] dark:opacity-[0.06]">
+              <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
                 <path
-                  d="M0 10 Q 25 0, 50 10 T 100 10 L 100 20 L 0 20 Z"
+                  d="M0,50 C150,80 350,20 600,50 C850,80 1050,20 1200,50 L1200,120 L0,120 Z"
                   fill="currentColor"
                   className="text-primary-700 dark:text-primary-400"
                 />
@@ -583,8 +569,23 @@ const TopicsTab = ({ topicsData, aiAnalysis, aiLoading }) => {
                   <div className="relative text-center p-4 rounded-2xl border-2 border-purple-200 dark:border-purple-900/30 bg-white/50 dark:bg-neutral-900/50">
                     <p className="text-xs text-purple-600 dark:text-purple-400 font-display mb-1 uppercase tracking-wide">Süre</p>
                     <p className="text-2xl font-bold text-purple-600 dark:text-purple-400 font-display">
-                      {Math.floor(item.stats.totalDuration / 60)}
-                      <span className="text-sm">dk</span>
+                      {item.stats.totalDuration >= 60 ? (
+                        <>
+                          {Math.floor(item.stats.totalDuration / 60)}
+                          <span className="text-sm">s</span>
+                          {item.stats.totalDuration % 60 > 0 && (
+                            <>
+                              {' '}{item.stats.totalDuration % 60}
+                              <span className="text-sm">dk</span>
+                            </>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {item.stats.totalDuration}
+                          <span className="text-sm">dk</span>
+                        </>
+                      )}
                     </p>
                   </div>
                 </motion.div>

@@ -104,8 +104,8 @@ const QuestionSolver = () => {
         setSolution(response.data);
         toast.success('Soru başarıyla çözüldü!');
       }
-    } catch (error) {
-      toast.error(error.message || 'Soru çözülürken hata oluştu');
+    } catch {
+      // Axios interceptor will show the error toast
     } finally {
       setIsLoading(false);
     }
@@ -121,8 +121,8 @@ const QuestionSolver = () => {
       await aiAPI.rateQuestion(solution.id, rating);
       setCurrentRating(rating);
       toast.success('Değerlendirmeniz kaydedildi');
-    } catch (error) {
-      toast.error('Değerlendirme kaydedilirken hata oluştu');
+    } catch {
+      // Axios interceptor will show the error toast
     }
   };
 
@@ -150,8 +150,8 @@ const QuestionSolver = () => {
       if (response.success) {
         setHistory(response.data);
       }
-    } catch (error) {
-      toast.error('Geçmiş yüklenirken hata oluştu');
+    } catch {
+      // Axios interceptor will show the error toast
     }
   };
 
