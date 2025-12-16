@@ -1,16 +1,11 @@
 require('dotenv').config();
 const app = require('./app');
+const logger = require('./utils/logger');
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
-console.log('PORT =>', PORT);
-console.log('NODE_ENV =>', process.env.NODE_ENV);
-
-if (!PORT) {
-  console.error('❌ PORT is undefined');
-  process.exit(1);
-}
-
-app.listen(Number(PORT), '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  logger.info(`🚀 Server running on port ${PORT}`);
+  logger.info(`Environment: ${process.env.NODE_ENV}`);
+  logger.info(`Frontend URL: ${process.env.FRONTEND_URL}`);
 });
