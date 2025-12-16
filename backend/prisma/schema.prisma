@@ -8,19 +8,19 @@ datasource db {
 }
 
 model User {
-  id                String                    @id @default(uuid())
-  email             String                    @unique
-  username          String                    @unique
+  id                String                      @id @default(uuid())
+  email             String                      @unique
+  username          String                      @unique
   password          String
   fullName          String
   examType          ExamType
   targetScore       Int?
-  createdAt         DateTime                  @default(now())
-  updatedAt         DateTime                  @updatedAt
+  createdAt         DateTime                    @default(now())
+  updatedAt         DateTime                    @updatedAt
   lastLoginAt       DateTime?
   targetDate        DateTime?
-  role              UserRole                  @default(USER)
-  learningVelocity  Float                     @default(1.0)
+  role              UserRole                    @default(USER)
+  learningVelocity  Float                       @default(1.0)
   aiQuestions       AIQuestionLog[]
   pomodoroSessions  PomodoroSession[]
   studyPlans        StudyPlan[]
@@ -45,8 +45,8 @@ model UserPreference {
   soundEnabled            Boolean   @default(true)
   theme                   ThemeMode @default(SYSTEM)
   dailyStudyHoursTarget   Int       @default(4)
-  preferredStudyStartHour Int?
   preferredStudyEndHour   Int?
+  preferredStudyStartHour Int?
   user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("UserPreference")
@@ -82,8 +82,8 @@ model Subject {
   color            String            @default("#3b82f6")
   createdAt        DateTime          @default(now())
   pomodoroSessions PomodoroSession[]
-  studySessions    StudySession[]
   studyPlanSlots   StudyPlanSlot[]
+  studySessions    StudySession[]
   topics           Topic[]
 
   @@index([examType])
@@ -91,21 +91,21 @@ model Subject {
 }
 
 model Topic {
-  id                  String                      @id @default(uuid())
-  subjectId           String
-  name                String
-  order               Int                         @default(0)
-  createdAt           DateTime                    @default(now())
-  code                String
-  averageQuestions    Float?
-  importanceScore     Float?
-  difficultyLevel     Int                         @default(3)
-  updatedAt           DateTime                    @updatedAt
-  studySessions       StudySession[]
-  studyPlanSlots      StudyPlanSlot[]
-  subject             Subject                     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  questionCounts      TopicQuestionCount[]
-  spacedRepetitions   UserTopicSpacedRepetition[]
+  id                String                      @id @default(uuid())
+  subjectId         String
+  name              String
+  order             Int                         @default(0)
+  createdAt         DateTime                    @default(now())
+  code              String
+  averageQuestions  Float?
+  importanceScore   Float?
+  updatedAt         DateTime                    @updatedAt
+  difficultyLevel   Int                         @default(3)
+  studyPlanSlots    StudyPlanSlot[]
+  studySessions     StudySession[]
+  subject           Subject                     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  questionCounts    TopicQuestionCount[]
+  spacedRepetitions UserTopicSpacedRepetition[]
 
   @@unique([subjectId, code])
   @@index([subjectId])
@@ -148,11 +148,11 @@ model StudyPlan {
   startDate     DateTime
   endDate       DateTime
   isActive      Boolean        @default(true)
-  isAIGenerated Boolean        @default(false)
-  aiExplanation String?        @db.Text
-  weeklyGoals   String?        @db.Text
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  aiExplanation String?
+  isAIGenerated Boolean        @default(false)
+  weeklyGoals   String?
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   days          StudyPlanDay[]
 
@@ -188,7 +188,7 @@ model StudyPlanSlot {
   isCompleted Boolean      @default(false)
   completedAt DateTime?
   notes       String?
-  aiReason    String?      @db.Text
+  aiReason    String?
   createdAt   DateTime     @default(now())
   day         StudyPlanDay @relation(fields: [dayId], references: [id], onDelete: Cascade)
   subject     Subject      @relation(fields: [subjectId], references: [id])
@@ -197,7 +197,6 @@ model StudyPlanSlot {
   @@index([dayId, startTime])
   @@map("StudyPlanSlot")
 }
-
 
 model PomodoroSession {
   id          String   @id @default(uuid())
@@ -224,8 +223,8 @@ model AIQuestionLog {
   aiModel       String
   rating        Int?
   tokensUsed    Int?
-  responseTime  Int?     // Response time in milliseconds
   createdAt     DateTime @default(now())
+  responseTime  Int?
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
@@ -255,9 +254,7 @@ model UserTopicSpacedRepetition {
 enum ExamType {
   LGS
   TYT
-  AYT
   AYT_MATEMATIK
-  AYT_GEOMETRI
   AYT_FIZIK
   AYT_KIMYA
   AYT_BIYOLOJI
@@ -270,6 +267,8 @@ enum ExamType {
   YKS_ESIT_AGIRLIK
   YKS_SOZEL
   YKS_DIL
+  AYT
+  AYT_GEOMETRI
 }
 
 enum UserRole {
