@@ -36,6 +36,11 @@ app.use(compression());
 // Rate limiting
 app.use('/api/', apiLimiter);
 
+app.get('/', (req, res) => {
+  res.status(200).send('OK');
+});
+
+
 // Health check
 app.get('/health', (req, res) => {
   res.status(200).json({ 
