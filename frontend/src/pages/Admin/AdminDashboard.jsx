@@ -456,31 +456,6 @@ const AdminDashboard = () => {
               ))}
             </div>
           </div>
-
-          {/* Info Banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="relative bg-gradient-to-r from-primary-700 via-primary-800 to-primary-900 rounded-3xl p-6 overflow-hidden shadow-elegant-xl"
-          >
-            <div className="absolute inset-0 opacity-5">
-              <svg className="w-full h-full">
-                <defs>
-                  <pattern id="infoDots" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
-                    <circle cx="15" cy="15" r="2" fill="white" />
-                  </pattern>
-                </defs>
-                <rect x="0" y="0" width="100%" height="100%" fill="url(#infoDots)" />
-              </svg>
-            </div>
-
-            <div className="relative z-10 flex items-center gap-4">
-              <div className="p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
-                <BarChart3 className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </motion.div>
         </div>
       </main>
     </div>
