@@ -479,14 +479,6 @@ const AdminDashboard = () => {
               <div className="p-3 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
                 <BarChart3 className="w-6 h-6 text-white" />
               </div>
-              <div>
-                <h3 className="text-lg font-medium text-white font-display">
-                  Yönetici Erişimi
-                </h3>
-                <p className="text-sm text-secondary-200 font-display">
-                  Bu panel sadece yetkili yöneticiler tarafından görüntülenebilir. Lütfen sistem verilerini dikkatli bir şekilde yönetin.
-                </p>
-              </div>
             </div>
           </motion.div>
         </div>

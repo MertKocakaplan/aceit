@@ -245,7 +245,7 @@ const ActivityHeatmap = ({ yearlyData }) => {
           <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 rounded-lg border border-orange-200 dark:border-orange-800">
             <Flame className="w-4 h-4 text-orange-600 dark:text-orange-400" />
             <span className="text-xs font-semibold text-orange-700 dark:text-orange-300 font-display">
-              Consistency is key!
+              Süreklilik başarı getirir!
             </span>
           </div>
         </div>

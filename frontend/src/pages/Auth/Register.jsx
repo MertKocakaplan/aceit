@@ -17,7 +17,7 @@ const Register = () => {
     username: '',
     password: '',
     fullName: '',
-    examType: 'LGS',
+    examType: 'YKS_SAYISAL',
   });
 
   const handleChange = (e) => {
@@ -51,11 +51,9 @@ const Register = () => {
   };
 
   const examOptions = [
-    { value: 'LGS', label: 'LGS (Ortaokul)' },
     { value: 'YKS_SAYISAL', label: 'YKS Sayısal' },
     { value: 'YKS_ESIT_AGIRLIK', label: 'YKS Eşit Ağırlık' },
     { value: 'YKS_SOZEL', label: 'YKS Sözel' },
-    { value: 'YKS_DIL', label: 'YKS Dil' },
   ];
 
   return (
